@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="MAIN" Id="{4538d9a0-54db-42fe-8559-12ac5bfe1677}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM MAIN
+VAR
+	myRobot:			TcA2B2Kitten;
+	cmdConnect:			BOOL;
+	connectCall:		PLCopenCall;
+	cmdGetRobotState: 	BOOL;
+	getRobotStateCall:	PLCopenCall;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+// Call Robot Instance
+myRobot.Cyclic();
+
+
+/////////////////////////
+// Connect
+
+IF cmdConnect THEN
+	myRobot.Connect(0, connectCall);
+	cmdConnect := FALSE;
+END_IF
+
+connectCall();
+connectCall.Execute := 0;
+
+// Process command result
+IF connectCall.Done THEN
+	LogMessage(0, 'Connection Established');
+ELSIF connectCall.Error THEN 
+	LogMessage(0, 'Connection command error');
+ELSIF connectCall.CommandAborted THEN 
+	LogMessage(0, 'Connection command aborted');
+END_IF
+
+/////////////////////////
+// Get Robot State
+
+IF cmdGetRobotState THEN
+	myRobot.GetRobotState(getRobotStateCall);
+	cmdGetRobotState := FALSE;
+END_IF
+
+getRobotStateCall();
+getRobotStateCall.Execute := 0;
+
+// Process command result
+IF getRobotStateCall.Done THEN
+	LogMessage(0, 'GetRobotState Done');
+ELSIF getRobotStateCall.Error THEN 
+	LogMessage(0, 'GetRobotState command error');
+ELSIF getRobotStateCall.CommandAborted THEN 
+	LogMessage(0, 'GetRobotState command aborted');
+END_IF
+]]></ST>
+    </Implementation>
+    <LineIds Name="MAIN">
+      <LineId Id="38" Count="0" />
+      <LineId Id="65" Count="0" />
+      <LineId Id="37" Count="0" />
+      <LineId Id="74" Count="0" />
+      <LineId Id="76" Count="2" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="28" Count="0" />
+      <LineId Id="26" Count="0" />
+      <LineId Id="46" Count="1" />
+      <LineId Id="49" Count="3" />
+      <LineId Id="61" Count="3" />
+      <LineId Id="60" Count="0" />
+      <LineId Id="55" Count="0" />
+      <LineId Id="53" Count="0" />
+      <LineId Id="17" Count="0" />
+      <LineId Id="73" Count="0" />
+      <LineId Id="31" Count="3" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="15" Count="0" />
+      <LineId Id="42" Count="0" />
+      <LineId Id="48" Count="0" />
+      <LineId Id="43" Count="0" />
+      <LineId Id="66" Count="6" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

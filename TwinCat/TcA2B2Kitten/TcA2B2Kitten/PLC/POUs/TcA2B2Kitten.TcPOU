@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="TcA2B2Kitten" Id="{ea1fde4a-6390-43d8-ae6c-e82c42f674c2}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK TcA2B2Kitten
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	_ConnectCommand: PLCopenCommand;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+
+
+]]></ST>
+    </Implementation>
+    <Method Name="Connect" Id="{e7faa834-d121-4df0-9a35-0dedcf979687}">
+      <Declaration><![CDATA[METHOD Connect : BOOL
+VAR_INPUT
+	ip:	DINT;
+	status: IPLCopenCall;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+
+
+
+IF status = 0 THEN
+	_ConnectCommand.Execute := 1;
+ELSE
+	status.Start(_ConnectCommand);
+END_IF
+
+
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Connect_Impl" Id="{d93b10d7-23fa-4f77-88b2-ba9c5838001e}">
+      <Declaration><![CDATA[METHOD Connect_Impl : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Cyclic" Id="{e891cab9-f69d-4866-ae67-7ef69a98b4aa}">
+      <Declaration><![CDATA[METHOD Cyclic : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+
+IF _ConnectCommand.Consume THEN
+	;//TempSetPoint := 350; //set the oven temp set point
+	
+END_IF
+
+Connect_Impl();
+
+IF connected THEN 
+	_ConnectCommand.Finished();
+END_IF
+
+_ConnectCommand.Execute := 0;
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="GetRobotState" Id="{6fdc1b90-83fc-42a7-8e4c-63e16e67acec}">
+      <Declaration><![CDATA[METHOD GetRobotState : BOOL
+VAR_INPUT
+	call: PLCopenCall;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="TcA2B2Kitten">
+      <LineId Id="23" Count="2" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="TcA2B2Kitten.Connect">
+      <LineId Id="6" Count="0" />
+      <LineId Id="22" Count="1" />
+      <LineId Id="30" Count="4" />
+      <LineId Id="27" Count="0" />
+      <LineId Id="9" Count="2" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcA2B2Kitten.Connect_Impl">
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcA2B2Kitten.Cyclic">
+      <LineId Id="6" Count="0" />
+      <LineId Id="15" Count="0" />
+      <LineId Id="17" Count="1" />
+      <LineId Id="22" Count="0" />
+      <LineId Id="16" Count="0" />
+      <LineId Id="7" Count="1" />
+      <LineId Id="14" Count="0" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="19" Count="1" />
+      <LineId Id="11" Count="1" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcA2B2Kitten.GetRobotState">
+      <LineId Id="5" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
