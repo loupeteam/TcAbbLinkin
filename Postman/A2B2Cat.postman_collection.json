@@ -1,0 +1,131 @@
+{
+	"info": {
+		"_postman_id": "0223a5d8-dbcd-43d2-8620-619967cd4fac",
+		"name": "A2B2Cat",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "20804728"
+	},
+	"item": [
+		{
+			"name": "IRC5_test",
+			"request": {
+				"auth": {
+					"type": "digest",
+					"digest": [
+						{
+							"key": "algorithm",
+							"value": "MD5",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "{{pw}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{user}}",
+							"type": "string"
+						},
+						{
+							"key": "disableRetryRequest",
+							"value": false,
+							"type": "boolean"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{abbhost}}/rw/rapid/execution?json=1",
+					"host": [
+						"{{abbhost}}"
+					],
+					"path": [
+						"rw",
+						"rapid",
+						"execution"
+					],
+					"query": [
+						{
+							"key": "json",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "OmnicorePort80_test",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"\r",
+							"/*\r",
+							"Note: I had to comment/uncomment the lines in C:\\Users\\dwiens\\AppData\\Local\\ABB\\RobotWare\\RobotControl_7.14.3\\system\\appweb.conf in order for the simulated robot controller to listen on port 80. Before that, it seemed it wasn't listening on port 443\r",
+							"\r",
+							"Listen -1\r",
+							"#ListenSecure -1\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							"*/\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"strictSSL": false
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pw}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{user}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/xhtml+xml;v=2.0",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/hal+json;v=2.0"
+					}
+				],
+				"url": {
+					"raw": "http://{{abbhost}}/rw/rapid/execution",
+					"protocol": "http",
+					"host": [
+						"{{abbhost}}"
+					],
+					"path": [
+						"rw",
+						"rapid",
+						"execution"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
