@@ -18,7 +18,7 @@ VAR
 	configClientConnect: BOOL;
 	getContentNow: BOOL;
 	
-	_jsonParser : FB_JsonDomParser;
+	_jsonDomParser : FB_JsonDomParser;
 	jsonRoot : SJsonValue;
 	jsonProp : SJsonValue;
 	parseContentNow: BOOL;
@@ -65,10 +65,10 @@ END_IF
 
 
 IF parseContentNow THEN
-	jsonRoot := _jsonParser.ParseDocument(sContent);
-	jsonProp := _jsonParser.FindMemberPath(jsonRoot, 'state#0/ctrlexecstate');	// See https://infosys.beckhoff.com/english.php?content=../content/1033/tcplclib_tc3_jsonxml/3664369803.html&id=4049129407046606983
+	jsonRoot := _jsonDomParser.ParseDocument(sContent);
+	jsonProp := _jsonDomParser.FindMemberPath(jsonRoot, 'state#0/ctrlexecstate');	// See https://infosys.beckhoff.com/english.php?content=../content/1033/tcplclib_tc3_jsonxml/3664369803.html&id=4049129407046606983
 	IF (jsonProp <> 0) THEN
-  		sState := _jsonParser.GetString(jsonProp);
+  		sState := _jsonDomParser.GetString(jsonProp);
 	END_IF
 	
 	parseContentNow := FALSE; 
