@@ -4,18 +4,20 @@
     <Declaration><![CDATA[PROGRAM MAIN
 VAR
 	myRobot:			TcA2B2Kitten;
-	cmdConnect:			BOOL;
-	connectCall:		PLCopenCall;
-	cmdGetRobotState: 	BOOL;
-	getRobotStateCall:	PLCopenCall;
+//	cmdConnect:			BOOL;
+//	connectCall:		PLCopenCall;
+//	cmdGetRobotState: 	BOOL;
+//	getRobotStateCall:	PLCopenCall;
 END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[
 // Call Robot Instance
-myRobot.Cyclic();
+myRobot();
 
+UDPTest();
 
+(*
 /////////////////////////
 // Connect
 
@@ -55,12 +57,13 @@ ELSIF getRobotStateCall.Error THEN
 ELSIF getRobotStateCall.CommandAborted THEN 
 	LogMessage(0, 'GetRobotState command aborted');
 END_IF
-]]></ST>
+*)]]></ST>
     </Implementation>
     <LineIds Name="MAIN">
       <LineId Id="38" Count="0" />
       <LineId Id="65" Count="0" />
       <LineId Id="37" Count="0" />
+      <LineId Id="87" Count="1" />
       <LineId Id="74" Count="0" />
       <LineId Id="76" Count="2" />
       <LineId Id="24" Count="0" />
