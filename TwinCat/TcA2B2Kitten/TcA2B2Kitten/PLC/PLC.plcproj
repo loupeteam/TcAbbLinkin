@@ -62,14 +62,6 @@
       <DefaultResolution>Tc3_Module, * (Beckhoff Automation GmbH)</DefaultResolution>
       <Namespace>Tc3_Module</Namespace>
     </PlaceholderReference>
-    <PlaceholderReference Include="TcCommando">
-      <DefaultResolution>TcCommando, * (Loupe)</DefaultResolution>
-      <Namespace>TcCommando</Namespace>
-    </PlaceholderReference>
-    <PlaceholderReference Include="TcPluginFramework">
-      <DefaultResolution>TcPluginFramework, * (Loupe)</DefaultResolution>
-      <Namespace>TcPluginFramework</Namespace>
-    </PlaceholderReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="PLC.tmc">
