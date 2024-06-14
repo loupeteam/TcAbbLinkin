@@ -14,8 +14,9 @@ VAR
 	bSendGet:				BOOL;
 	connectNow: 			BOOL;
 	requestNow: 			BOOL;
-	sContent				: STRING(511);
+	sContent				: STRING(2000);
 	configClientConnect: BOOL;
+	getContentNow: BOOL;
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -37,16 +38,23 @@ END_IF
 
 
 
-IF _httpClient.bConnected AND requestNow THEN
+//IF _httpClient.bConnected AND requestNow THEN
+IF requestNow THEN
 	//_httpRequest.eCompressionMode := ;
 	//_httpRequest.sContentType := ;
 	
 	_httpRequestHeader.AddField('accept', 'application/hal+json;v=2.0', FALSE);
-	_httpRequestHeader.AddField('authorization', 'Basic RGVmYXVsdCBVc2VyOnJvYm90aWNz', TRUE);
+	_httpRequestHeader.AddField('authorization', 'Basic RGVmYXVsdCBVc2VyOnJvYm90aWNz', FALSE);	// encoded Username: Default User, Password: robotics
 	
 	_httpRequest.SendRequest(sUri:='/rw/rapid/execution', fbClient:=_httpClient, eRequestType:=ETcIotHttpRequestType.HTTP_Get, pContent:=ADR(sContent), nContentSize:=SIZEOF(sContent), fbHeader:=_httpRequestHeader);
-
+	
 	requestNow := FALSE;
+END_IF
+
+
+IF getContentNow THEN
+	_httpRequest.GetContent(ADR(sContent), nContentSize:=SIZEOF(sContent), TRUE);
+	getContentNow := FALSE;
 END_IF
 
 
@@ -147,7 +155,7 @@ END_VAR
       <LineId Id="72" Count="0" />
       <LineId Id="98" Count="0" />
       <LineId Id="87" Count="1" />
-      <LineId Id="65" Count="0" />
+      <LineId Id="170" Count="1" />
       <LineId Id="108" Count="1" />
       <LineId Id="103" Count="0" />
       <LineId Id="125" Count="1" />
@@ -156,6 +164,11 @@ END_VAR
       <LineId Id="95" Count="0" />
       <LineId Id="92" Count="0" />
       <LineId Id="90" Count="0" />
+      <LineId Id="173" Count="1" />
+      <LineId Id="172" Count="0" />
+      <LineId Id="175" Count="0" />
+      <LineId Id="178" Count="0" />
+      <LineId Id="176" Count="0" />
       <LineId Id="66" Count="0" />
       <LineId Id="25" Count="0" />
       <LineId Id="35" Count="8" />
