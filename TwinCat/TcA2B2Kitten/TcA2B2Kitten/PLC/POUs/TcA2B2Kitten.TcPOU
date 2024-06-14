@@ -17,6 +17,12 @@ VAR
 	sContent				: STRING(2000);
 	configClientConnect: BOOL;
 	getContentNow: BOOL;
+	
+	_jsonParser : FB_JsonDomParser;
+	jsonRoot : SJsonValue;
+	jsonProp : SJsonValue;
+	parseContentNow: BOOL;
+	sState: STRING;
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -58,7 +64,15 @@ IF getContentNow THEN
 END_IF
 
 
-
+IF parseContentNow THEN
+	jsonRoot := _jsonParser.ParseDocument(sContent);
+	jsonProp := _jsonParser.FindMemberPath(jsonRoot, 'state#0/ctrlexecstate');	// See https://infosys.beckhoff.com/english.php?content=../content/1033/tcplclib_tc3_jsonxml/3664369803.html&id=4049129407046606983
+	IF (jsonProp <> 0) THEN
+  		sState := _jsonParser.GetString(jsonProp);
+	END_IF
+	
+	parseContentNow := FALSE; 
+END_IF
 
 
 
@@ -171,7 +185,16 @@ END_VAR
       <LineId Id="176" Count="0" />
       <LineId Id="66" Count="0" />
       <LineId Id="25" Count="0" />
-      <LineId Id="35" Count="8" />
+      <LineId Id="35" Count="0" />
+      <LineId Id="182" Count="0" />
+      <LineId Id="186" Count="0" />
+      <LineId Id="192" Count="0" />
+      <LineId Id="198" Count="0" />
+      <LineId Id="196" Count="0" />
+      <LineId Id="199" Count="0" />
+      <LineId Id="185" Count="0" />
+      <LineId Id="183" Count="0" />
+      <LineId Id="36" Count="7" />
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="TcA2B2Kitten.Connect">
