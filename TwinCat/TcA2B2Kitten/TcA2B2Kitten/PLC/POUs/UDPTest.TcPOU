@@ -34,7 +34,7 @@ IF configSend THEN
 	socketSend.sSrvNetId := '';
 	socketSend.sRemoteHost := '127.0.0.1';
 	socketSend.nRemotePort := 8000;
-	socketSend.cbLen := LEN(sMsg);
+	socketSend.cbLen := INT_TO_UDINT(LEN(sMsg));
 	socketSend.pSrc := ADR(sMsg);
 	socketSend.tTimeout := T#5S;
 	configSend := FALSE;
