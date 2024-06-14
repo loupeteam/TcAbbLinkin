@@ -5,6 +5,11 @@
 			<Settings MaxCpus="4" NonWinCpus="1">
 				<Cpu CpuId="3"/>
 			</Settings>
+			<Licenses>
+				<Target>
+					<ManualSelect>{3EBB9639-5FF3-42B6-8847-35C70DC013C8}</ManualSelect>
+				</Target>
+			</Licenses>
 			<Tasks>
 				<Task Id="3" Priority="20" CycleTime="100000" AmsPort="350" AdtTasks="true">
 					<Name>PlcTask</Name>
@@ -13,7 +18,7 @@
 		</System>
 		<Plc>
 			<Project GUID="{4E5B9AAD-8719-42B7-8844-6385142E2AE9}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="PLC\PLC.tmc" TmcHash="{E18AE231-2BD1-A034-E901-D2B42451823E}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="PLC\PLC.tmc" TmcHash="{9F2C766A-A457-DF90-26AE-A42474A08D12}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Contexts>

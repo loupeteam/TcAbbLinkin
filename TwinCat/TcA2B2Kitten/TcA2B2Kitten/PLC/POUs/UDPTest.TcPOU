@@ -9,6 +9,7 @@ VAR
 	sendNow:		BOOL;
 	sMsg:			STRING[20] := 'Hello World';
 	configCreate: 	BOOL := true;
+	configSend: 	BOOL := TRUE;
 END_VAR
 		]]></Declaration>
     <Implementation>
@@ -16,9 +17,9 @@ END_VAR
 
 
 IF configCreate THEN
-	socketCreate.sSrvNetId := '39.19.23.23.1.1';
-	socketCreate.sLocalHost := '192.168.56.101';
-	socketCreate.nLocalPort := 41414;
+	socketCreate.sSrvNetId := '';
+	socketCreate.sLocalHost := '127.0.0.1';
+	socketCreate.nLocalPort := 52123;
 	socketCreate.tTimeout := T#5S;
 	configCreate := FALSE;
 END_IF
@@ -29,31 +30,24 @@ END_IF
 //	createNow := FALSE;
 //END_IF
 
-
-socketSend.hSocket := socketCreate.hSocket;
-socketSend.sSrvNetId := '';
-socketSend.sRemoteHost := '192.168.56.1';
-socketSend.nRemotePort := 8000;
-socketSend.cbLen := LEN(sMsg);
-socketSend.pSrc := ADR(sMsg);
-socketSend.tTimeout := T#5S;
-
-IF sendNow THEN
-	socketSend.bExecute := sendNow;
-	sendNow := FALSE;
+IF configSend THEN
+	socketSend.sSrvNetId := '';
+	socketSend.sRemoteHost := '127.0.0.1';
+	socketSend.nRemotePort := 8000;
+	socketSend.cbLen := LEN(sMsg);
+	socketSend.pSrc := ADR(sMsg);
+	socketSend.tTimeout := T#5S;
+	configSend := FALSE;
 END_IF
 
-// CAll fbs
+socketSend.hSocket := socketCreate.hSocket;
+
+socketSend.bExecute := sendNow;
+sendNow := FALSE;
+
+// Call fbs
 socketCreate();
 socketSend();
-
-
-
-
-
-
-
-
 ]]></ST>
     </Implementation>
     <LineIds Name="UDPTest">
@@ -69,22 +63,21 @@ socketSend();
       <LineId Id="28" Count="0" />
       <LineId Id="35" Count="0" />
       <LineId Id="29" Count="0" />
-      <LineId Id="40" Count="2" />
-      <LineId Id="63" Count="2" />
-      <LineId Id="43" Count="0" />
-      <LineId Id="51" Count="0" />
-      <LineId Id="53" Count="0" />
-      <LineId Id="55" Count="0" />
+      <LineId Id="40" Count="0" />
+      <LineId Id="95" Count="0" />
+      <LineId Id="97" Count="4" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="85" Count="0" />
+      <LineId Id="94" Count="0" />
+      <LineId Id="103" Count="0" />
+      <LineId Id="102" Count="0" />
       <LineId Id="54" Count="0" />
       <LineId Id="56" Count="0" />
       <LineId Id="59" Count="0" />
-      <LineId Id="57" Count="0" />
       <LineId Id="47" Count="0" />
       <LineId Id="33" Count="0" />
       <LineId Id="32" Count="0" />
-      <LineId Id="37" Count="2" />
-      <LineId Id="36" Count="0" />
-      <LineId Id="7" Count="4" />
+      <LineId Id="37" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
   </POU>

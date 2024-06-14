@@ -15,16 +15,21 @@ VAR
 	connectNow: 			BOOL;
 	requestNow: 			BOOL;
 	sContent				: STRING(511);
+	configClientConnect: BOOL;
 END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[
-
-_httpClient.sHostName := '192.168.56.1';
-_httpClient.nHostPort := 80;
-_httpClient.bKeepAlive := TRUE;
-_httpClient.stTLS.bNoServerCertCheck:=TRUE;
-_httpClient.tConnectionTimeout := T#10S;
+IF configClientConnect THEN 
+	//_httpClient.sHostName := '192.168.56.1';
+	_httpClient.sHostName := '127.0.0.1';
+	_httpClient.nHostPort := 80;
+	_httpClient.bKeepAlive := TRUE;
+	_httpClient.stTLS.bNoServerCertCheck:=TRUE;
+	_httpClient.tConnectionTimeout := T#10S;
+	
+	configClientConnect := FALSE;
+END_IF
 
 IF connectNow THEN
 	_httpClient.Execute();
@@ -129,11 +134,12 @@ END_VAR
     </Method>
     <LineIds Name="TcA2B2Kitten">
       <LineId Id="23" Count="0" />
+      <LineId Id="145" Count="0" />
+      <LineId Id="152" Count="1" />
+      <LineId Id="147" Count="2" />
       <LineId Id="49" Count="0" />
-      <LineId Id="46" Count="0" />
-      <LineId Id="52" Count="0" />
-      <LineId Id="50" Count="0" />
-      <LineId Id="48" Count="0" />
+      <LineId Id="151" Count="0" />
+      <LineId Id="150" Count="0" />
       <LineId Id="63" Count="0" />
       <LineId Id="70" Count="0" />
       <LineId Id="45" Count="0" />
