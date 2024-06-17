@@ -22,6 +22,12 @@ VAR
 	jsonProp : SJsonValue;
 	parseContentNow: BOOL;
 	sState: STRING;
+	
+	
+	_jsonSaxParser : 				FB_JsonSaxReader;
+	jsonSaxHandler_RobotState :		JsonSaxHandler_RobotState;
+	
+	saxParseContentNow: 			BOOL;
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -74,6 +80,13 @@ IF parseContentNow THEN
 END_IF
 
 
+IF saxParseContentNow THEN
+	jsonSaxHandler_RobotState.Reset();
+	_jsonSaxParser.Parse(sContent, ipHdl := jsonSaxHandler_RobotState, );
+	sState := jsonSaxHandler_RobotState.parsedState;
+	
+	saxParseContentNow := FALSE; 
+END_IF
 
 
 
@@ -122,7 +135,12 @@ END_IF
       <LineId Id="199" Count="0" />
       <LineId Id="185" Count="0" />
       <LineId Id="183" Count="0" />
-      <LineId Id="36" Count="7" />
+      <LineId Id="36" Count="1" />
+      <LineId Id="224" Count="0" />
+      <LineId Id="230" Count="0" />
+      <LineId Id="262" Count="2" />
+      <LineId Id="231" Count="1" />
+      <LineId Id="38" Count="5" />
       <LineId Id="9" Count="0" />
     </LineIds>
   </POU>
