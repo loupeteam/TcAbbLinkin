@@ -1,0 +1,1 @@
+{"_links":{"base":{"href":"http://127.0.0.1:80/rw/rapid/"},"self":{"href":"execution"}},"status":{"code":294912},"state":[{"_type":"rap-execution","_title":"execution","ctrlexecstate":"stopped","cycle":"forever"}]}
