@@ -4,6 +4,7 @@
     <Declaration><![CDATA[PROGRAM MAIN
 VAR
 	myRobot:			TcA2B2Kitten;
+	digestTest:			DigestTest;
 //	cmdConnect:			BOOL;
 //	connectCall:		PLCopenCall;
 //	cmdGetRobotState: 	BOOL;
@@ -16,6 +17,8 @@ END_VAR
 myRobot();
 
 UDPTest();
+
+digestTest();
 
 (*
 /////////////////////////
