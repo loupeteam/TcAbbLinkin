@@ -57,7 +57,7 @@ IF requestNow THEN
 	_httpRequestHeader.AddField('accept', 'application/hal+json;v=2.0', FALSE);
 	_httpRequestHeader.AddField('authorization', 'Basic RGVmYXVsdCBVc2VyOnJvYm90aWNz', FALSE);	// encoded Username: Default User, Password: robotics
 	
-	_httpRequest.SendRequest(sUri:='/rw/rapid/execution', fbClient:=_httpClient, eRequestType:=ETcIotHttpRequestType.HTTP_Get, pContent:=ADR(sContent), nContentSize:=SIZEOF(sContent), fbHeader:=_httpRequestHeader);
+	_httpRequest.SendRequest(sUri:='/rw/rapid/execution', fbClient:=_httpClient, eRequestType:=ETcIotHttpRequestType.HTTP_Get, pContent:=0, nContentSize:=0, fbHeader:=_httpRequestHeader);
 	
 	requestNow := FALSE;
 END_IF
