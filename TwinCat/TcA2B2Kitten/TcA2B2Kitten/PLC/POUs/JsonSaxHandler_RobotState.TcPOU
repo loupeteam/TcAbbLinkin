@@ -46,7 +46,6 @@ END_VAR
 {attribute 'c++_compatible'}
 {attribute 'minimal_input_size' := '4'}
 {attribute 'pack_mode' := '4'}
-{warning 'add method implementation '}
 METHOD OnBool : HRESULT
 VAR_INPUT
 	value	: BOOL;
@@ -62,7 +61,6 @@ END_VAR
 {attribute 'c++_compatible'}
 {attribute 'minimal_input_size' := '4'}
 {attribute 'pack_mode' := '4'}
-{warning 'add method implementation '}
 METHOD OnDint : HRESULT
 VAR_INPUT
 	value	: DINT;
@@ -78,7 +76,6 @@ END_VAR
 {attribute 'c++_compatible'}
 {attribute 'minimal_input_size' := '4'}
 {attribute 'pack_mode' := '4'}
-{warning 'add method implementation '}
 METHOD OnEndArray : HRESULT
 VAR_INPUT
 	elementCount	: UDINT;
@@ -94,7 +91,6 @@ END_VAR
 {attribute 'c++_compatible'}
 {attribute 'minimal_input_size' := '4'}
 {attribute 'pack_mode' := '4'}
-{warning 'add method implementation '}
 METHOD OnEndObject : HRESULT
 VAR_INPUT
 	memberCount	: UDINT;
@@ -110,7 +106,6 @@ END_VAR
 {attribute 'c++_compatible'}
 {attribute 'minimal_input_size' := '4'}
 {attribute 'pack_mode' := '4'}
-{warning 'add method implementation '}
 METHOD OnKey : HRESULT
 VAR_IN_OUT CONSTANT
 	key	: STRING;
@@ -139,7 +134,6 @@ END_IF
 {attribute 'c++_compatible'}
 {attribute 'minimal_input_size' := '4'}
 {attribute 'pack_mode' := '4'}
-{warning 'add method implementation '}
 METHOD OnLint : HRESULT
 VAR_INPUT
 	value	: LINT;
@@ -155,7 +149,6 @@ END_VAR
 {attribute 'c++_compatible'}
 {attribute 'minimal_input_size' := '4'}
 {attribute 'pack_mode' := '4'}
-{warning 'add method implementation '}
 METHOD OnLreal : HRESULT
 VAR_INPUT
 	value	: LREAL;
@@ -171,7 +164,6 @@ END_VAR
 {attribute 'c++_compatible'}
 {attribute 'minimal_input_size' := '4'}
 {attribute 'pack_mode' := '4'}
-{warning 'add method implementation '}
 METHOD OnNull : HRESULT
 ]]></Declaration>
       <Implementation>
@@ -184,7 +176,6 @@ METHOD OnNull : HRESULT
 {attribute 'c++_compatible'}
 {attribute 'minimal_input_size' := '4'}
 {attribute 'pack_mode' := '4'}
-{warning 'add method implementation '}
 METHOD OnRawNumber : HRESULT
 VAR_IN_OUT CONSTANT
 	value	: STRING;
@@ -203,7 +194,6 @@ END_VAR
 {attribute 'c++_compatible'}
 {attribute 'minimal_input_size' := '4'}
 {attribute 'pack_mode' := '4'}
-{warning 'add method implementation '}
 METHOD OnStartArray : HRESULT
 ]]></Declaration>
       <Implementation>
@@ -219,7 +209,6 @@ METHOD OnStartArray : HRESULT
 {attribute 'c++_compatible'}
 {attribute 'minimal_input_size' := '4'}
 {attribute 'pack_mode' := '4'}
-{warning 'add method implementation '}
 METHOD OnStartObject : HRESULT
 ]]></Declaration>
       <Implementation>
@@ -235,7 +224,6 @@ METHOD OnStartObject : HRESULT
 {attribute 'c++_compatible'}
 {attribute 'minimal_input_size' := '4'}
 {attribute 'pack_mode' := '4'}
-{warning 'add method implementation '}
 METHOD OnString : HRESULT
 VAR_IN_OUT CONSTANT
 	value	: STRING;
@@ -259,7 +247,6 @@ END_IF
 {attribute 'c++_compatible'}
 {attribute 'minimal_input_size' := '4'}
 {attribute 'pack_mode' := '4'}
-{warning 'add method implementation '}
 METHOD OnUdint : HRESULT
 VAR_INPUT
 	value	: UDINT;
@@ -275,7 +262,6 @@ END_VAR
 {attribute 'c++_compatible'}
 {attribute 'minimal_input_size' := '4'}
 {attribute 'pack_mode' := '4'}
-{warning 'add method implementation '}
 METHOD OnUlint : HRESULT
 VAR_INPUT
 	value	: ULINT;
@@ -308,7 +294,6 @@ bCtrlexecstateFound := FALSE;
 {attribute 'c++_compatible'}
 {attribute 'minimal_input_size' := '4'}
 {attribute 'pack_mode' := '4'}
-{warning 'add method implementation '}
 METHOD TcAddRef : UDINT
 ]]></Declaration>
       <Implementation>
@@ -321,7 +306,6 @@ METHOD TcAddRef : UDINT
 {attribute 'c++_compatible'}
 {attribute 'minimal_input_size' := '4'}
 {attribute 'pack_mode' := '4'}
-{warning 'add method implementation '}
 METHOD TcQueryInterface : HRESULT
 VAR_INPUT
 	iid	: REFERENCE TO IID;
@@ -338,7 +322,6 @@ END_VAR
 {attribute 'c++_compatible'}
 {attribute 'minimal_input_size' := '4'}
 {attribute 'pack_mode' := '4'}
-{warning 'add method implementation '}
 METHOD TcRelease : UDINT
 ]]></Declaration>
       <Implementation>
