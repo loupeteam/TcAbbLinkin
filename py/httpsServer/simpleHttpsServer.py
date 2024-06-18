@@ -20,8 +20,8 @@ def run(server_class=http.server.HTTPServer, handler_class=RequestHandler, port=
     httpd = server_class(server_address, handler_class)
     httpd.socket = ssl.wrap_socket(httpd.socket, 
                                    server_side=True, 
-                                   certfile='server.pem', 
-                                   keyfile='server.key', 
+                                   certfile='server.pem',   # to generate, install openssl from https://slproweb.com/products/Win32OpenSSL.html, then run `openssl req -new -newkey rsa:2048 -days 365 -nodes -x509 -keyout server.key -out server.pem`
+                                   keyfile='server.key',    # (see above comment)
                                    ssl_version=ssl.PROTOCOL_TLS)
     print(f'Starting HTTPS server on port {port}...')
     httpd.serve_forever()
