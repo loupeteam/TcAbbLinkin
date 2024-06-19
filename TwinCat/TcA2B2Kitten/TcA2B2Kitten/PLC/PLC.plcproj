@@ -33,6 +33,9 @@
     <Compile Include="POUs\TcA2B2Kitten.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\TcA2B2KittenDigest.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\UDPTest.TcPOU">
       <SubType>Code</SubType>
     </Compile>
