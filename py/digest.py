@@ -1,3 +1,5 @@
+# Ref: https://www.whitelist1.com/2018/04/calculating-http-digest-authentication.html
+
 import hashlib
 
 # from wireshark
