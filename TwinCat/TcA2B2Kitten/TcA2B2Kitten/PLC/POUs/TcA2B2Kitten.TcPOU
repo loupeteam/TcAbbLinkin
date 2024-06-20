@@ -10,11 +10,11 @@ VAR
 	_httpClient:			FB_IotHttpClient;
 	_httpRequest:			FB_IotHttpRequest;
 	_httpRequestHeader:		FB_IotHttpHeaderFieldMap;
+	bTLS:					BOOL;
 	bSendGet:				BOOL;
-	connectNow: 			BOOL;
+	configureNow:			BOOL;
 	requestNow: 			BOOL;
 	sContent				: STRING(2000);
-	configClientConnect: BOOL;
 	getContentNow: BOOL;
 	
 	_jsonDomParser : FB_JsonDomParser;
@@ -32,7 +32,7 @@ END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[
-IF configClientConnect THEN 
+IF (NOT _httpClient.bConfigured) OR configureNow THEN 
 	//_httpClient.sHostName := '192.168.56.1';
 	_httpClient.sHostName := '127.0.0.1';
 	_httpClient.nHostPort := 80;
@@ -40,24 +40,34 @@ IF configClientConnect THEN
 	_httpClient.stTLS.bNoServerCertCheck:=TRUE;
 	_httpClient.tConnectionTimeout := T#10S;
 	
-	configClientConnect := FALSE;
+	IF bTLS THEN
+		//_httpClient.stTLS.aPskKey := 0;
+		_httpClient.stTLS.bNoServerCertCheck := FALSE;
+		//_httpClient.stTLS.nPskKeyLen := 0;
+		//_httpClient.stTLS.sCA := '';
+		//_httpClient.stTLS.sCert := '';
+		_httpClient.stTLS.sCiphers := 'TLS_AES_128_GCM_SHA256';
+		//_httpClient.stTLS.sCrl := '';
+		//_httpClient.stTLS.sKeyFile := '';
+		//_httpClient.stTLS.sKeyPwd := '';
+		//_httpClient.stTLS.sPskIdentity := '';
+		_httpClient.stTLS.sVersion := 'tlsv1.3';
+	END_IF
+	configureNow := FALSE;
 END_IF
 
-IF connectNow THEN
-	_httpClient.Execute();
-END_IF
-
-
+// Method for background communication with the TwinCAT driver. The method must be called cyclically for every client FUB instance.
+_httpClient.Execute();
 
 //IF _httpClient.bConnected AND requestNow THEN
-IF requestNow THEN
+IF requestNow AND _httpClient.bConfigured THEN
 	//_httpRequest.eCompressionMode := ;
 	//_httpRequest.sContentType := ;
 	
-	_httpRequestHeader.AddField('accept', 'application/hal+json;v=2.0', FALSE);
+	_httpRequestHeader.AddField('accept', 'application/xhtml+xml;v=2.0', FALSE);
 	_httpRequestHeader.AddField('authorization', 'Basic RGVmYXVsdCBVc2VyOnJvYm90aWNz', FALSE);	// encoded Username: Default User, Password: robotics
 	
-	_httpRequest.SendRequest(sUri:='/rw/rapid/execution', fbClient:=_httpClient, eRequestType:=ETcIotHttpRequestType.HTTP_Get, pContent:=0, nContentSize:=0, fbHeader:=_httpRequestHeader);
+	_httpRequest.SendRequest(sUri:='/users/rmmp', fbClient:=_httpClient, eRequestType:=ETcIotHttpRequestType.HTTP_Get, pContent:=0, nContentSize:=0, fbHeader:=_httpRequestHeader);
 	
 	requestNow := FALSE;
 END_IF
@@ -100,16 +110,20 @@ END_IF
       <LineId Id="145" Count="0" />
       <LineId Id="152" Count="1" />
       <LineId Id="147" Count="2" />
-      <LineId Id="49" Count="0" />
-      <LineId Id="151" Count="0" />
-      <LineId Id="150" Count="0" />
+      <LineId Id="299" Count="0" />
+      <LineId Id="303" Count="2" />
+      <LineId Id="308" Count="0" />
+      <LineId Id="310" Count="1" />
+      <LineId Id="316" Count="2" />
+      <LineId Id="315" Count="0" />
+      <LineId Id="320" Count="2" />
+      <LineId Id="306" Count="0" />
+      <LineId Id="327" Count="0" />
       <LineId Id="63" Count="0" />
-      <LineId Id="70" Count="0" />
+      <LineId Id="295" Count="0" />
       <LineId Id="45" Count="0" />
       <LineId Id="74" Count="0" />
-      <LineId Id="72" Count="0" />
-      <LineId Id="223" Count="0" />
-      <LineId Id="87" Count="1" />
+      <LineId Id="88" Count="0" />
       <LineId Id="170" Count="1" />
       <LineId Id="108" Count="1" />
       <LineId Id="103" Count="0" />
