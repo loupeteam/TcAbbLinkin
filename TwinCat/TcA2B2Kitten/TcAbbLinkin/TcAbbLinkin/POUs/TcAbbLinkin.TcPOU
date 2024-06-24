@@ -7,27 +7,10 @@ END_VAR
 VAR_OUTPUT
 END_VAR
 VAR
-	powerCommand: PLCOpenCommand;
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[
-
-IF powerCommand.Consume THEN
-	
-	// run through state
-	
-	
-END_IF
-
-
-// When power command is done
-IF robotIspowered THEN
-	
-	powerCommand.Finish()
-
-END_IF
-]]></ST>
+      <ST><![CDATA[]]></ST>
     </Implementation>
     <Method Name="ConnectionReset" Id="{fb28cdfe-8e1b-44f1-869a-b019fa3c0b7f}">
       <Declaration><![CDATA[METHOD ConnectionReset : BOOL
@@ -122,20 +105,10 @@ END_VAR
     <Method Name="RobotPowerOn" Id="{e270cd96-8004-4691-9cb0-f9c8d0300c0b}">
       <Declaration><![CDATA[METHOD RobotPowerOn : BOOL
 VAR_INPUT
-	status: IPLCOpenCommand;
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[
-IF status <> 0 THEN
-	status.Start(powerCommand);
-ELSE
-	powerCommand.Execute := TRUE;
-END_IF
-
-
-
-]]></ST>
+        <ST><![CDATA[]]></ST>
       </Implementation>
     </Method>
     <Method Name="RobotStart" Id="{2acbd226-93a7-4d9b-8ddf-34c3d2ee1221}">
@@ -175,17 +148,6 @@ END_VAR
       </Implementation>
     </Method>
     <LineIds Name="TcAbbLinkin">
-      <LineId Id="18" Count="2" />
-      <LineId Id="23" Count="0" />
-      <LineId Id="25" Count="1" />
-      <LineId Id="31" Count="0" />
-      <LineId Id="24" Count="0" />
-      <LineId Id="32" Count="1" />
-      <LineId Id="21" Count="0" />
-      <LineId Id="35" Count="0" />
-      <LineId Id="38" Count="1" />
-      <LineId Id="36" Count="0" />
-      <LineId Id="22" Count="0" />
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.ConnectionReset">
@@ -219,12 +181,6 @@ END_VAR
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.RobotPowerOn">
-      <LineId Id="13" Count="1" />
-      <LineId Id="18" Count="0" />
-      <LineId Id="20" Count="0" />
-      <LineId Id="22" Count="0" />
-      <LineId Id="19" Count="0" />
-      <LineId Id="15" Count="2" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.RobotStart">
