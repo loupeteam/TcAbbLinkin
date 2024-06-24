@@ -1,0 +1,243 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="TcAbbLinkin" Id="{83aacf3c-7637-43d5-b1b4-45d5caf263aa}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK TcAbbLinkin
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	powerCommand: PLCOpenCommand;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+
+IF powerCommand.Consume THEN
+	
+	// run through state
+	
+	
+END_IF
+
+
+// When power command is done
+IF robotIspowered THEN
+	
+	powerCommand.Finish()
+
+END_IF
+]]></ST>
+    </Implementation>
+    <Method Name="ConnectionReset" Id="{fb28cdfe-8e1b-44f1-869a-b019fa3c0b7f}">
+      <Declaration><![CDATA[METHOD ConnectionReset : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ConnectionSetup" Id="{ae04014b-99d1-4864-b820-dd29eedcb99e}">
+      <Declaration><![CDATA[METHOD ConnectionSetup : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="GetIO" Id="{bd29dab4-cb08-45fe-84ff-e3737f6110e8}">
+      <Declaration><![CDATA[METHOD GetIO : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="GetState" Id="{39878dda-bc14-4b8b-833d-1d9c4ab2cc84}">
+      <Declaration><![CDATA[METHOD GetState : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="GetSymbol" Id="{85af9ad1-0b82-4752-9ea8-7aabc8bae9aa}">
+      <Declaration><![CDATA[METHOD GetSymbol : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="IOWatchInit" Id="{73cfccc7-56e4-4d35-a07c-3dccb64e2e07}">
+      <Declaration><![CDATA[METHOD IOWatchInit : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="RapidReset" Id="{8680bb07-92fa-45e4-93ac-a5f26d92aefb}">
+      <Declaration><![CDATA[METHOD RapidReset : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="RobotMotorsOff" Id="{0e9c796b-4548-4647-8b3c-207480990c05}">
+      <Declaration><![CDATA[METHOD RobotMotorsOff : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="RobotMotorsOn" Id="{61a3e16c-d842-4ebd-be26-10100c74cc52}">
+      <Declaration><![CDATA[METHOD RobotMotorsOn : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="RobotPowerOff" Id="{7e704635-bfa1-4267-9db0-7f188918765f}">
+      <Declaration><![CDATA[METHOD RobotPowerOff : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="RobotPowerOn" Id="{e270cd96-8004-4691-9cb0-f9c8d0300c0b}">
+      <Declaration><![CDATA[METHOD RobotPowerOn : BOOL
+VAR_INPUT
+	status: IPLCOpenCommand;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+IF status <> 0 THEN
+	status.Start(powerCommand);
+ELSE
+	powerCommand.Execute := TRUE;
+END_IF
+
+
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="RobotStart" Id="{2acbd226-93a7-4d9b-8ddf-34c3d2ee1221}">
+      <Declaration><![CDATA[METHOD RobotStart : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="RobotStop" Id="{648edf84-4daf-4e8c-8ad5-61b6305b08fb}">
+      <Declaration><![CDATA[METHOD RobotStop : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="SetIO" Id="{ce5e4a58-9783-46a9-ba0d-44594affd7f4}">
+      <Declaration><![CDATA[METHOD SetIO : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="SetSymbol" Id="{bc0a5da5-b662-4b6f-a5f4-f2caf9d05bbf}">
+      <Declaration><![CDATA[METHOD SetSymbol : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="TcAbbLinkin">
+      <LineId Id="18" Count="2" />
+      <LineId Id="23" Count="0" />
+      <LineId Id="25" Count="1" />
+      <LineId Id="31" Count="0" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="32" Count="1" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="35" Count="0" />
+      <LineId Id="38" Count="1" />
+      <LineId Id="36" Count="0" />
+      <LineId Id="22" Count="0" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin.ConnectionReset">
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin.ConnectionSetup">
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin.GetIO">
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin.GetState">
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin.GetSymbol">
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin.IOWatchInit">
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin.RapidReset">
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin.RobotMotorsOff">
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin.RobotMotorsOn">
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin.RobotPowerOff">
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin.RobotPowerOn">
+      <LineId Id="13" Count="1" />
+      <LineId Id="18" Count="0" />
+      <LineId Id="20" Count="0" />
+      <LineId Id="22" Count="0" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="15" Count="2" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin.RobotStart">
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin.RobotStop">
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin.SetIO">
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin.SetSymbol">
+      <LineId Id="5" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
