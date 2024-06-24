@@ -66,6 +66,42 @@ END_VAR
         <ST><![CDATA[]]></ST>
       </Implementation>
     </Method>
+    <Method Name="MotorsOff" Id="{0e9c796b-4548-4647-8b3c-207480990c05}">
+      <Declaration><![CDATA[METHOD MotorsOff : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="MotorsOn" Id="{61a3e16c-d842-4ebd-be26-10100c74cc52}">
+      <Declaration><![CDATA[METHOD MotorsOn : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="PowerOff" Id="{7e704635-bfa1-4267-9db0-7f188918765f}">
+      <Declaration><![CDATA[METHOD PowerOff : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="PowerOn" Id="{e270cd96-8004-4691-9cb0-f9c8d0300c0b}">
+      <Declaration><![CDATA[METHOD PowerOn : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="RapidReset" Id="{8680bb07-92fa-45e4-93ac-a5f26d92aefb}">
       <Declaration><![CDATA[METHOD RapidReset : BOOL
 VAR_INPUT
@@ -75,8 +111,8 @@ END_VAR
         <ST><![CDATA[]]></ST>
       </Implementation>
     </Method>
-    <Method Name="RobotMotorsOff" Id="{0e9c796b-4548-4647-8b3c-207480990c05}">
-      <Declaration><![CDATA[METHOD RobotMotorsOff : BOOL
+    <Method Name="RapidStart" Id="{2acbd226-93a7-4d9b-8ddf-34c3d2ee1221}">
+      <Declaration><![CDATA[METHOD RapidStart : BOOL
 VAR_INPUT
 END_VAR
 ]]></Declaration>
@@ -84,44 +120,8 @@ END_VAR
         <ST><![CDATA[]]></ST>
       </Implementation>
     </Method>
-    <Method Name="RobotMotorsOn" Id="{61a3e16c-d842-4ebd-be26-10100c74cc52}">
-      <Declaration><![CDATA[METHOD RobotMotorsOn : BOOL
-VAR_INPUT
-END_VAR
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="RobotPowerOff" Id="{7e704635-bfa1-4267-9db0-7f188918765f}">
-      <Declaration><![CDATA[METHOD RobotPowerOff : BOOL
-VAR_INPUT
-END_VAR
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="RobotPowerOn" Id="{e270cd96-8004-4691-9cb0-f9c8d0300c0b}">
-      <Declaration><![CDATA[METHOD RobotPowerOn : BOOL
-VAR_INPUT
-END_VAR
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="RobotStart" Id="{2acbd226-93a7-4d9b-8ddf-34c3d2ee1221}">
-      <Declaration><![CDATA[METHOD RobotStart : BOOL
-VAR_INPUT
-END_VAR
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="RobotStop" Id="{648edf84-4daf-4e8c-8ad5-61b6305b08fb}">
-      <Declaration><![CDATA[METHOD RobotStop : BOOL
+    <Method Name="RapidStop" Id="{648edf84-4daf-4e8c-8ad5-61b6305b08fb}">
+      <Declaration><![CDATA[METHOD RapidStop : BOOL
 VAR_INPUT
 END_VAR
 ]]></Declaration>
@@ -168,25 +168,25 @@ END_VAR
     <LineIds Name="TcAbbLinkin.IOWatchInit">
       <LineId Id="5" Count="0" />
     </LineIds>
+    <LineIds Name="TcAbbLinkin.MotorsOff">
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin.MotorsOn">
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin.PowerOff">
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin.PowerOn">
+      <LineId Id="5" Count="0" />
+    </LineIds>
     <LineIds Name="TcAbbLinkin.RapidReset">
       <LineId Id="5" Count="0" />
     </LineIds>
-    <LineIds Name="TcAbbLinkin.RobotMotorsOff">
+    <LineIds Name="TcAbbLinkin.RapidStart">
       <LineId Id="5" Count="0" />
     </LineIds>
-    <LineIds Name="TcAbbLinkin.RobotMotorsOn">
-      <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="TcAbbLinkin.RobotPowerOff">
-      <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="TcAbbLinkin.RobotPowerOn">
-      <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="TcAbbLinkin.RobotStart">
-      <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="TcAbbLinkin.RobotStop">
+    <LineIds Name="TcAbbLinkin.RapidStop">
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.SetIO">
