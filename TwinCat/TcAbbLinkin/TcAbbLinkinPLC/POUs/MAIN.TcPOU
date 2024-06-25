@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
-  <POU Name="MAIN" Id="{90b89767-3bdb-45b8-891a-e1dd770f9097}" SpecialFunc="None">
+  <POU Name="MAIN" Id="{af726fc5-8ad0-4774-86c1-258758d62ada}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM MAIN
 VAR
 	myRobotLink		: TcAbbLinkin;
@@ -10,7 +10,7 @@ END_VAR
       <ST><![CDATA[]]></ST>
     </Implementation>
     <LineIds Name="MAIN">
-      <LineId Id="105" Count="0" />
+      <LineId Id="2" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

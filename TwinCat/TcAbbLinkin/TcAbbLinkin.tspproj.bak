@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-<TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4024.53">
-	<Project ProjectGUID="{8989CC60-B5CA-40A0-BD7D-C55247D479B4}" Target64Bit="true" ShowHideConfigurations="#x6">
-		<Plc>
-			<Project GUID="{0A049AE8-A014-4237-B3D2-F82D56307667}" Name="TcAbbLinkin" PrjFilePath="TcAbbLinkin\TcAbbLinkin.plcproj" TmcFilePath="TcAbbLinkin\TcAbbLinkin.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e"/>
-		</Plc>
-	</Project>
-</TcSmProject>

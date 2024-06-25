@@ -3,19 +3,19 @@
   <PropertyGroup>
     <FileVersion>1.0.0.0</FileVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{0a049ae8-a014-4237-b3d2-f82d56307667}</ProjectGuid>
+    <ProjectGuid>{d1d47807-ddc9-4c87-ba84-a94c789102da}</ProjectGuid>
     <SubObjectsSortedByName>True</SubObjectsSortedByName>
     <DownloadApplicationInfo>true</DownloadApplicationInfo>
     <WriteProductVersion>true</WriteProductVersion>
     <GenerateTpy>false</GenerateTpy>
-    <Name>TcAbbLinkin</Name>
+    <Name>TcAbbLinkinPLC</Name>
     <ProgramVersion>3.1.4024.0</ProgramVersion>
-    <Application>{108f3382-240b-4eae-b7eb-8fde0dd03e97}</Application>
-    <TypeSystem>{f85f5913-4cea-46fa-ac59-a1540ea1b7ef}</TypeSystem>
-    <Implicit_Task_Info>{98bec361-c6c6-4db4-899c-569fa7c1e79d}</Implicit_Task_Info>
-    <Implicit_KindOfTask>{c7952e86-75c7-43b0-9557-afe1317be759}</Implicit_KindOfTask>
-    <Implicit_Jitter_Distribution>{3c70be06-ffd3-465f-a1ef-6d8154e12828}</Implicit_Jitter_Distribution>
-    <LibraryReferences>{4805dc9d-606a-47e5-82bb-7fa919d96b9c}</LibraryReferences>
+    <Application>{3c914a8d-4a17-4f1e-9445-1becbb2b5183}</Application>
+    <TypeSystem>{1c6e5c95-0d27-455e-908e-faaa1e8978af}</TypeSystem>
+    <Implicit_Task_Info>{2b6e5500-fd60-42e2-b5f1-33190fdb4fe9}</Implicit_Task_Info>
+    <Implicit_KindOfTask>{9ac765d3-3ac0-47da-b792-f5c56075217f}</Implicit_KindOfTask>
+    <Implicit_Jitter_Distribution>{4dab9041-af5c-40f9-aeb5-736c8459509b}</Implicit_Jitter_Distribution>
+    <LibraryReferences>{995e1ac0-267a-47a1-8ab1-6aac09d641b7}</LibraryReferences>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="DUTs\AbbLinkinConnectionConfig_Typ.TcDUT">
@@ -51,23 +51,17 @@
     </PlaceholderReference>
     <PlaceholderReference Include="Tc3_IotBase">
       <DefaultResolution>Tc3_IotBase, * (Beckhoff Automation GmbH)</DefaultResolution>
-      <Namespace>Tc3_IotBase</Namespace>
     </PlaceholderReference>
     <PlaceholderReference Include="Tc3_Module">
       <DefaultResolution>Tc3_Module, * (Beckhoff Automation GmbH)</DefaultResolution>
       <Namespace>Tc3_Module</Namespace>
     </PlaceholderReference>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="TcAbbLinkin.tmc">
-      <SubType>Content</SubType>
-    </None>
-  </ItemGroup>
   <ProjectExtensions>
     <PlcProjectOptions>
       <XmlArchive>
-        <Data>
-          <o xml:space="preserve" t="OptionKey">
+  <Data>
+    <o xml:space="preserve" t="OptionKey">
       <v n="Name">"&lt;ProjectRoot&gt;"</v>
       <d n="SubKeys" t="Hashtable" ckt="String" cvt="OptionKey">
         <v>{40450F57-0AA3-4216-96F3-5444ECB29763}</v>
@@ -88,13 +82,13 @@
       </d>
       <d n="Values" t="Hashtable" />
     </o>
-        </Data>
-        <TypeList>
-          <Type n="Hashtable">System.Collections.Hashtable</Type>
-          <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
-          <Type n="String">System.String</Type>
-        </TypeList>
-      </XmlArchive>
+  </Data>
+  <TypeList>
+    <Type n="Hashtable">System.Collections.Hashtable</Type>
+    <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
+    <Type n="String">System.String</Type>
+  </TypeList>
+</XmlArchive>
     </PlcProjectOptions>
   </ProjectExtensions>
 </Project>
