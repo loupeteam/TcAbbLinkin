@@ -11,6 +11,7 @@ VAR
 	_httpClient: FB_IotHttpClient;
 	_methodConnectionStartCalled: BOOL;
 	_methodConnectionStopCalled: BOOL;
+	_methodAckErrorCalled: BOOL;
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -39,6 +40,17 @@ CASE connectionConfig.rwsVersion OF
 		_httpClient.stTLS.bNoServerCertCheck := FALSE;
 		// TODO: add other tls settings
 END_CASE
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="AckError" Id="{e7f175da-d890-48da-a6d6-1a4277b5b980}">
+      <Declaration><![CDATA[METHOD AckError : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+_methodAckErrorCalled := TRUE;
 ]]></ST>
       </Implementation>
     </Method>
@@ -112,6 +124,15 @@ IF _methodConnectionStopCalled THEN
 	
 	_methodConnectionStopCalled := FALSE;
 END_IF
+
+IF _methodAckErrorCalled THEN
+	error := 0;
+	errorID := 0;
+	
+	_methodAckErrorCalled := FALSE;
+END_IF
+
+
 ]]></ST>
       </Implementation>
     </Method>
@@ -242,6 +263,10 @@ END_VAR
       <LineId Id="15" Count="8" />
       <LineId Id="5" Count="0" />
     </LineIds>
+    <LineIds Name="TcAbbLinkin.AckError">
+      <LineId Id="6" Count="1" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
     <LineIds Name="TcAbbLinkin.ConnectionStart">
       <LineId Id="57" Count="1" />
       <LineId Id="64" Count="0" />
@@ -251,7 +276,9 @@ END_VAR
       <LineId Id="62" Count="0" />
       <LineId Id="56" Count="0" />
       <LineId Id="5" Count="0" />
-      <LineId Id="17" Count="0" />
+      <LineId Id="65" Count="0" />
+      <LineId Id="69" Count="1" />
+      <LineId Id="67" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.ConnectionStop">
       <LineId Id="12" Count="0" />
@@ -261,8 +288,24 @@ END_VAR
     <LineIds Name="TcAbbLinkin.Cyclic">
       <LineId Id="7" Count="1" />
       <LineId Id="10" Count="1" />
+      <LineId Id="63" Count="0" />
       <LineId Id="9" Count="0" />
       <LineId Id="5" Count="0" />
+      <LineId Id="28" Count="3" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="32" Count="0" />
+      <LineId Id="39" Count="1" />
+      <LineId Id="42" Count="0" />
+      <LineId Id="35" Count="0" />
+      <LineId Id="34" Count="0" />
+      <LineId Id="43" Count="0" />
+      <LineId Id="48" Count="4" />
+      <LineId Id="44" Count="0" />
+      <LineId Id="57" Count="5" />
+      <LineId Id="55" Count="0" />
+      <LineId Id="53" Count="0" />
+      <LineId Id="47" Count="0" />
+      <LineId Id="15" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.GetIO">
       <LineId Id="5" Count="0" />
