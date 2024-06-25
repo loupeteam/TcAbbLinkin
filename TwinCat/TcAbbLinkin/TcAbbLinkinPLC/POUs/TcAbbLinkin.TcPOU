@@ -9,6 +9,8 @@ VAR_OUTPUT
 END_VAR
 VAR
 	_httpClient: FB_IotHttpClient;
+	_methodConnectionStartCalled: BOOL;
+	_methodConnectionStopCalled: BOOL;
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -57,6 +59,9 @@ END_IF
 
 _configureClient(connectionConfig);
 _connectionEnabled := TRUE;
+
+_methodConnectionStartCalled := TRUE;
+
 ]]></ST>
       </Implementation>
     </Method>
@@ -68,12 +73,17 @@ END_VAR
       <Implementation>
         <ST><![CDATA[
 _connectionEnabled := FALSE;
-]]></ST>
+_methodConnectionStopCalled := TRUE;]]></ST>
       </Implementation>
     </Method>
     <Method Name="Cyclic" Id="{b14f94df-ed21-4275-9dc6-f78c593c481d}">
       <Declaration><![CDATA[METHOD Cyclic : BOOL
 VAR_INPUT
+END_VAR
+VAR_OUTPUT
+	error	: BOOL;
+	errorID	: DINT;
+	ready	: BOOL;
 END_VAR
 ]]></Declaration>
       <Implementation>
@@ -82,6 +92,26 @@ IF _connectionEnabled THEN
 	_httpClient.Execute();
 END_IF
 
+// Status
+ready := _connectionEnabled AND _httpClient.bConfigured;
+
+
+
+// Handle Methods
+
+IF _methodConnectionStartCalled THEN
+	error := _httpClient.bError;
+	errorID := _httpClient.hrErrorCode;
+	
+	_methodConnectionStartCalled := FALSE;
+END_IF
+
+IF _methodConnectionStopCalled THEN
+	error := 0;
+	errorID := 0;
+	
+	_methodConnectionStopCalled := FALSE;
+END_IF
 ]]></ST>
       </Implementation>
     </Method>
