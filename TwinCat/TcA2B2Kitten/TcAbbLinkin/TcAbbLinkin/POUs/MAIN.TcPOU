@@ -3,6 +3,7 @@
   <POU Name="MAIN" Id="{90b89767-3bdb-45b8-891a-e1dd770f9097}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM MAIN
 VAR
+	myRobotLink		: TcAbbLinkin;
 END_VAR
 ]]></Declaration>
     <Implementation>

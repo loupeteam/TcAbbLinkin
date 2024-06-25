@@ -3,31 +3,58 @@
   <POU Name="TcAbbLinkin" Id="{83aacf3c-7637-43d5-b1b4-45d5caf263aa}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK TcAbbLinkin
 VAR_INPUT
+	_connectionEnabled : BOOL := TRUE;
 END_VAR
 VAR_OUTPUT
 END_VAR
 VAR
+	_httpClient: FB_IotHttpClient;
 END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
-    <Method Name="ConnectionReset" Id="{fb28cdfe-8e1b-44f1-869a-b019fa3c0b7f}">
-      <Declaration><![CDATA[METHOD ConnectionReset : BOOL
+    <Method Name="ConnectionStart" Id="{ae04014b-99d1-4864-b820-dd29eedcb99e}">
+      <Declaration><![CDATA[METHOD ConnectionStart : BOOL
 VAR_INPUT
+	connectionConfig:	AbbLinkinConnectionConfig_Typ;	
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[]]></ST>
+        <ST><![CDATA[
+
+// Configuration
+_httpClient.sHostName := connectionConfig.remoteIpAddress;
+_httpClient.nHostPort := connectionConfig.remotePort;
+_httpClient.bKeepAlive := TRUE;
+_httpClient.tConnectionTimeout := T#10S;
+
+
+CASE connectionConfig.rwsVersion OF
+	ABBLINKIN_RWS_API_VERSION.V1:
+		_httpClient.stTLS.bNoServerCertCheck := TRUE;
+		
+	ABBLINKIN_RWS_API_VERSION.V2:
+		_httpClient.stTLS.bNoServerCertCheck := FALSE;
+		// TODO: add other tls settings
+END_CASE
+
+
+
+_connectionEnabled := TRUE;
+
+]]></ST>
       </Implementation>
     </Method>
-    <Method Name="ConnectionSetup" Id="{ae04014b-99d1-4864-b820-dd29eedcb99e}">
-      <Declaration><![CDATA[METHOD ConnectionSetup : BOOL
+    <Method Name="ConnectionStop" Id="{fb28cdfe-8e1b-44f1-869a-b019fa3c0b7f}">
+      <Declaration><![CDATA[METHOD ConnectionStop : BOOL
 VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[]]></ST>
+        <ST><![CDATA[
+_connectionEnabled := FALSE;
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="GetIO" Id="{bd29dab4-cb08-45fe-84ff-e3737f6110e8}">
@@ -150,11 +177,32 @@ END_VAR
     <LineIds Name="TcAbbLinkin">
       <LineId Id="9" Count="0" />
     </LineIds>
-    <LineIds Name="TcAbbLinkin.ConnectionReset">
+    <LineIds Name="TcAbbLinkin.ConnectionStart">
+      <LineId Id="12" Count="0" />
+      <LineId Id="32" Count="0" />
+      <LineId Id="13" Count="0" />
+      <LineId Id="27" Count="2" />
+      <LineId Id="33" Count="0" />
+      <LineId Id="51" Count="0" />
+      <LineId Id="35" Count="0" />
+      <LineId Id="34" Count="0" />
+      <LineId Id="36" Count="0" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="44" Count="0" />
+      <LineId Id="39" Count="0" />
+      <LineId Id="42" Count="1" />
+      <LineId Id="37" Count="0" />
+      <LineId Id="47" Count="0" />
+      <LineId Id="46" Count="0" />
+      <LineId Id="18" Count="0" />
       <LineId Id="5" Count="0" />
+      <LineId Id="20" Count="0" />
+      <LineId Id="17" Count="0" />
     </LineIds>
-    <LineIds Name="TcAbbLinkin.ConnectionSetup">
+    <LineIds Name="TcAbbLinkin.ConnectionStop">
+      <LineId Id="12" Count="0" />
       <LineId Id="5" Count="0" />
+      <LineId Id="13" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.GetIO">
       <LineId Id="5" Count="0" />

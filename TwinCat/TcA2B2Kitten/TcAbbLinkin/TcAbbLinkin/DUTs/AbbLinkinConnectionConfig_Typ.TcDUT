@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <DUT Name="AbbLinkinConnectionConfig_Typ" Id="{eb4cc820-41d0-4679-875f-49cfa6130169}">
+    <Declaration><![CDATA[TYPE AbbLinkinConnectionConfig_Typ :
+STRUCT
+	rwsVersion 		: ABBLINKIN_RWS_API_VERSION;
+	remoteIpAddress	: STRING := '127.0.0.1';
+	remotePort 		: USINT := 80;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>
