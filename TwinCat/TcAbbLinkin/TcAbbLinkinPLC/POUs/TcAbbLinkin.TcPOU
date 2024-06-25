@@ -14,16 +14,15 @@ END_VAR
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
-    <Method Name="ConnectionStart" Id="{ae04014b-99d1-4864-b820-dd29eedcb99e}">
-      <Declaration><![CDATA[METHOD ConnectionStart : BOOL
-VAR_INPUT
+    <Method Name="_configureClient" Id="{4a508a3b-482e-4d68-8353-2815209fac39}">
+      <Declaration><![CDATA[METHOD PRIVATE _configureClient : BOOL
+VAR_IN_OUT
 	connectionConfig:	AbbLinkinConnectionConfig_Typ;	
 END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[
 
-// Configuration
 _httpClient.sHostName := connectionConfig.remoteIpAddress;
 _httpClient.nHostPort := connectionConfig.remotePort;
 _httpClient.bKeepAlive := TRUE;
@@ -38,11 +37,26 @@ CASE connectionConfig.rwsVersion OF
 		_httpClient.stTLS.bNoServerCertCheck := FALSE;
 		// TODO: add other tls settings
 END_CASE
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ConnectionStart" Id="{ae04014b-99d1-4864-b820-dd29eedcb99e}">
+      <Declaration><![CDATA[METHOD ConnectionStart : BOOL
+VAR_INPUT
+	connectionConfig:	AbbLinkinConnectionConfig_Typ;	
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+// If Connection is already enabled, disable and disconnect
+// Reference: https://infosys.beckhoff.com/content/1033/tf6760_tc3_iot_https_rest/9298409995.html?id=3568786990275794598
+IF _connectionEnabled THEN
+	_connectionEnabled := FALSE;
+	_httpClient.Disconnect();
+END_IF
 
-
-
+_configureClient(connectionConfig);
 _connectionEnabled := TRUE;
-
 ]]></ST>
       </Implementation>
     </Method>
@@ -54,6 +68,20 @@ END_VAR
       <Implementation>
         <ST><![CDATA[
 _connectionEnabled := FALSE;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Cyclic" Id="{b14f94df-ed21-4275-9dc6-f78c593c481d}">
+      <Declaration><![CDATA[METHOD Cyclic : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+IF _connectionEnabled THEN
+	_httpClient.Execute();
+END_IF
+
 ]]></ST>
       </Implementation>
     </Method>
@@ -177,32 +205,34 @@ END_VAR
     <LineIds Name="TcAbbLinkin">
       <LineId Id="9" Count="0" />
     </LineIds>
-    <LineIds Name="TcAbbLinkin.ConnectionStart">
-      <LineId Id="12" Count="0" />
-      <LineId Id="32" Count="0" />
-      <LineId Id="13" Count="0" />
-      <LineId Id="27" Count="2" />
-      <LineId Id="33" Count="0" />
-      <LineId Id="51" Count="0" />
-      <LineId Id="35" Count="0" />
-      <LineId Id="34" Count="0" />
-      <LineId Id="36" Count="0" />
-      <LineId Id="41" Count="0" />
-      <LineId Id="44" Count="0" />
-      <LineId Id="39" Count="0" />
-      <LineId Id="42" Count="1" />
-      <LineId Id="37" Count="0" />
-      <LineId Id="47" Count="0" />
-      <LineId Id="46" Count="0" />
-      <LineId Id="18" Count="0" />
+    <LineIds Name="TcAbbLinkin._configureClient">
+      <LineId Id="7" Count="0" />
+      <LineId Id="9" Count="4" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="15" Count="8" />
       <LineId Id="5" Count="0" />
-      <LineId Id="20" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin.ConnectionStart">
+      <LineId Id="57" Count="1" />
+      <LineId Id="64" Count="0" />
+      <LineId Id="12" Count="0" />
+      <LineId Id="61" Count="0" />
+      <LineId Id="59" Count="1" />
+      <LineId Id="62" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="5" Count="0" />
       <LineId Id="17" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.ConnectionStop">
       <LineId Id="12" Count="0" />
       <LineId Id="5" Count="0" />
       <LineId Id="13" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin.Cyclic">
+      <LineId Id="7" Count="1" />
+      <LineId Id="10" Count="1" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.GetIO">
       <LineId Id="5" Count="0" />
