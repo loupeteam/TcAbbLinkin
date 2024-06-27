@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <DUT Name="ABBLINKIN_STATE" Id="{74fac755-88b4-4b19-95ed-c39f2425b0c7}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+{attribute 'strict'}
+TYPE ABBLINKIN_STATE :
+(
+	IDLE,
+	SEND_REQUEST,
+	WAIT_FOR_RESONSE,
+	PROCESS_RESPONSE
+);
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

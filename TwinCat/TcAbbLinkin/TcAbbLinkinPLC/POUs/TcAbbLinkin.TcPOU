@@ -3,27 +3,97 @@
   <POU Name="TcAbbLinkin" Id="{83aacf3c-7637-43d5-b1b4-45d5caf263aa}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK TcAbbLinkin
 VAR_INPUT
-	_connectionEnabled : BOOL := TRUE;
+	configuration : AbbLinkinConfiguration_Typ;
 END_VAR
 VAR_OUTPUT
+	ready	: BOOL;
+	error	: BOOL;
+	errorID	: DINT;
+	statusSource : STRING;
+	responseData : STRING;
 END_VAR
 VAR
+	_connectionEnabled : BOOL;
 	_httpClient: FB_IotHttpClient;
+	_httpRequest: FB_IotHttpRequest;
+	_httpHeader: FB_IotHttpHeaderFieldMap;
+	_httpHeader2: FB_IotHttpHeaderFieldMap;
+	_methodConnectionStartCalled: BOOL;
+	_methodConnectionStopCalled: BOOL;
+	_methodAckErrorCalled: BOOL;
+	_state: ABBLINKIN_STATE;
+	_requestQueue: AbbLinkinRequestQueue_Typ;
+	_currentRequest: AbbLinkinRequest_Typ;
+	
+	testString: string;
 END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
-    <Method Name="ConnectionStart" Id="{ae04014b-99d1-4864-b820-dd29eedcb99e}">
-      <Declaration><![CDATA[METHOD ConnectionStart : BOOL
+    <Folder Name="responseCallbacks" Id="{81e09dac-321f-4653-938f-510c189b178d}" />
+    <Method Name="_callCommandSuccessHandler" Id="{4e7a3f83-8e9c-4794-9ff8-99e39dc09c79}">
+      <Declaration><![CDATA[METHOD PRIVATE _callCommandSuccessHandler : BOOL
 VAR_INPUT
-	connectionConfig:	AbbLinkinConnectionConfig_Typ;	
+	command : ABBLINKIN_COMMAND_TYPE;
+END_VAR
+VAR_IN_OUT
+	httpRequest : FB_IotHttpRequest;
 END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[
 
-// Configuration
+
+CASE command OF 
+	ABBLINKIN_COMMAND_TYPE.GET_IO:
+		;//TODO
+		
+	ABBLINKIN_COMMAND_TYPE.GET_STATE:
+		_getStateRespCallbackSuccess(httpRequest);
+		
+	ABBLINKIN_COMMAND_TYPE.GET_SYMBOL:
+		;//TODO
+		
+	ABBLINKIN_COMMAND_TYPE.MOTORS_OFF:
+		;//TODO
+		
+	ABBLINKIN_COMMAND_TYPE.MOTORS_ON:
+		;//TODO
+		
+	ABBLINKIN_COMMAND_TYPE.POWER_OFF:
+		;//TODO
+		
+	ABBLINKIN_COMMAND_TYPE.POWER_ON:
+		;//TODO
+		
+	ABBLINKIN_COMMAND_TYPE.RAPID_RESET:
+		;//TODO
+		
+	ABBLINKIN_COMMAND_TYPE.RAPID_START:
+		;//TODO
+		
+	ABBLINKIN_COMMAND_TYPE.RAPID_STOP:
+		;//TODO
+		
+	ABBLINKIN_COMMAND_TYPE.SET_IO:
+		;//TODO
+		
+	ABBLINKIN_COMMAND_TYPE.SET_SYMBOL:
+		;//TODO
+		
+END_CASE
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="_configureClient" Id="{4a508a3b-482e-4d68-8353-2815209fac39}">
+      <Declaration><![CDATA[METHOD PRIVATE _configureClient : BOOL
+VAR_IN_OUT
+	connectionConfig:	AbbLinkinConfiguration_Typ;	
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
 _httpClient.sHostName := connectionConfig.remoteIpAddress;
 _httpClient.nHostPort := connectionConfig.remotePort;
 _httpClient.bKeepAlive := TRUE;
@@ -38,10 +108,146 @@ CASE connectionConfig.rwsVersion OF
 		_httpClient.stTLS.bNoServerCertCheck := FALSE;
 		// TODO: add other tls settings
 END_CASE
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="_encodeBase64" Id="{3fa22cec-5508-414f-9012-9c1691dace64}">
+      <Declaration><![CDATA[METHOD PRIVATE _encodeBase64 : STRING
+VAR_INPUT
+	rawText: STRING;
+END_VAR
+VAR
+	_jsonDomParser : 	FB_JsonDomParser;
+	_jsonRoot :	SJsonValue;
+	_jsonValue: SJsonValue;
+	_jsonValue2: SJsonValue;
+END_VAR
+
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[	
+_jsonRoot := _jsonDomParser.ParseDocument('{"k": ""}');
+_jsonValue := _jsonDomParser.FindMember(_jsonRoot, 'k');
+_jsonValue2 := _jsonDomParser.SetBase64(_jsonValue, ADR(rawText), LEN(rawText));
+_encodeBase64 := _jsonDomParser.GetString(_jsonValue2);
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="_getStateRespCallbackSuccess" Id="{70e217fe-2d07-46fe-9a64-f1eb329f34c5}" FolderPath="responseCallbacks\">
+      <Declaration><![CDATA[METHOD PRIVATE _getStateRespCallbackSuccess : BOOL
+VAR_IN_OUT
+	httpRequest : 	FB_IotHttpRequest;
+END_VAR
+VAR
+	jsonDomParser : FB_JsonDomParser;
+	jsonRoot : SJsonValue;
+	jsonValue : SJsonValue;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+// RWS V1: https://developercenter.robotstudio.com/api/rwsApi/rapid_execution_get_page.html
+
+
+jsonRoot := httpRequest.GetJsonDomContent(jsonDomParser);
+jsonValue := jsonDomParser.FindMemberPath(jsonRoot, 'state#0/ctrlexecstate');
+IF (jsonValue <> 0) THEN
+	responseData := jsonDomParser.GetString(jsonValue);
+ELSE
+	responseData := '';
+END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="_requestQueueAdd" Id="{04fd7ebd-e8f9-46c7-bc9e-2330c22267da}">
+      <Declaration><![CDATA[METHOD PRIVATE _requestQueueAdd : BOOL
+VAR_INPUT
+	request : AbbLinkinRequest_Typ;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+// Note: the requestQueue and this method are temporary implementations. It is not a real queue as shown.
+
+_requestQueue.request := request;
+_requestQueue.empty := FALSE;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="_requestQueuePop" Id="{daa4e678-3558-4037-bf7f-bd7a40f193a5}">
+      <Declaration><![CDATA[METHOD PRIVATE _requestQueuePop : AbbLinkinRequest_Typ
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+// Note: the requestQueue and this method are temporary implementations. It is not a real queue as shown.
+
+_requestQueue.empty := TRUE;
+_requestQueuePop := _requestQueue.request;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="_setHeader" Id="{03deb409-7be0-4e61-9c99-83e8f97b30dc}">
+      <Declaration><![CDATA[METHOD PRIVATE _setHeader : BOOL
+VAR_INPUT
+END_VAR
+VAR
+	authValue : STRING;
+	combinedUnPwRaw: STRING;
+	combinedUnPwBase64: STRING;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+// Accept JSON 
+IF configuration.rwsVersion = ABBLINKIN_RWS_API_VERSION.V2 THEN
+	_httpHeader.AddField('Accept', 'application/hal+json;v=2.0', FALSE);
+END_IF
+
+
+// Authorization
+combinedUnPwRaw := configuration.rwsUsername;
+combinedUnPwRaw := CONCAT(combinedUnPwRaw, ':');
+combinedUnPwRaw := CONCAT(combinedUnPwRaw, configuration.rwsPassword);
+combinedUnPwBase64 := _encodeBase64(combinedUnPwRaw);
+
+authValue := 'Basic ';
+authValue := CONCAT(authValue, combinedUnPwBase64);
+_httpHeader.AddField('Authorization', authValue, FALSE);
 
 
 
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="AckError" Id="{e7f175da-d890-48da-a6d6-1a4277b5b980}">
+      <Declaration><![CDATA[METHOD AckError : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+_methodAckErrorCalled := TRUE;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ConnectionStart" Id="{ae04014b-99d1-4864-b820-dd29eedcb99e}">
+      <Declaration><![CDATA[METHOD ConnectionStart : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+// If Connection is already enabled, disable and disconnect
+// Reference: https://infosys.beckhoff.com/content/1033/tf6760_tc3_iot_https_rest/9298409995.html?id=3568786990275794598
+IF _connectionEnabled THEN
+	_connectionEnabled := FALSE;
+	_httpClient.Disconnect();
+END_IF
+
+_configureClient(configuration);
 _connectionEnabled := TRUE;
+
+_methodConnectionStartCalled := TRUE;
 
 ]]></ST>
       </Implementation>
@@ -54,6 +260,122 @@ END_VAR
       <Implementation>
         <ST><![CDATA[
 _connectionEnabled := FALSE;
+_methodConnectionStopCalled := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Cyclic" Id="{b14f94df-ed21-4275-9dc6-f78c593c481d}">
+      <Declaration><![CDATA[METHOD Cyclic : BOOL
+VAR_INPUT
+END_VAR
+
+VAR
+	retVal: BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+IF _connectionEnabled THEN
+	_httpClient.Execute();
+END_IF
+
+// Status
+ready := _connectionEnabled AND _httpClient.bConfigured;
+
+
+
+IF NOT ready THEN
+	_state := ABBLINKIN_STATE.IDLE;
+END_IF
+
+
+CASE _state OF 
+	
+	ABBLINKIN_STATE.IDLE:
+		
+		IF ready AND NOT _requestQueue.empty THEN
+			_currentRequest := _requestQueuePop();
+			_state := ABBLINKIN_STATE.SEND_REQUEST;
+		END_IF
+		
+	ABBLINKIN_STATE.SEND_REQUEST:
+		
+		_setHeader();
+		retVal := _httpRequest.SendRequest(_currentRequest.uri, _httpClient, _currentRequest.httpMethod, _currentRequest.pContent, _currentRequest.contentSize, _httpHeader);
+		
+		IF retVal = FALSE THEN
+			Error := TRUE;
+			// Error: "The request could not be sent"
+			_state := ABBLINKIN_STATE.IDLE;	// todo: decide if we want to retry
+		ELSE
+			_state := ABBLINKIN_STATE.WAIT_FOR_RESONSE;
+		END_IF
+		
+	ABBLINKIN_STATE.WAIT_FOR_RESONSE:
+	
+		IF _httpRequest.bError THEN
+			// Error: "The request client object returned an error"
+			error := TRUE;
+			errorID	:= _httpRequest.eErrorId;
+			statusSource := TO_STRING(_currentRequest.command);
+			_state := ABBLINKIN_STATE.IDLE;	// todo: decide if we want to retry
+		ELSIF _httpRequest.bBusy = FALSE THEN
+			_state := ABBLINKIN_STATE.PROCESS_RESPONSE;
+		END_IF
+		
+	ABBLINKIN_STATE.PROCESS_RESPONSE:
+		
+		CASE _httpRequest.nStatusCode OF 
+		
+			200..204 : // HTTP Success
+			
+				// TODO: requestType-specific processing here
+				_callCommandSuccessHandler(_currentRequest.command, _httpRequest);
+				
+				_state := ABBLINKIN_STATE.IDLE;
+				
+			401: // HTTP Client Error - "Unauthorized"
+			
+				
+			
+			400, 402..451:	// HTTP Client Error	
+		
+			500..511: // HTTP Server Error
+				
+		END_CASE
+		;//_httpRequest.GetJsonDomContent();
+		
+
+
+END_CASE
+
+
+
+// Handle Methods
+
+IF _methodConnectionStartCalled THEN
+	error := _httpClient.bError;
+	errorID := _httpClient.hrErrorCode;
+	
+	_methodConnectionStartCalled := FALSE;
+END_IF
+
+IF _methodConnectionStopCalled THEN
+	error := 0;
+	errorID := 0;
+	
+	_methodConnectionStopCalled := FALSE;
+END_IF
+
+IF _methodAckErrorCalled THEN
+	error := 0;
+	errorID := 0;
+	statusSource := '';
+	
+	_methodAckErrorCalled := FALSE;
+END_IF
+
+
+
+testString := _encodeBase64('Default User:robotics');
 ]]></ST>
       </Implementation>
     </Method>
@@ -70,9 +392,25 @@ END_VAR
       <Declaration><![CDATA[METHOD GetState : BOOL
 VAR_INPUT
 END_VAR
-]]></Declaration>
+
+VAR
+	request: AbbLinkinRequest_Typ;
+END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[]]></ST>
+        <ST><![CDATA[
+request.command := ABBLINKIN_COMMAND_TYPE.GET_STATE;
+request.httpMethod :=  ETcIotHttpRequestType.HTTP_Get;
+
+CASE configuration.rwsVersion OF
+	ABBLINKIN_RWS_API_VERSION.V1:
+		request.uri := '/rw/rapid/execution?json=1';
+
+	ABBLINKIN_RWS_API_VERSION.V2:	
+		request.uri := '/rw/rapid/execution';
+END_CASE
+
+_requestQueueAdd(request);
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="GetSymbol" Id="{85af9ad1-0b82-4752-9ea8-7aabc8bae9aa}">
@@ -177,37 +515,214 @@ END_VAR
     <LineIds Name="TcAbbLinkin">
       <LineId Id="9" Count="0" />
     </LineIds>
-    <LineIds Name="TcAbbLinkin.ConnectionStart">
-      <LineId Id="12" Count="0" />
-      <LineId Id="32" Count="0" />
+    <LineIds Name="TcAbbLinkin._callCommandSuccessHandler">
+      <LineId Id="10" Count="1" />
       <LineId Id="13" Count="0" />
-      <LineId Id="27" Count="2" />
-      <LineId Id="33" Count="0" />
-      <LineId Id="51" Count="0" />
-      <LineId Id="35" Count="0" />
-      <LineId Id="34" Count="0" />
-      <LineId Id="36" Count="0" />
-      <LineId Id="41" Count="0" />
-      <LineId Id="44" Count="0" />
-      <LineId Id="39" Count="0" />
-      <LineId Id="42" Count="1" />
-      <LineId Id="37" Count="0" />
-      <LineId Id="47" Count="0" />
-      <LineId Id="46" Count="0" />
       <LineId Id="18" Count="0" />
+      <LineId Id="33" Count="0" />
+      <LineId Id="35" Count="0" />
+      <LineId Id="47" Count="0" />
+      <LineId Id="34" Count="0" />
+      <LineId Id="23" Count="0" />
+      <LineId Id="46" Count="0" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="36" Count="0" />
+      <LineId Id="57" Count="0" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="37" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="26" Count="0" />
+      <LineId Id="38" Count="0" />
+      <LineId Id="55" Count="0" />
+      <LineId Id="27" Count="0" />
+      <LineId Id="39" Count="0" />
+      <LineId Id="54" Count="0" />
+      <LineId Id="28" Count="0" />
+      <LineId Id="40" Count="0" />
+      <LineId Id="53" Count="0" />
+      <LineId Id="29" Count="0" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="52" Count="0" />
+      <LineId Id="30" Count="0" />
+      <LineId Id="42" Count="0" />
+      <LineId Id="51" Count="0" />
+      <LineId Id="31" Count="0" />
+      <LineId Id="43" Count="0" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="32" Count="0" />
+      <LineId Id="44" Count="0" />
+      <LineId Id="49" Count="0" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="48" Count="0" />
+      <LineId Id="15" Count="0" />
       <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin._configureClient">
+      <LineId Id="9" Count="4" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="15" Count="8" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin._encodeBase64">
+      <LineId Id="15" Count="4" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin._getStateRespCallbackSuccess">
+      <LineId Id="32" Count="0" />
+      <LineId Id="12" Count="0" />
+      <LineId Id="33" Count="0" />
+      <LineId Id="15" Count="1" />
+      <LineId Id="25" Count="2" />
+      <LineId Id="30" Count="1" />
+      <LineId Id="23" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin._requestQueueAdd">
+      <LineId Id="10" Count="0" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="11" Count="0" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="8" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin._requestQueuePop">
+      <LineId Id="10" Count="0" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="16" Count="0" />
+      <LineId Id="8" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin._setHeader">
+      <LineId Id="36" Count="0" />
+      <LineId Id="38" Count="1" />
+      <LineId Id="42" Count="0" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="6" Count="0" />
+      <LineId Id="9" Count="0" />
       <LineId Id="20" Count="0" />
-      <LineId Id="17" Count="0" />
+      <LineId Id="28" Count="0" />
+      <LineId Id="31" Count="2" />
+      <LineId Id="22" Count="0" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="23" Count="0" />
+      <LineId Id="11" Count="0" />
+      <LineId Id="14" Count="2" />
+      <LineId Id="8" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin.AckError">
+      <LineId Id="6" Count="1" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin.ConnectionStart">
+      <LineId Id="57" Count="1" />
+      <LineId Id="64" Count="0" />
+      <LineId Id="12" Count="0" />
+      <LineId Id="61" Count="0" />
+      <LineId Id="59" Count="1" />
+      <LineId Id="62" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="65" Count="0" />
+      <LineId Id="69" Count="1" />
+      <LineId Id="67" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.ConnectionStop">
       <LineId Id="12" Count="0" />
       <LineId Id="5" Count="0" />
       <LineId Id="13" Count="0" />
     </LineIds>
+    <LineIds Name="TcAbbLinkin.Cyclic">
+      <LineId Id="7" Count="1" />
+      <LineId Id="10" Count="1" />
+      <LineId Id="63" Count="0" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="28" Count="0" />
+      <LineId Id="64" Count="2" />
+      <LineId Id="70" Count="0" />
+      <LineId Id="69" Count="0" />
+      <LineId Id="71" Count="0" />
+      <LineId Id="73" Count="0" />
+      <LineId Id="72" Count="0" />
+      <LineId Id="74" Count="0" />
+      <LineId Id="79" Count="1" />
+      <LineId Id="82" Count="1" />
+      <LineId Id="86" Count="0" />
+      <LineId Id="84" Count="0" />
+      <LineId Id="87" Count="2" />
+      <LineId Id="142" Count="0" />
+      <LineId Id="92" Count="0" />
+      <LineId Id="90" Count="0" />
+      <LineId Id="96" Count="1" />
+      <LineId Id="101" Count="1" />
+      <LineId Id="99" Count="1" />
+      <LineId Id="98" Count="0" />
+      <LineId Id="103" Count="2" />
+      <LineId Id="112" Count="0" />
+      <LineId Id="117" Count="0" />
+      <LineId Id="113" Count="0" />
+      <LineId Id="115" Count="0" />
+      <LineId Id="120" Count="0" />
+      <LineId Id="119" Count="0" />
+      <LineId Id="106" Count="4" />
+      <LineId Id="123" Count="2" />
+      <LineId Id="129" Count="0" />
+      <LineId Id="135" Count="1" />
+      <LineId Id="138" Count="1" />
+      <LineId Id="137" Count="0" />
+      <LineId Id="130" Count="1" />
+      <LineId Id="140" Count="1" />
+      <LineId Id="134" Count="0" />
+      <LineId Id="133" Count="0" />
+      <LineId Id="127" Count="0" />
+      <LineId Id="132" Count="0" />
+      <LineId Id="128" Count="0" />
+      <LineId Id="126" Count="0" />
+      <LineId Id="111" Count="0" />
+      <LineId Id="81" Count="0" />
+      <LineId Id="78" Count="0" />
+      <LineId Id="76" Count="0" />
+      <LineId Id="75" Count="0" />
+      <LineId Id="67" Count="0" />
+      <LineId Id="29" Count="2" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="32" Count="0" />
+      <LineId Id="39" Count="1" />
+      <LineId Id="42" Count="0" />
+      <LineId Id="35" Count="0" />
+      <LineId Id="34" Count="0" />
+      <LineId Id="43" Count="0" />
+      <LineId Id="48" Count="4" />
+      <LineId Id="44" Count="0" />
+      <LineId Id="57" Count="4" />
+      <LineId Id="122" Count="0" />
+      <LineId Id="62" Count="0" />
+      <LineId Id="55" Count="0" />
+      <LineId Id="53" Count="0" />
+      <LineId Id="47" Count="0" />
+      <LineId Id="149" Count="0" />
+      <LineId Id="15" Count="0" />
+      <LineId Id="150" Count="0" />
+    </LineIds>
     <LineIds Name="TcAbbLinkin.GetIO">
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.GetState">
+      <LineId Id="9" Count="0" />
+      <LineId Id="20" Count="0" />
+      <LineId Id="10" Count="0" />
+      <LineId Id="30" Count="0" />
+      <LineId Id="29" Count="0" />
+      <LineId Id="31" Count="0" />
+      <LineId Id="37" Count="0" />
+      <LineId Id="35" Count="0" />
+      <LineId Id="34" Count="0" />
+      <LineId Id="36" Count="0" />
+      <LineId Id="32" Count="0" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="13" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.GetSymbol">
