@@ -27,6 +27,9 @@
     <Compile Include="DUTs\AbbLinkinRequestQueue_Typ.TcDUT">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DUTs\AbbLinkinRequestStatus_Typ.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="DUTs\ABBLINKIN_RWS_API_VERSION.TcDUT">
       <SubType>Code</SubType>
     </Compile>

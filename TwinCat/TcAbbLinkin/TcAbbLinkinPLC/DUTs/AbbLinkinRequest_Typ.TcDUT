@@ -8,6 +8,7 @@ STRUCT
 	httpMethod	: ETcIotHttpRequestType;
 	pContent	: PVOID;
 	contentSize	: UDINT;
+	pStatus		: POINTER TO AbbLinkinRequestStatus_Typ;
 END_STRUCT
 END_TYPE
 ]]></Declaration>

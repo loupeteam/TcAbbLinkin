@@ -9,7 +9,6 @@ VAR_OUTPUT
 	ready	: BOOL;
 	error	: BOOL;
 	errorID	: DINT;
-	statusSource : STRING;
 	responseData : STRING;
 END_VAR
 VAR
@@ -83,6 +82,24 @@ CASE command OF
 		;//TODO
 		
 END_CASE
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="_clearRequestStatus" Id="{c36ff0b3-102e-47ec-ab8d-11137cae997a}">
+      <Declaration><![CDATA[METHOD PRIVATE _clearRequestStatus : BOOL
+VAR_INPUT
+	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+pStatus^.busy := FALSE;
+pStatus^.done := FALSE;
+pStatus^.error := FALSE;
+pStatus^.errorID := 0;
+pStatus^.errorMsg := '';
+
+_clearRequestStatus := TRUE;
 ]]></ST>
       </Implementation>
     </Method>
@@ -302,8 +319,10 @@ CASE _state OF
 		retVal := _httpRequest.SendRequest(_currentRequest.uri, _httpClient, _currentRequest.httpMethod, _currentRequest.pContent, _currentRequest.contentSize, _httpHeader);
 		
 		IF retVal = FALSE THEN
-			Error := TRUE;
-			// Error: "The request could not be sent"
+			_currentRequest.pStatus^.busy := FALSE;
+			_currentRequest.pStatus^.error := TRUE;
+			_currentRequest.pStatus^.errorMsg := 'The request could not be sent';
+			
 			_state := ABBLINKIN_STATE.IDLE;	// todo: decide if we want to retry
 		ELSE
 			_state := ABBLINKIN_STATE.WAIT_FOR_RESONSE;
@@ -312,10 +331,11 @@ CASE _state OF
 	ABBLINKIN_STATE.WAIT_FOR_RESONSE:
 	
 		IF _httpRequest.bError THEN
-			// Error: "The request client object returned an error"
-			error := TRUE;
-			errorID	:= _httpRequest.eErrorId;
-			statusSource := TO_STRING(_currentRequest.command);
+			_currentRequest.pStatus^.busy := FALSE;
+			_currentRequest.pStatus^.error := TRUE;
+			_currentRequest.pStatus^.errorID := _httpRequest.eErrorId;
+			_currentRequest.pStatus^.errorMsg := 'The client request object returned an error';
+			
 			_state := ABBLINKIN_STATE.IDLE;	// todo: decide if we want to retry
 		ELSIF _httpRequest.bBusy = FALSE THEN
 			_state := ABBLINKIN_STATE.PROCESS_RESPONSE;
@@ -330,21 +350,35 @@ CASE _state OF
 				// TODO: requestType-specific processing here
 				_callCommandSuccessHandler(_currentRequest.command, _httpRequest);
 				
+				_currentRequest.pStatus^.busy := FALSE;
+				_currentRequest.pStatus^.done := TRUE;
+				
 				_state := ABBLINKIN_STATE.IDLE;
 				
-			401: // HTTP Client Error - "Unauthorized"
-			
+			401, 503: // HTTP Error - "Unauthorized" 
 				
-			
+				// TODO: implement Authorization implementation
+				
+				_state := ABBLINKIN_STATE.IDLE;	// todo: decide if we want to retry
+								
 			400, 402..451:	// HTTP Client Error	
-		
-			500..511: // HTTP Server Error
+				_currentRequest.pStatus^.busy := FALSE;
+				_currentRequest.pStatus^.error := TRUE;
+				_currentRequest.pStatus^.errorID := _httpRequest.nStatusCode;
+				_currentRequest.pStatus^.errorMsg := 'The Robot responded with an error (client error, 4xx). See errorID';
+				
+				_state := ABBLINKIN_STATE.IDLE;	// todo: decide if we want to retry
+				
+			500..502, 504..511: // HTTP Server Error
+				_currentRequest.pStatus^.busy := FALSE;
+				_currentRequest.pStatus^.error := TRUE;
+				_currentRequest.pStatus^.errorID := _httpRequest.nStatusCode;
+				_currentRequest.pStatus^.errorMsg := 'The Robot responded with an error (server error, 5xx). See errorID';
+				
+				_state := ABBLINKIN_STATE.IDLE;	// todo: decide if we want to retry
 				
 		END_CASE
-		;//_httpRequest.GetJsonDomContent();
 		
-
-
 END_CASE
 
 
@@ -368,11 +402,9 @@ END_IF
 IF _methodAckErrorCalled THEN
 	error := 0;
 	errorID := 0;
-	statusSource := '';
 	
 	_methodAckErrorCalled := FALSE;
 END_IF
-
 
 
 testString := _encodeBase64('Default User:robotics');
@@ -391,6 +423,7 @@ END_VAR
     <Method Name="GetState" Id="{39878dda-bc14-4b8b-833d-1d9c4ab2cc84}">
       <Declaration><![CDATA[METHOD GetState : BOOL
 VAR_INPUT
+	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
 END_VAR
 
 VAR
@@ -398,6 +431,10 @@ VAR
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
+// Clear Status
+_clearRequestStatus(pStatus);
+
+
 request.command := ABBLINKIN_COMMAND_TYPE.GET_STATE;
 request.httpMethod :=  ETcIotHttpRequestType.HTTP_Get;
 
@@ -409,7 +446,19 @@ CASE configuration.rwsVersion OF
 		request.uri := '/rw/rapid/execution';
 END_CASE
 
+request.pStatus := pStatus;
+
+
 _requestQueueAdd(request);
+
+// Set Busy (or Error) Status
+IF TRUE THEN // TODO: Check that request successfully added to queue
+	pStatus^.busy := TRUE;
+ELSE
+	pStatus^.error := TRUE;
+	pStatus^.errorMsg := TO_STRING(ABBLINKIN_COMMAND_TYPE.GET_STATE);
+	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' could not be added to request Queue');
+END_IF
 ]]></ST>
       </Implementation>
     </Method>
@@ -558,6 +607,16 @@ END_VAR
       <LineId Id="15" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
+    <LineIds Name="TcAbbLinkin._clearRequestStatus">
+      <LineId Id="17" Count="0" />
+      <LineId Id="10" Count="0" />
+      <LineId Id="13" Count="0" />
+      <LineId Id="16" Count="0" />
+      <LineId Id="14" Count="1" />
+      <LineId Id="18" Count="0" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="19" Count="0" />
+    </LineIds>
     <LineIds Name="TcAbbLinkin._configureClient">
       <LineId Id="9" Count="4" />
       <LineId Id="24" Count="0" />
@@ -649,40 +708,52 @@ END_VAR
       <LineId Id="74" Count="0" />
       <LineId Id="79" Count="1" />
       <LineId Id="82" Count="1" />
+      <LineId Id="157" Count="0" />
       <LineId Id="86" Count="0" />
       <LineId Id="84" Count="0" />
       <LineId Id="87" Count="2" />
       <LineId Id="142" Count="0" />
       <LineId Id="92" Count="0" />
       <LineId Id="90" Count="0" />
-      <LineId Id="96" Count="1" />
+      <LineId Id="96" Count="0" />
+      <LineId Id="158" Count="0" />
+      <LineId Id="160" Count="1" />
       <LineId Id="101" Count="1" />
       <LineId Id="99" Count="1" />
       <LineId Id="98" Count="0" />
-      <LineId Id="103" Count="2" />
-      <LineId Id="112" Count="0" />
-      <LineId Id="117" Count="0" />
-      <LineId Id="113" Count="0" />
-      <LineId Id="115" Count="0" />
+      <LineId Id="103" Count="1" />
+      <LineId Id="162" Count="0" />
+      <LineId Id="164" Count="0" />
+      <LineId Id="163" Count="0" />
+      <LineId Id="165" Count="0" />
+      <LineId Id="105" Count="0" />
+      <LineId Id="166" Count="0" />
       <LineId Id="120" Count="0" />
       <LineId Id="119" Count="0" />
       <LineId Id="106" Count="4" />
       <LineId Id="123" Count="2" />
       <LineId Id="129" Count="0" />
       <LineId Id="135" Count="1" />
-      <LineId Id="138" Count="1" />
+      <LineId Id="138" Count="0" />
+      <LineId Id="168" Count="0" />
+      <LineId Id="167" Count="0" />
+      <LineId Id="169" Count="0" />
+      <LineId Id="139" Count="0" />
       <LineId Id="137" Count="0" />
       <LineId Id="130" Count="1" />
       <LineId Id="140" Count="1" />
+      <LineId Id="182" Count="1" />
       <LineId Id="134" Count="0" />
+      <LineId Id="170" Count="2" />
       <LineId Id="133" Count="0" />
+      <LineId Id="177" Count="2" />
+      <LineId Id="173" Count="3" />
       <LineId Id="127" Count="0" />
       <LineId Id="132" Count="0" />
+      <LineId Id="181" Count="0" />
+      <LineId Id="180" Count="0" />
       <LineId Id="128" Count="0" />
       <LineId Id="126" Count="0" />
-      <LineId Id="111" Count="0" />
-      <LineId Id="81" Count="0" />
-      <LineId Id="78" Count="0" />
       <LineId Id="76" Count="0" />
       <LineId Id="75" Count="0" />
       <LineId Id="67" Count="0" />
@@ -696,21 +767,23 @@ END_VAR
       <LineId Id="43" Count="0" />
       <LineId Id="48" Count="4" />
       <LineId Id="44" Count="0" />
-      <LineId Id="57" Count="4" />
+      <LineId Id="57" Count="2" />
+      <LineId Id="61" Count="0" />
       <LineId Id="122" Count="0" />
       <LineId Id="62" Count="0" />
-      <LineId Id="55" Count="0" />
       <LineId Id="53" Count="0" />
       <LineId Id="47" Count="0" />
       <LineId Id="149" Count="0" />
       <LineId Id="15" Count="0" />
-      <LineId Id="150" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.GetIO">
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.GetState">
       <LineId Id="9" Count="0" />
+      <LineId Id="63" Count="0" />
+      <LineId Id="66" Count="0" />
+      <LineId Id="64" Count="1" />
       <LineId Id="20" Count="0" />
       <LineId Id="10" Count="0" />
       <LineId Id="30" Count="0" />
@@ -721,8 +794,17 @@ END_VAR
       <LineId Id="34" Count="0" />
       <LineId Id="36" Count="0" />
       <LineId Id="32" Count="0" />
+      <LineId Id="47" Count="0" />
+      <LineId Id="45" Count="1" />
       <LineId Id="21" Count="0" />
       <LineId Id="13" Count="0" />
+      <LineId Id="58" Count="0" />
+      <LineId Id="70" Count="0" />
+      <LineId Id="57" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="61" Count="1" />
+      <LineId Id="68" Count="1" />
+      <LineId Id="60" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.GetSymbol">
