@@ -30,6 +30,12 @@
     <Compile Include="DUTs\AbbLinkinRequestStatus_Typ.TcDUT">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DUTs\AbbLinkinAuth_Typ.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\ABBLINKIN_AUTH_HEADER_VALUE.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="DUTs\ABBLINKIN_RWS_API_VERSION.TcDUT">
       <SubType>Code</SubType>
     </Compile>

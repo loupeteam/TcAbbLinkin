@@ -6,10 +6,10 @@ VAR_INPUT
 	configuration : AbbLinkinConfiguration_Typ;
 END_VAR
 VAR_OUTPUT
-	ready	: BOOL;
-	error	: BOOL;
-	errorID	: DINT;
-	responseData : STRING;
+	readyForCmd		: BOOL;
+	error			: BOOL;
+	errorID			: DINT;
+	responseData 	: STRING;
 END_VAR
 VAR
 	_connectionEnabled : BOOL;
@@ -21,12 +21,18 @@ VAR
 	_methodConnectionStopCalled: BOOL;
 	_methodAckErrorCalled: BOOL;
 	_state: ABBLINKIN_STATE;
+	_auth: AbbLinkinAuth_Typ;
 	_requestQueue: AbbLinkinRequestQueue_Typ;
 	_currentRequest: AbbLinkinRequest_Typ;
-	
-	testString: string;
+	_sendingEnabled: BOOL;
+	_authorized: BOOL;
+	_httpSessionCookie: STRING;
+	_ABBCXCookie: STRING;
 END_VAR
-]]></Declaration>
+
+VAR CONSTANT
+	AUTH_URI: STRING := '/?json=1';
+END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
@@ -207,29 +213,123 @@ _requestQueuePop := _requestQueue.request;
     <Method Name="_setHeader" Id="{03deb409-7be0-4e61-9c99-83e8f97b30dc}">
       <Declaration><![CDATA[METHOD PRIVATE _setHeader : BOOL
 VAR_INPUT
+	authorizationValue : ABBLINKIN_AUTH_HEADER_VALUE;
 END_VAR
 VAR
 	authValue : STRING;
 	combinedUnPwRaw: STRING;
 	combinedUnPwBase64: STRING;
+	anyCookieSetYet: BOOL;
+	tempString: STRING(255);
+	cookieValue: STRING(1000);
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
-// Accept JSON 
+// Accept 
 IF configuration.rwsVersion = ABBLINKIN_RWS_API_VERSION.V2 THEN
 	_httpHeader.AddField('Accept', 'application/hal+json;v=2.0', FALSE);
+ELSE
+	_httpHeader.AddField('Accept', '*/*', FALSE);
 END_IF
 
 
 // Authorization
-combinedUnPwRaw := configuration.rwsUsername;
-combinedUnPwRaw := CONCAT(combinedUnPwRaw, ':');
-combinedUnPwRaw := CONCAT(combinedUnPwRaw, configuration.rwsPassword);
-combinedUnPwBase64 := _encodeBase64(combinedUnPwRaw);
+CASE authorizationValue OF
+	ABBLINKIN_AUTH_HEADER_VALUE.NONE:
+		_httpHeader.AddField('Authorization', ' ', FALSE);
+	
+	ABBLINKIN_AUTH_HEADER_VALUE.BASIC:
+		combinedUnPwRaw := configuration.rwsUsername;
+		combinedUnPwRaw := CONCAT(combinedUnPwRaw, ':');
+		combinedUnPwRaw := CONCAT(combinedUnPwRaw, configuration.rwsPassword);
+		combinedUnPwBase64 := _encodeBase64(combinedUnPwRaw);
+		
+		authValue := 'Basic ';
+		authValue := CONCAT(authValue, combinedUnPwBase64);
+		_httpHeader.AddField('Authorization', authValue, FALSE);
+	
+	ABBLINKIN_AUTH_HEADER_VALUE.DIGEST:
+		_httpHeader.AddField('Authorization', 'Digest xxx', FALSE); // TODO
+		
+END_CASE
 
-authValue := 'Basic ';
-authValue := CONCAT(authValue, combinedUnPwBase64);
-_httpHeader.AddField('Authorization', authValue, FALSE);
+
+// Cookie
+anyCookieSetYet := FALSE;
+cookieValue := '';
+IF LEN(_httpSessionCookie) > 0 THEN
+	tempString := '';
+	tempString := CONCAT(tempString, '-http-session-='); 
+	tempString := CONCAT(tempString, _httpSessionCookie); 
+	cookieValue := CONCAT(cookieValue, tempString);
+	//_httpHeader.AddField('Cookie', tempString, anyCookieSetYet);
+	anyCookieSetYet := TRUE;
+END_IF
+
+IF LEN(_ABBCXCookie) > 0 THEN
+	IF anyCookieSetYet THEN
+		tempString := '; ';
+	ELSE
+		tempString := '';	
+	END_IF
+	tempString := CONCAT(tempString, 'ABBCX='); 
+	tempString := CONCAT(tempString, _ABBCXCookie); 
+	cookieValue := CONCAT(cookieValue, tempString);	
+	//_httpHeader.AddField('Cookie', tempString, anyCookieSetYet);
+	anyCookieSetYet := TRUE;
+END_IF
+
+_httpHeader.AddField('Cookie', cookieValue, FALSE);
+
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="_storeCookies" Id="{495ad33e-c453-424c-aeee-f8fc1c4fb6d3}">
+      <Declaration><![CDATA[METHOD PRIVATE _storeCookies : BOOL
+VAR_INPUT
+	httpRequest:	FB_IotHttpRequest;
+END_VAR
+VAR
+	setCookieValue:	STRING(1000);
+	Set: INT;
+	tempString:	STRING(1000);
+	setCookieValueLen: INT;
+	keyLoc : INT;
+	equalLoc: INT;
+	semicolonLoc : INT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+IF httpRequest.GetHeaderField('Set-Cookie', ADR(setCookieValue), SIZEOF(setCookieValue)-1) THEN 
+	
+	// NOTE: if there are multiple 'Set-Cookie' headers, they will all be contained in one value, separated by a newline
+	//		e.g. 'token1=Beckhoff$Ntoken2=IoT' per https://infosys.beckhoff.com/content/1033/tf6760_tc3_iot_https_rest/9335286283.html
+	// Real header examples from RWS:
+	//		Set-Cookie: -http-session-=1::http.session::241eb766f25fa09a53f749ebbafb9aa9; path=/; domain=127.0.0.1; httponly\r\n
+	//		Set-Cookie: ABBCX=12; path=/; domain=127.0.0.1; httponly\r\n
+	
+	setCookieValueLen := len(setCookieValue);
+		
+	// -http-session-
+	keyLoc := FIND(setCookieValue, '-http-session-');
+	tempString := RIGHT(setCookieValue, setCookieValueLen - keyLoc);
+	equalLoc := FIND(tempString, '=') + keyLoc;
+	tempString := RIGHT(setCookieValue, setCookieValueLen - equalLoc);
+	semicolonLoc := FIND(tempString, ';') + equalLoc;
+	_httpSessionCookie := MID(setCookieValue, semicolonLoc - equalLoc - 1, equalLoc + 1);
+	
+	
+	// ABBCX
+	keyLoc := FIND(setCookieValue, 'ABBCX');
+	tempString := RIGHT(setCookieValue, setCookieValueLen - keyLoc);
+	equalLoc := FIND(tempString, '=') + keyLoc;
+	tempString := RIGHT(setCookieValue, setCookieValueLen - equalLoc);
+	semicolonLoc := FIND(tempString, ';') + equalLoc;
+	_ABBCXCookie := MID(setCookieValue, semicolonLoc - equalLoc - 1, equalLoc + 1);
+	
+	
+END_IF
 
 
 
@@ -295,11 +395,10 @@ IF _connectionEnabled THEN
 END_IF
 
 // Status
-ready := _connectionEnabled AND _httpClient.bConfigured;
+_sendingEnabled := _connectionEnabled AND _httpClient.bConfigured;
+readyForCmd := _sendingEnabled AND _authorized;
 
-
-
-IF NOT ready THEN
+IF NOT _sendingEnabled THEN
 	_state := ABBLINKIN_STATE.IDLE;
 END_IF
 
@@ -308,14 +407,31 @@ CASE _state OF
 	
 	ABBLINKIN_STATE.IDLE:
 		
-		IF ready AND NOT _requestQueue.empty THEN
-			_currentRequest := _requestQueuePop();
-			_state := ABBLINKIN_STATE.SEND_REQUEST;
+		IF _sendingEnabled THEN
+			IF _authorized THEN 
+				
+				// Check for existing request
+				IF _currentRequest.pStatus <> 0	THEN 
+					IF _currentRequest.pStatus^.busy THEN
+						// This is the case when a request was sent, but a 401 Unauthorized was returned (causing re-auth steps). Here, we are retrying.
+						_state := ABBLINKIN_STATE.SEND_REQUEST;
+					END_IF;
+				END_IF
+				
+				// Check if queue contains at least one request
+				IF _state <> ABBLINKIN_STATE.SEND_REQUEST  AND NOT _requestQueue.empty THEN
+					_currentRequest := _requestQueuePop();
+					_state := ABBLINKIN_STATE.SEND_REQUEST;
+				END_IF;
+			ELSE
+				// Start Auth sequence within state machine
+				_state := ABBLINKIN_STATE.AUTH_SEND_REQUEST;
+			END_IF;
 		END_IF
 		
 	ABBLINKIN_STATE.SEND_REQUEST:
 		
-		_setHeader();
+		_setHeader(ABBLINKIN_AUTH_HEADER_VALUE.NONE);
 		retVal := _httpRequest.SendRequest(_currentRequest.uri, _httpClient, _currentRequest.httpMethod, _currentRequest.pContent, _currentRequest.contentSize, _httpHeader);
 		
 		IF retVal = FALSE THEN
@@ -352,13 +468,14 @@ CASE _state OF
 				
 				_currentRequest.pStatus^.busy := FALSE;
 				_currentRequest.pStatus^.done := TRUE;
+				MEMSET(ADR(_currentRequest), 0, SIZEOF(_currentRequest));
 				
 				_state := ABBLINKIN_STATE.IDLE;
 				
 			401, 503: // HTTP Error - "Unauthorized" 
 				
 				// TODO: implement Authorization implementation
-				
+				_authorized := FALSE;
 				_state := ABBLINKIN_STATE.IDLE;	// todo: decide if we want to retry
 								
 			400, 402..451:	// HTTP Client Error	
@@ -376,10 +493,95 @@ CASE _state OF
 				_currentRequest.pStatus^.errorMsg := 'The Robot responded with an error (server error, 5xx). See errorID';
 				
 				_state := ABBLINKIN_STATE.IDLE;	// todo: decide if we want to retry
-				
+							
+		END_CASE
+	
+	
+	ABBLINKIN_STATE.AUTH_START:
+		_auth.numAttempts := 0;
+		_state := ABBLINKIN_STATE.AUTH_SEND_REQUEST;
+		
+	ABBLINKIN_STATE.AUTH_SEND_REQUEST:
+		
+		CASE configuration.rwsVersion OF
+			ABBLINKIN_RWS_API_VERSION.V1:
+				_setHeader(ABBLINKIN_AUTH_HEADER_VALUE.NONE);
+			ABBLINKIN_RWS_API_VERSION.V2:
+				_setHeader(ABBLINKIN_AUTH_HEADER_VALUE.BASIC);
 		END_CASE
 		
+		retVal := _httpRequest.SendRequest(AUTH_URI, _httpClient, ETcIotHttpRequestType.HTTP_Get, 0, 0, _httpHeader);
+		
+		IF retVal = FALSE THEN
+			_state := ABBLINKIN_STATE.IDLE;	// TODO: handle error better
+		ELSE
+			_state := ABBLINKIN_STATE.AUTH_WAIT_FOR_RESONSE;
+		END_IF
+		
+	ABBLINKIN_STATE.AUTH_WAIT_FOR_RESONSE:
+		
+		IF _httpRequest.bError THEN
+			_state := ABBLINKIN_STATE.IDLE;	// TODO: handle error better
+		ELSIF _httpRequest.bBusy = FALSE THEN
+			_state := ABBLINKIN_STATE.AUTH_PROCESS_RESPONSE;
+		END_IF
+		
+	ABBLINKIN_STATE.AUTH_PROCESS_RESPONSE:
+		
+		_storeCookies(_httpRequest);
+		
+		CASE _httpRequest.nStatusCode OF 
+		
+			200..204 : // HTTP Success
+				
+				// Successfully authorized
+				_authorized := TRUE;
+				
+				_state := ABBLINKIN_STATE.IDLE;
+				
+			401: // HTTP Error - "Unauthorized"
+
+				CASE configuration.rwsVersion OF
+					ABBLINKIN_RWS_API_VERSION.V1:
+						_state := ABBLINKIN_STATE.AUTH_DIGEST_RESPONSE_CALCULATE;
+					
+					ABBLINKIN_RWS_API_VERSION.V2:
+						// Invalid username or password
+						_state := ABBLINKIN_STATE.IDLE;	// todo: handle better	
+				END_CASE
+				
+			503:  
+				// Note: You can get a 503 if you try to send the same credentials repeatedly instead of 
+				// 		sending the http session cookies that the server provides after the first successful authentication
+				
+				_state := ABBLINKIN_STATE.IDLE;	// todo: handle better
+		ELSE
+			
+			_state := ABBLINKIN_STATE.IDLE;	// todo: handle better				
+		END_CASE
+	
+	
+		
+	
+	ABBLINKIN_STATE.AUTH_DIGEST_RESPONSE_CALCULATE:
+		// Calculate Digest parameters
+	
+	
+	ABBLINKIN_STATE.AUTH_DIGEST_RESPONSE_SEND:
+	
+		_setHeader(ABBLINKIN_AUTH_HEADER_VALUE.DIGEST);
+		retVal := _httpRequest.SendRequest(AUTH_URI, _httpClient, ABBLINKIN_COMMAND_TYPE.GET_STATE, 0, 0, _httpHeader);
+		
+		IF retVal = FALSE THEN
+			_state := ABBLINKIN_STATE.IDLE;	// TODO: handle error better
+		ELSE
+			_state := ABBLINKIN_STATE.AUTH_WAIT_FOR_RESONSE;
+		END_IF
+		
+	
 END_CASE
+
+
 
 
 
@@ -405,9 +607,6 @@ IF _methodAckErrorCalled THEN
 	
 	_methodAckErrorCalled := FALSE;
 END_IF
-
-
-testString := _encodeBase64('Default User:robotics');
 ]]></ST>
       </Implementation>
     </Method>
@@ -657,18 +856,71 @@ END_VAR
       <LineId Id="36" Count="0" />
       <LineId Id="38" Count="1" />
       <LineId Id="42" Count="0" />
+      <LineId Id="52" Count="0" />
+      <LineId Id="54" Count="0" />
       <LineId Id="41" Count="0" />
       <LineId Id="6" Count="0" />
       <LineId Id="9" Count="0" />
       <LineId Id="20" Count="0" />
-      <LineId Id="28" Count="0" />
-      <LineId Id="31" Count="2" />
-      <LineId Id="22" Count="0" />
-      <LineId Id="21" Count="0" />
-      <LineId Id="23" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="58" Count="0" />
+      <LineId Id="60" Count="1" />
+      <LineId Id="64" Count="7" />
+      <LineId Id="74" Count="1" />
+      <LineId Id="62" Count="0" />
+      <LineId Id="77" Count="0" />
+      <LineId Id="73" Count="0" />
+      <LineId Id="59" Count="0" />
+      <LineId Id="78" Count="0" />
+      <LineId Id="76" Count="0" />
       <LineId Id="11" Count="0" />
-      <LineId Id="14" Count="2" />
+      <LineId Id="85" Count="0" />
+      <LineId Id="112" Count="0" />
+      <LineId Id="14" Count="0" />
+      <LineId Id="98" Count="0" />
+      <LineId Id="100" Count="0" />
+      <LineId Id="96" Count="0" />
+      <LineId Id="80" Count="0" />
+      <LineId Id="113" Count="0" />
+      <LineId Id="90" Count="0" />
+      <LineId Id="81" Count="0" />
+      <LineId Id="92" Count="0" />
+      <LineId Id="101" Count="0" />
+      <LineId Id="106" Count="1" />
+      <LineId Id="109" Count="1" />
+      <LineId Id="108" Count="0" />
+      <LineId Id="102" Count="0" />
+      <LineId Id="104" Count="1" />
+      <LineId Id="114" Count="0" />
+      <LineId Id="95" Count="0" />
+      <LineId Id="91" Count="0" />
+      <LineId Id="115" Count="0" />
+      <LineId Id="88" Count="0" />
+      <LineId Id="15" Count="1" />
       <LineId Id="8" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin._storeCookies">
+      <LineId Id="6" Count="0" />
+      <LineId Id="13" Count="0" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="26" Count="0" />
+      <LineId Id="18" Count="0" />
+      <LineId Id="28" Count="0" />
+      <LineId Id="27" Count="0" />
+      <LineId Id="32" Count="0" />
+      <LineId Id="47" Count="0" />
+      <LineId Id="33" Count="2" />
+      <LineId Id="40" Count="4" />
+      <LineId Id="53" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="58" Count="1" />
+      <LineId Id="63" Count="3" />
+      <LineId Id="17" Count="0" />
+      <LineId Id="54" Count="1" />
+      <LineId Id="16" Count="0" />
+      <LineId Id="8" Count="2" />
+      <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.AckError">
       <LineId Id="6" Count="1" />
@@ -698,7 +950,6 @@ END_VAR
       <LineId Id="63" Count="0" />
       <LineId Id="9" Count="0" />
       <LineId Id="5" Count="0" />
-      <LineId Id="28" Count="0" />
       <LineId Id="64" Count="2" />
       <LineId Id="70" Count="0" />
       <LineId Id="69" Count="0" />
@@ -707,8 +958,25 @@ END_VAR
       <LineId Id="72" Count="0" />
       <LineId Id="74" Count="0" />
       <LineId Id="79" Count="1" />
-      <LineId Id="82" Count="1" />
+      <LineId Id="82" Count="0" />
+      <LineId Id="278" Count="0" />
+      <LineId Id="437" Count="0" />
+      <LineId Id="447" Count="0" />
+      <LineId Id="446" Count="0" />
+      <LineId Id="439" Count="0" />
+      <LineId Id="442" Count="0" />
+      <LineId Id="445" Count="0" />
+      <LineId Id="444" Count="0" />
+      <LineId Id="440" Count="0" />
+      <LineId Id="438" Count="0" />
+      <LineId Id="448" Count="0" />
+      <LineId Id="433" Count="0" />
+      <LineId Id="83" Count="0" />
       <LineId Id="157" Count="0" />
+      <LineId Id="284" Count="0" />
+      <LineId Id="279" Count="0" />
+      <LineId Id="449" Count="0" />
+      <LineId Id="281" Count="1" />
       <LineId Id="86" Count="0" />
       <LineId Id="84" Count="0" />
       <LineId Id="87" Count="2" />
@@ -730,13 +998,15 @@ END_VAR
       <LineId Id="166" Count="0" />
       <LineId Id="120" Count="0" />
       <LineId Id="119" Count="0" />
-      <LineId Id="106" Count="4" />
+      <LineId Id="106" Count="3" />
+      <LineId Id="432" Count="0" />
       <LineId Id="123" Count="2" />
       <LineId Id="129" Count="0" />
       <LineId Id="135" Count="1" />
       <LineId Id="138" Count="0" />
       <LineId Id="168" Count="0" />
-      <LineId Id="167" Count="0" />
+      <LineId Id="450" Count="0" />
+      <LineId Id="452" Count="0" />
       <LineId Id="169" Count="0" />
       <LineId Id="139" Count="0" />
       <LineId Id="137" Count="0" />
@@ -745,18 +1015,63 @@ END_VAR
       <LineId Id="182" Count="1" />
       <LineId Id="134" Count="0" />
       <LineId Id="170" Count="2" />
-      <LineId Id="133" Count="0" />
-      <LineId Id="177" Count="2" />
-      <LineId Id="173" Count="3" />
-      <LineId Id="127" Count="0" />
-      <LineId Id="132" Count="0" />
-      <LineId Id="181" Count="0" />
-      <LineId Id="180" Count="0" />
+      <LineId Id="329" Count="11" />
       <LineId Id="128" Count="0" />
-      <LineId Id="126" Count="0" />
+      <LineId Id="266" Count="0" />
+      <LineId Id="290" Count="0" />
+      <LineId Id="292" Count="15" />
+      <LineId Id="328" Count="0" />
+      <LineId Id="309" Count="2" />
+      <LineId Id="270" Count="0" />
+      <LineId Id="312" Count="2" />
+      <LineId Id="320" Count="2" />
+      <LineId Id="271" Count="0" />
+      <LineId Id="323" Count="0" />
+      <LineId Id="272" Count="0" />
+      <LineId Id="341" Count="0" />
+      <LineId Id="427" Count="0" />
+      <LineId Id="429" Count="0" />
+      <LineId Id="342" Count="3" />
+      <LineId Id="436" Count="0" />
+      <LineId Id="351" Count="1" />
+      <LineId Id="384" Count="0" />
+      <LineId Id="381" Count="0" />
+      <LineId Id="354" Count="0" />
+      <LineId Id="385" Count="0" />
+      <LineId Id="379" Count="0" />
+      <LineId Id="388" Count="0" />
+      <LineId Id="390" Count="0" />
+      <LineId Id="393" Count="0" />
+      <LineId Id="389" Count="0" />
+      <LineId Id="391" Count="1" />
+      <LineId Id="387" Count="0" />
+      <LineId Id="380" Count="0" />
+      <LineId Id="378" Count="0" />
+      <LineId Id="357" Count="0" />
+      <LineId Id="395" Count="0" />
+      <LineId Id="358" Count="0" />
+      <LineId Id="394" Count="0" />
+      <LineId Id="374" Count="0" />
+      <LineId Id="383" Count="0" />
+      <LineId Id="382" Count="0" />
+      <LineId Id="376" Count="1" />
+      <LineId Id="324" Count="0" />
+      <LineId Id="326" Count="0" />
+      <LineId Id="325" Count="0" />
+      <LineId Id="422" Count="0" />
+      <LineId Id="424" Count="0" />
+      <LineId Id="426" Count="0" />
+      <LineId Id="425" Count="0" />
+      <LineId Id="423" Count="0" />
+      <LineId Id="421" Count="0" />
+      <LineId Id="416" Count="0" />
+      <LineId Id="410" Count="5" />
+      <LineId Id="401" Count="0" />
+      <LineId Id="276" Count="1" />
       <LineId Id="76" Count="0" />
       <LineId Id="75" Count="0" />
-      <LineId Id="67" Count="0" />
+      <LineId Id="223" Count="0" />
+      <LineId Id="191" Count="1" />
       <LineId Id="29" Count="2" />
       <LineId Id="41" Count="0" />
       <LineId Id="32" Count="0" />
@@ -771,9 +1086,6 @@ END_VAR
       <LineId Id="61" Count="0" />
       <LineId Id="122" Count="0" />
       <LineId Id="62" Count="0" />
-      <LineId Id="53" Count="0" />
-      <LineId Id="47" Count="0" />
-      <LineId Id="149" Count="0" />
       <LineId Id="15" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.GetIO">
