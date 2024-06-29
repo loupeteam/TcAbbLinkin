@@ -15,12 +15,12 @@ END_VAR
     <Implementation>
       <ST><![CDATA[
 // Call Robot Instance
-//myRobot();
-myRobotDigest();
+myRobot();
+//myRobotDigest();
 
-UDPTest();
+//UDPTest();
 
-digestTest();
+//digestTest();
 
 (*
 /////////////////////////
