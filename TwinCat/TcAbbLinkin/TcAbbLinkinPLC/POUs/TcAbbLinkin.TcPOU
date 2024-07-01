@@ -331,6 +331,8 @@ END_VAR
 
 _requestQueue.request := request;
 _requestQueue.empty := FALSE;
+
+_requestQueueAdd := TRUE;
 ]]></ST>
       </Implementation>
     </Method>
@@ -827,8 +829,23 @@ VAR
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
+// Check for invalid status pointer
+IF pStatus = 0 THEN
+	GetState := FALSE;
+	RETURN;
+END_IF;
+
 // Clear Status
 _clearRequestStatus(pStatus);
+
+// Check for invalid results pointer
+IF pResults = 0 THEN
+	pStatus^.error := TRUE;
+	pStatus^.errorMsg := TO_STRING(ABBLINKIN_COMMAND_TYPE.GET_STATE);
+	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' results pointer invalid.');
+	GetState := FALSE;
+	RETURN;
+END_IF
 
 
 request.command := ABBLINKIN_COMMAND_TYPE.GET_STATE;
@@ -845,16 +862,17 @@ END_CASE
 request.pStatus := pStatus;
 request.pResults := pResults;
 
-_requestQueueAdd(request);
-
 // Set Busy (or Error) Status
-IF TRUE THEN // TODO: Check that request successfully added to queue
+IF _requestQueueAdd(request) THEN
 	pStatus^.busy := TRUE;
+	GetState := TRUE;
 ELSE
 	pStatus^.error := TRUE;
 	pStatus^.errorMsg := TO_STRING(ABBLINKIN_COMMAND_TYPE.GET_STATE);
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' could not be added to request Queue');
+	GetState := FALSE;
 END_IF
+
 ]]></ST>
       </Implementation>
     </Method>
@@ -879,12 +897,15 @@ END_VAR
     <Method Name="MotorsOff" Id="{0e9c796b-4548-4647-8b3c-207480990c05}">
       <Declaration><![CDATA[METHOD MotorsOff : BOOL
 VAR_INPUT
+	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
 END_VAR
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[
 
-]]></ST>
+
+VAR
+	request: AbbLinkinRequest_Typ;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
       </Implementation>
     </Method>
     <Method Name="MotorsOn" Id="{61a3e16c-d842-4ebd-be26-10100c74cc52}">
@@ -1090,6 +1111,7 @@ END_VAR
       <LineId Id="11" Count="0" />
       <LineId Id="5" Count="0" />
       <LineId Id="9" Count="0" />
+      <LineId Id="16" Count="1" />
       <LineId Id="8" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin._requestQueuePop">
@@ -1362,10 +1384,22 @@ END_VAR
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.GetState">
-      <LineId Id="9" Count="0" />
-      <LineId Id="63" Count="0" />
-      <LineId Id="66" Count="0" />
-      <LineId Id="64" Count="1" />
+      <LineId Id="102" Count="0" />
+      <LineId Id="81" Count="0" />
+      <LineId Id="80" Count="0" />
+      <LineId Id="84" Count="1" />
+      <LineId Id="96" Count="0" />
+      <LineId Id="99" Count="1" />
+      <LineId Id="98" Count="0" />
+      <LineId Id="101" Count="0" />
+      <LineId Id="97" Count="0" />
+      <LineId Id="89" Count="0" />
+      <LineId Id="92" Count="2" />
+      <LineId Id="90" Count="0" />
+      <LineId Id="95" Count="0" />
+      <LineId Id="83" Count="0" />
+      <LineId Id="103" Count="0" />
+      <LineId Id="65" Count="0" />
       <LineId Id="20" Count="0" />
       <LineId Id="10" Count="0" />
       <LineId Id="30" Count="0" />
@@ -1378,15 +1412,16 @@ END_VAR
       <LineId Id="32" Count="0" />
       <LineId Id="47" Count="0" />
       <LineId Id="45" Count="1" />
-      <LineId Id="21" Count="0" />
-      <LineId Id="13" Count="0" />
       <LineId Id="58" Count="0" />
       <LineId Id="70" Count="0" />
       <LineId Id="57" Count="0" />
       <LineId Id="56" Count="0" />
+      <LineId Id="87" Count="0" />
       <LineId Id="61" Count="1" />
       <LineId Id="68" Count="1" />
+      <LineId Id="88" Count="0" />
       <LineId Id="60" Count="0" />
+      <LineId Id="86" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.GetSymbol">
@@ -1396,8 +1431,6 @@ END_VAR
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.MotorsOff">
-      <LineId Id="33" Count="0" />
-      <LineId Id="36" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.MotorsOn">
