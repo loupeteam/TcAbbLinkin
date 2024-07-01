@@ -9,6 +9,9 @@ VAR
 	userGetStateNow: BOOL;
 	userAckErrorNow: BOOL;
 	userSetConfigurationNow: BOOL := TRUE;
+	
+	userGetStateStatus: AbbLinkinRequestStatus_Typ;
+	userGetStateResults: AbbLinkinGetterResults_Typ;
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -17,7 +20,7 @@ END_VAR
 if userSetConfigurationNow then
 	myRobotLink.configuration.remoteIpAddress := '127.0.0.1';
 	myRobotLink.configuration.remotePort := 80;
-	myRobotLink.configuration.rwsVersion := ABBLINKIN_RWS_API_VERSION.V2;
+	myRobotLink.configuration.rwsVersion := ABBLINKIN_RWS_API_VERSION.V1;
 	myRobotLink.configuration.rwsUsername := 'Default User';
 	myRobotLink.configuration.rwsPassword := 'robotics';
 	userSetConfigurationNow := FALSE;
@@ -39,7 +42,7 @@ IF userConnectStopNow THEN
 END_IF
 
 IF userGetStateNow THEN
-	myRobotLink.GetState();
+	myRobotLink.GetState(ADR(userGetStateStatus), ADR(userGetStateResults));
 	userGetStateNow := FALSE;
 END_IF
 
