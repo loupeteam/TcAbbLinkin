@@ -3,7 +3,9 @@
   <DUT Name="AbbLinkinAuth_Typ" Id="{3b3e7797-3422-4ef6-95c4-998015db4fcc}">
     <Declaration><![CDATA[TYPE AbbLinkinAuth_Typ :
 STRUCT
-	numAttempts	: UINT;
+	numAttempts	: 		UINT;
+	wwwAuthContent :	STRING_EX_LEN;
+	digest : 			AbbLinkinAuthDigest_Typ;
 END_STRUCT
 END_TYPE
 ]]></Declaration>
