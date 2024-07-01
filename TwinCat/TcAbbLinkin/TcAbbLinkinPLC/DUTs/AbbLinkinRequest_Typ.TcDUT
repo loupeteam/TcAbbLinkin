@@ -9,6 +9,7 @@ STRUCT
 	pContent	: PVOID;
 	contentSize	: UDINT;
 	pStatus		: POINTER TO AbbLinkinRequestStatus_Typ;
+	pResults	: POINTER TO AbbLinkinGetterResults_Typ;
 END_STRUCT
 END_TYPE
 ]]></Declaration>

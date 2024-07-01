@@ -11,6 +11,7 @@ VAR
 	userSetConfigurationNow: BOOL := TRUE;
 	
 	userGetStateStatus: AbbLinkinRequestStatus_Typ;
+	userGetStateResults: AbbLinkinGetterResults_Typ;
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -41,7 +42,7 @@ IF userConnectStopNow THEN
 END_IF
 
 IF userGetStateNow THEN
-	myRobotLink.GetState(ADR(userGetStateStatus));
+	myRobotLink.GetState(ADR(userGetStateStatus), ADR(userGetStateResults));
 	userGetStateNow := FALSE;
 END_IF
 

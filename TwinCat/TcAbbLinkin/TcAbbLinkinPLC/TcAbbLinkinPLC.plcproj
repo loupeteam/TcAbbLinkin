@@ -24,6 +24,9 @@
     <Compile Include="DUTs\AbbLinkinConfiguration_Typ.TcDUT">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DUTs\AbbLinkinGetterResults_Typ.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="DUTs\AbbLinkinRequest_Typ.TcDUT">
       <SubType>Code</SubType>
     </Compile>
@@ -46,6 +49,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="DUTs\ABBLINKIN_COMMAND_TYPE.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\ABBLINKIN_RESULT_TYPE_Typ.TcDUT">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="DUTs\STRING_EX_LEN.TcDUT">

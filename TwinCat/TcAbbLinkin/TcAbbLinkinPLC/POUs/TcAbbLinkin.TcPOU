@@ -9,7 +9,6 @@ VAR_OUTPUT
 	readyForCmd		: BOOL;
 	error			: BOOL;
 	errorID			: DINT;
-	responseData 	: STRING;
 END_VAR
 VAR
 	_connectionEnabled : BOOL;
@@ -36,8 +35,9 @@ END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
+    <Folder Name="digestMethods" Id="{29dc1ba2-5044-4aed-a071-8839204fb61b}" />
     <Folder Name="responseCallbacks" Id="{81e09dac-321f-4653-938f-510c189b178d}" />
-    <Method Name="_calculateDigestResponse" Id="{b6ba6c5c-69f4-4fe0-9917-9e6697b8c0e1}">
+    <Method Name="_calculateDigestResponse" Id="{b6ba6c5c-69f4-4fe0-9917-9e6697b8c0e1}" FolderPath="digestMethods\">
       <Declaration><![CDATA[METHOD PRIVATE _calculateDigestResponse : STRING
 VAR_INPUT
 	username : STRING;
@@ -119,6 +119,7 @@ VAR_INPUT
 END_VAR
 VAR_IN_OUT
 	httpRequest : FB_IotHttpRequest;
+	request: AbbLinkinRequest_Typ;
 END_VAR
 ]]></Declaration>
       <Implementation>
@@ -130,7 +131,7 @@ CASE command OF
 		;//TODO
 		
 	ABBLINKIN_COMMAND_TYPE.GET_STATE:
-		_getStateRespCallbackSuccess(httpRequest);
+		_getStateRespCallbackSuccess(httpRequest, request);
 		
 	ABBLINKIN_COMMAND_TYPE.GET_SYMBOL:
 		;//TODO
@@ -245,28 +246,45 @@ _encodeBase64 := _jsonDomParser.GetString(_jsonValue2);
       <Declaration><![CDATA[METHOD PRIVATE _getStateRespCallbackSuccess : BOOL
 VAR_IN_OUT
 	httpRequest : 	FB_IotHttpRequest;
+	request : AbbLinkinRequest_Typ;
 END_VAR
 VAR
 	jsonDomParser : FB_JsonDomParser;
 	jsonRoot : SJsonValue;
 	jsonValue : SJsonValue;
+	valuePath : STRING;
+	tempString : STRING;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
 // RWS V1: https://developercenter.robotstudio.com/api/rwsApi/rapid_execution_get_page.html
 
+CASE configuration.rwsVersion OF 
+	ABBLINKIN_RWS_API_VERSION.V1:
+		valuePath := '_embedded/_state#0/ctrlexecstate';
+	ABBLINKIN_RWS_API_VERSION.V2:
+		valuePath := 'state#0/ctrlexecstate';
+END_CASE
 
 jsonRoot := httpRequest.GetJsonDomContent(jsonDomParser);
-jsonValue := jsonDomParser.FindMemberPath(jsonRoot, 'state#0/ctrlexecstate');
+jsonValue := jsonDomParser.FindMemberPath(jsonRoot, valuePath);
 IF (jsonValue <> 0) THEN
-	responseData := jsonDomParser.GetString(jsonValue);
+	tempString := jsonDomParser.GetString(jsonValue);
+	memset(request.pResults, 0, SIZEOF(AbbLinkinGetterResults_Typ.data));
+	memcpy(request.pResults, ADR(tempString), LEN(tempString) + 1);
+	request.pResults^.dataType := ABBLINKIN_RESULT_TYPE_Typ._STRING;
+	request.pResults^.dataLen := LEN(tempString) + 1;
 ELSE
-	responseData := '';
+	request.pStatus^.error := TRUE;
+	request.pStatus^.errorID := 0;
+	request.pStatus^.errorMsg := 'Unable to parse RWS json response';
+	request.pResults^.dataType := ABBLINKIN_RESULT_TYPE_Typ._NONE;
+	request.pResults^.dataLen := 0;
 END_IF
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="_parseWwwAuthForParameter" Id="{3381c2f0-a73a-48c3-a8d7-1dfd534075ee}">
+    <Method Name="_parseWwwAuthForParameter" Id="{3381c2f0-a73a-48c3-a8d7-1dfd534075ee}" FolderPath="digestMethods\">
       <Declaration><![CDATA[METHOD PRIVATE _parseWwwAuthForParameter : STRING
 
 VAR_INPUT
@@ -587,10 +605,11 @@ CASE _state OF
 			200..204 : // HTTP Success
 			
 				// TODO: requestType-specific processing here
-				_callCommandSuccessHandler(_currentRequest.command, _httpRequest);
+				_callCommandSuccessHandler(_currentRequest.command, _httpRequest, _currentRequest);
 				
+				// Write and close out current request status
 				_currentRequest.pStatus^.busy := FALSE;
-				_currentRequest.pStatus^.done := TRUE;
+				_currentRequest.pStatus^.done := NOT _currentRequest.pStatus^.error; // Set done if error false
 				MEMSET(ADR(_currentRequest), 0, SIZEOF(_currentRequest));
 				
 				_state := ABBLINKIN_STATE.IDLE;
@@ -800,6 +819,7 @@ END_VAR
       <Declaration><![CDATA[METHOD GetState : BOOL
 VAR_INPUT
 	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pResults : POINTER TO AbbLinkinGetterResults_Typ;
 END_VAR
 
 VAR
@@ -823,7 +843,7 @@ CASE configuration.rwsVersion OF
 END_CASE
 
 request.pStatus := pStatus;
-
+request.pResults := pResults;
 
 _requestQueueAdd(request);
 
@@ -862,7 +882,9 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[]]></ST>
+        <ST><![CDATA[
+
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="MotorsOn" Id="{61a3e16c-d842-4ebd-be26-10100c74cc52}">
@@ -1031,10 +1053,25 @@ END_VAR
     <LineIds Name="TcAbbLinkin._getStateRespCallbackSuccess">
       <LineId Id="32" Count="0" />
       <LineId Id="12" Count="0" />
-      <LineId Id="33" Count="0" />
+      <LineId Id="53" Count="0" />
+      <LineId Id="52" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="58" Count="0" />
+      <LineId Id="57" Count="0" />
+      <LineId Id="59" Count="0" />
+      <LineId Id="55" Count="0" />
       <LineId Id="15" Count="1" />
-      <LineId Id="25" Count="2" />
-      <LineId Id="30" Count="1" />
+      <LineId Id="25" Count="1" />
+      <LineId Id="47" Count="0" />
+      <LineId Id="45" Count="1" />
+      <LineId Id="27" Count="0" />
+      <LineId Id="44" Count="0" />
+      <LineId Id="30" Count="0" />
+      <LineId Id="62" Count="0" />
+      <LineId Id="65" Count="0" />
+      <LineId Id="67" Count="0" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="31" Count="0" />
       <LineId Id="23" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
@@ -1217,6 +1254,7 @@ END_VAR
       <LineId Id="129" Count="0" />
       <LineId Id="135" Count="1" />
       <LineId Id="138" Count="0" />
+      <LineId Id="643" Count="0" />
       <LineId Id="168" Count="0" />
       <LineId Id="450" Count="0" />
       <LineId Id="452" Count="0" />
@@ -1358,6 +1396,8 @@ END_VAR
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.MotorsOff">
+      <LineId Id="33" Count="0" />
+      <LineId Id="36" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.MotorsOn">
