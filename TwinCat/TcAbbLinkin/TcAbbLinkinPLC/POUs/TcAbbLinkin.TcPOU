@@ -128,7 +128,7 @@ END_VAR
 
 CASE command OF 
 	ABBLINKIN_COMMAND_TYPE.GET_IO:
-		;//TODO
+		_getIORespCallbackSuccess(httpRequest, request);
 		
 	ABBLINKIN_COMMAND_TYPE.GET_STATE:
 		_getStateRespCallbackSuccess(httpRequest, request);
@@ -239,6 +239,146 @@ _jsonRoot := _jsonDomParser.ParseDocument('{"k": ""}');
 _jsonValue := _jsonDomParser.FindMember(_jsonRoot, 'k');
 _jsonValue2 := _jsonDomParser.SetBase64(_jsonValue, ADR(rawText), LEN(rawText));
 _encodeBase64 := _jsonDomParser.GetString(_jsonValue2);
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="_getIO" Id="{bd29dab4-cb08-45fe-84ff-e3737f6110e8}">
+      <Declaration><![CDATA[METHOD PRIVATE _getIO : BOOL
+VAR_INPUT
+	signal : STRING;
+	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pResultBool : POINTER TO BOOL := 0;
+	pResultDint : POINTER TO DINT := 0;
+	pResultLreal : POINTER TO LREAL := 0;
+END_VAR
+
+VAR
+	request: AbbLinkinRequest_Typ;
+	pointersSet: INT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF pStatus = 0 THEN
+	_getIO := FALSE;
+	RETURN;
+END_IF;
+
+// Clear Status
+_clearRequestStatus(pStatus);
+
+// Check that one and only one pointer is populated
+pointersSet := 0;
+IF (pResultBOOL <> 0) THEN 
+	request.results.dataType := ABBLINKIN_RESULT_TYPE_Typ._BOOL;
+	request.results.pDataBool := pResultBool;
+	pointersSet := pointersSet + 1; 
+END_IF
+IF (pResultDINT <> 0) THEN
+	request.results.dataType := ABBLINKIN_RESULT_TYPE_Typ._DINT;
+	request.results.pDataDint := pResultDint;
+	pointersSet := pointersSet + 1;
+END_IF
+IF (pResultLREAL <> 0) THEN
+	request.results.dataType := ABBLINKIN_RESULT_TYPE_Typ._LREAL;
+	request.results.pDataLreal := pResultLreal;
+	pointersSet := pointersSet + 1;
+END_IF
+
+
+IF pointersSet = 0 THEN
+	pStatus^.error := TRUE;
+	pStatus^.errorMsg := TO_STRING(ABBLINKIN_COMMAND_TYPE.GET_STATE);
+	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ': No result pointer set');
+	_getIO := FALSE;
+ELSIF pointersSet >= 2 THEN
+	pStatus^.error := TRUE;
+	pStatus^.errorMsg := TO_STRING(ABBLINKIN_COMMAND_TYPE.GET_STATE);
+	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ': Two or more result pointer set');
+	_getIO := FALSE;
+END_IF;
+
+request.command := ABBLINKIN_COMMAND_TYPE.GET_IO;
+request.httpMethod :=  ETcIotHttpRequestType.HTTP_Get;
+
+CASE configuration.rwsVersion OF
+	ABBLINKIN_RWS_API_VERSION.V1:
+		request.uri := '/rw/iosystem/signals/';
+		request.uri := CONCAT(request.uri, signal);
+		request.uri := CONCAT(request.uri, '?json=1');
+
+	ABBLINKIN_RWS_API_VERSION.V2:	
+		request.uri := '/rw/iosystem/signals/';
+		request.uri := CONCAT(request.uri, signal);
+END_CASE
+
+request.pStatus := pStatus;
+
+// Set Busy (or Error) Status
+IF _requestQueueAdd(request) THEN
+	pStatus^.busy := TRUE;
+	_getIO := TRUE;
+ELSE
+	pStatus^.error := TRUE;
+	pStatus^.errorMsg := TO_STRING(ABBLINKIN_COMMAND_TYPE.GET_STATE);
+	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' could not be added to request Queue');
+	_getIO := FALSE;
+END_IF
+
+
+
+
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="_getIORespCallbackSuccess" Id="{8de14980-869f-4f0b-8bbf-fcfda3d0e6d3}" FolderPath="responseCallbacks\">
+      <Declaration><![CDATA[METHOD PRIVATE _getIORespCallbackSuccess : BOOL
+VAR_IN_OUT
+	httpRequest : 	FB_IotHttpRequest;
+	request : AbbLinkinRequest_Typ;
+END_VAR
+VAR
+	jsonDomParser : FB_JsonDomParser;
+	jsonRoot : SJsonValue;
+	jsonValue : SJsonValue;
+	valuePath : STRING;
+	valueString : STRING;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+// RWS V1: https://developercenter.robotstudio.com/api/rwsApi/rapid_execution_get_page.html
+
+CASE configuration.rwsVersion OF 
+	ABBLINKIN_RWS_API_VERSION.V1:
+		valuePath := '_embedded/_state#0/lvalue';
+	ABBLINKIN_RWS_API_VERSION.V2:
+		valuePath := 'todo';
+END_CASE
+
+jsonRoot := httpRequest.GetJsonDomContent(jsonDomParser);
+jsonValue := jsonDomParser.FindMemberPath(jsonRoot, valuePath);
+IF (jsonValue <> 0) THEN
+	valueString := jsonDomParser.GetString(jsonValue);
+	
+	CASE request.results.dataType OF
+			ABBLINKIN_RESULT_TYPE_Typ._BOOL:
+				request.results.pDataBool^ := INT_TO_BOOL(STRING_TO_INT(valueString));
+			ABBLINKIN_RESULT_TYPE_Typ._DINT:
+				request.results.pDataDint^ := STRING_TO_DINT(valueString);
+			ABBLINKIN_RESULT_TYPE_Typ._LREAL:
+				request.results.pDataLreal^ := STRING_TO_LREAL(valueString);
+	ELSE
+		; // error todo
+	END_CASE
+ELSE
+	request.pStatus^.error := TRUE;
+	request.pStatus^.errorID := 0;
+	request.pStatus^.errorMsg := 'Unable to parse RWS json response';
+	//request.pResults^.dataType := ABBLINKIN_RESULT_TYPE_Typ._NONE;
+	//request.pResults^.dataLen := 0;
+END_IF
+
+
+_getIORespCallbackSuccess := TRUE;
 ]]></ST>
       </Implementation>
     </Method>
@@ -812,13 +952,46 @@ END_IF
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="GetIO" Id="{bd29dab4-cb08-45fe-84ff-e3737f6110e8}">
-      <Declaration><![CDATA[METHOD GetIO : BOOL
+    <Method Name="GetIOAnalog" Id="{424a197a-bbbf-4f2e-8c17-41d394c583bb}">
+      <Declaration><![CDATA[METHOD GetIOAnalog : BOOL
 VAR_INPUT
+	signal : STRING;
+	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pResult : POINTER TO LREAL;
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[]]></ST>
+        <ST><![CDATA[
+GetIOAnalog:= _getIO(signal, pStatus, pResultBOOL := 0, pResultDINT := 0, pResultLREAL := pResult);
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="GetIODigital" Id="{9be63dba-bb17-4051-930b-859270d1ab9b}">
+      <Declaration><![CDATA[METHOD GetIODigital : BOOL
+VAR_INPUT
+	signal : STRING;
+	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pResult : POINTER TO BOOL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+GetIODigital := _getIO(signal, pStatus, pResultBOOL := pResult, pResultDINT := 0, pResultLREAL := 0);
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="GetIOGroup" Id="{7a4347af-368e-48dc-876d-605869fae69a}">
+      <Declaration><![CDATA[METHOD GetIOGroup : BOOL
+VAR_INPUT
+	signal : STRING;
+	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pResult : POINTER TO DINT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+GetIOGroup := _getIO(signal, pStatus, pResultBOOL := 0, pResultDINT := pResult, pResultLREAL := 0);
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="GetState" Id="{39878dda-bc14-4b8b-833d-1d9c4ab2cc84}">
@@ -1051,6 +1224,86 @@ END_VAR
     <LineIds Name="TcAbbLinkin._encodeBase64">
       <LineId Id="15" Count="4" />
       <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin._getIO">
+      <LineId Id="25" Count="2" />
+      <LineId Id="22" Count="0" />
+      <LineId Id="40" Count="1" />
+      <LineId Id="29" Count="0" />
+      <LineId Id="42" Count="0" />
+      <LineId Id="30" Count="0" />
+      <LineId Id="46" Count="0" />
+      <LineId Id="48" Count="0" />
+      <LineId Id="64" Count="0" />
+      <LineId Id="110" Count="0" />
+      <LineId Id="66" Count="0" />
+      <LineId Id="65" Count="0" />
+      <LineId Id="49" Count="0" />
+      <LineId Id="76" Count="0" />
+      <LineId Id="111" Count="0" />
+      <LineId Id="67" Count="0" />
+      <LineId Id="70" Count="0" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="75" Count="0" />
+      <LineId Id="112" Count="0" />
+      <LineId Id="68" Count="0" />
+      <LineId Id="72" Count="0" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="43" Count="0" />
+      <LineId Id="55" Count="3" />
+      <LineId Id="36" Count="0" />
+      <LineId Id="53" Count="0" />
+      <LineId Id="60" Count="2" />
+      <LineId Id="54" Count="0" />
+      <LineId Id="37" Count="0" />
+      <LineId Id="77" Count="0" />
+      <LineId Id="83" Count="4" />
+      <LineId Id="93" Count="0" />
+      <LineId Id="97" Count="1" />
+      <LineId Id="89" Count="0" />
+      <LineId Id="95" Count="1" />
+      <LineId Id="90" Count="0" />
+      <LineId Id="78" Count="0" />
+      <LineId Id="113" Count="0" />
+      <LineId Id="79" Count="0" />
+      <LineId Id="99" Count="10" />
+      <LineId Id="80" Count="2" />
+      <LineId Id="35" Count="0" />
+      <LineId Id="23" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin._getIORespCallbackSuccess">
+      <LineId Id="32" Count="0" />
+      <LineId Id="12" Count="0" />
+      <LineId Id="53" Count="0" />
+      <LineId Id="52" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="58" Count="0" />
+      <LineId Id="57" Count="0" />
+      <LineId Id="59" Count="0" />
+      <LineId Id="55" Count="0" />
+      <LineId Id="15" Count="1" />
+      <LineId Id="25" Count="1" />
+      <LineId Id="47" Count="0" />
+      <LineId Id="94" Count="0" />
+      <LineId Id="97" Count="1" />
+      <LineId Id="112" Count="0" />
+      <LineId Id="104" Count="0" />
+      <LineId Id="113" Count="0" />
+      <LineId Id="108" Count="0" />
+      <LineId Id="114" Count="0" />
+      <LineId Id="110" Count="1" />
+      <LineId Id="115" Count="0" />
+      <LineId Id="30" Count="0" />
+      <LineId Id="62" Count="0" />
+      <LineId Id="65" Count="0" />
+      <LineId Id="67" Count="0" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="31" Count="0" />
+      <LineId Id="23" Count="0" />
+      <LineId Id="80" Count="1" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="82" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin._getStateRespCallbackSuccess">
       <LineId Id="32" Count="0" />
@@ -1364,7 +1617,19 @@ END_VAR
       <LineId Id="62" Count="0" />
       <LineId Id="15" Count="0" />
     </LineIds>
-    <LineIds Name="TcAbbLinkin.GetIO">
+    <LineIds Name="TcAbbLinkin.GetIOAnalog">
+      <LineId Id="123" Count="0" />
+      <LineId Id="109" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin.GetIODigital">
+      <LineId Id="123" Count="0" />
+      <LineId Id="109" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin.GetIOGroup">
+      <LineId Id="123" Count="0" />
+      <LineId Id="109" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.GetState">

@@ -8,8 +8,8 @@ TYPE ABBLINKIN_RESULT_TYPE_Typ :
 	_NONE,
 	_STRING,
 	_BOOL,
-	_INT,
-	_REAL
+	_DINT,
+	_LREAL
 );
 END_TYPE
 ]]></Declaration>
