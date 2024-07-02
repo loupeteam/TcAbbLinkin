@@ -269,18 +269,22 @@ END_CASE
 jsonRoot := httpRequest.GetJsonDomContent(jsonDomParser);
 jsonValue := jsonDomParser.FindMemberPath(jsonRoot, valuePath);
 IF (jsonValue <> 0) THEN
-	tempString := jsonDomParser.GetString(jsonValue);
-	memset(request.pResults, 0, SIZEOF(AbbLinkinGetterResults_Typ.data));
-	memcpy(request.pResults, ADR(tempString), LEN(tempString) + 1);
-	request.pResults^.dataType := ABBLINKIN_RESULT_TYPE_Typ._STRING;
-	request.pResults^.dataLen := LEN(tempString) + 1;
+	request.results.pDataString^ := jsonDomParser.GetString(jsonValue);
+	//tempString := jsonDomParser.GetString(jsonValue);
+	//memset(request.pResults, 0, SIZEOF(AbbLinkinGetterResults_Typ.data));
+	//memcpy(request.pResults, ADR(tempString), LEN(tempString) + 1);
+	//request.pResults^.dataType := ABBLINKIN_RESULT_TYPE_Typ._STRING;
+	//request.pResults^.dataLen := LEN(tempString) + 1;
 ELSE
 	request.pStatus^.error := TRUE;
 	request.pStatus^.errorID := 0;
 	request.pStatus^.errorMsg := 'Unable to parse RWS json response';
-	request.pResults^.dataType := ABBLINKIN_RESULT_TYPE_Typ._NONE;
-	request.pResults^.dataLen := 0;
+	//request.pResults^.dataType := ABBLINKIN_RESULT_TYPE_Typ._NONE;
+	//request.pResults^.dataLen := 0;
 END_IF
+
+
+_getStateRespCallbackSuccess := TRUE;
 ]]></ST>
       </Implementation>
     </Method>
@@ -821,7 +825,7 @@ END_VAR
       <Declaration><![CDATA[METHOD GetState : BOOL
 VAR_INPUT
 	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
-	pResults : POINTER TO AbbLinkinGetterResults_Typ;
+	pResultState : POINTER TO STRING;
 END_VAR
 
 VAR
@@ -839,7 +843,7 @@ END_IF;
 _clearRequestStatus(pStatus);
 
 // Check for invalid results pointer
-IF pResults = 0 THEN
+IF pResultState = 0 THEN
 	pStatus^.error := TRUE;
 	pStatus^.errorMsg := TO_STRING(ABBLINKIN_COMMAND_TYPE.GET_STATE);
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' results pointer invalid.');
@@ -860,7 +864,7 @@ CASE configuration.rwsVersion OF
 END_CASE
 
 request.pStatus := pStatus;
-request.pResults := pResults;
+request.results.pDataString := pResultState;
 
 // Set Busy (or Error) Status
 IF _requestQueueAdd(request) THEN
@@ -1061,6 +1065,7 @@ END_VAR
       <LineId Id="15" Count="1" />
       <LineId Id="25" Count="1" />
       <LineId Id="47" Count="0" />
+      <LineId Id="79" Count="0" />
       <LineId Id="45" Count="1" />
       <LineId Id="27" Count="0" />
       <LineId Id="44" Count="0" />
@@ -1071,7 +1076,9 @@ END_VAR
       <LineId Id="50" Count="0" />
       <LineId Id="31" Count="0" />
       <LineId Id="23" Count="0" />
+      <LineId Id="80" Count="1" />
       <LineId Id="5" Count="0" />
+      <LineId Id="82" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin._parseWwwAuthForParameter">
       <LineId Id="41" Count="0" />
