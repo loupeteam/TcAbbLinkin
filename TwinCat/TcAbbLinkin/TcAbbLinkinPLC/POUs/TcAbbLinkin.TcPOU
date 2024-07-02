@@ -894,29 +894,6 @@ END_VAR
         <ST><![CDATA[]]></ST>
       </Implementation>
     </Method>
-    <Method Name="MotorsOff" Id="{0e9c796b-4548-4647-8b3c-207480990c05}">
-      <Declaration><![CDATA[METHOD MotorsOff : BOOL
-VAR_INPUT
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
-END_VAR
-
-
-VAR
-	request: AbbLinkinRequest_Typ;
-END_VAR]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="MotorsOn" Id="{61a3e16c-d842-4ebd-be26-10100c74cc52}">
-      <Declaration><![CDATA[METHOD MotorsOn : BOOL
-VAR_INPUT
-END_VAR
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[]]></ST>
-      </Implementation>
-    </Method>
     <Method Name="PowerOff" Id="{7e704635-bfa1-4267-9db0-7f188918765f}">
       <Declaration><![CDATA[METHOD PowerOff : BOOL
 VAR_INPUT
@@ -1428,12 +1405,6 @@ END_VAR
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.IOWatchInit">
-      <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="TcAbbLinkin.MotorsOff">
-      <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="TcAbbLinkin.MotorsOn">
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.PowerOff">
