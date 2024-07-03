@@ -4,25 +4,26 @@
     <Declaration><![CDATA[PROGRAM MAIN
 VAR
 	myRobotLink		: TcAbbLinkin;
+	userSetConfigurationNow: BOOL := TRUE;
 	userConnectStartNow: BOOL := TRUE;
 	userConnectStopNow: BOOL;
-	userGetStateNow: BOOL;
-	userAckErrorNow: BOOL;
-	userSetConfigurationNow: BOOL := TRUE;
 	
+	userGetStateNow: BOOL;
 	userGetStateStatus: AbbLinkinRequestStatus_Typ;
 	userGetStateResult: STRING;
 	
 	userGetIoBoolNow : BOOL;
+	userGetIoBoolStatus: AbbLinkinRequestStatus_Typ;
 	userGetIoBoolResult : BOOL;
 	
 	userGetIoLrealNow : BOOL;
+	userGetIoLrealStatus: AbbLinkinRequestStatus_Typ;
 	userGetIoLrealResult : LREAL;
 	
 	userGetIoDintNow : BOOL;
+	userGetIoDintStatus: AbbLinkinRequestStatus_Typ;
 	userGetIoDintResult : DINT;
 	
-	userGetIoStatus: AbbLinkinRequestStatus_Typ;
 	
 	userSetIoBoolNow : BOOL;
 	userSetIoBoolValue: BOOL := 1;
@@ -74,6 +75,7 @@ VAR
 	userRapidStartStatus: AbbLinkinRequestStatus_Typ;
 	
 	
+	userAckErrorNow: BOOL;
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -82,7 +84,7 @@ END_VAR
 if userSetConfigurationNow then
 	myRobotLink.configuration.remoteIpAddress := '127.0.0.1';
 	myRobotLink.configuration.remotePort := 80;
-	myRobotLink.configuration.rwsVersion := ABBLINKIN_RWS_API_VERSION.V1;
+	myRobotLink.configuration.rwsVersion := ABBLINKIN_RWS_API_VERSION.V2;
 	myRobotLink.configuration.rwsUsername := 'Default User';
 	myRobotLink.configuration.rwsPassword := 'robotics';
 	userSetConfigurationNow := FALSE;
@@ -103,23 +105,25 @@ IF userConnectStopNow THEN
 	userConnectStopNow := FALSE;
 END_IF
 
+
 IF userGetStateNow THEN
 	myRobotLink.GetState(ADR(userGetStateStatus), ADR(userGetStateResult));
 	userGetStateNow := FALSE;
 END_IF
 
+
 IF userGetIoBoolNow THEN
-	myRobotLink.GetIODigital(signal := 'myInputDIG', pStatus := ADR(userGetIoStatus), pResult := ADR(userGetIoBoolResult));
+	myRobotLink.GetIODigital(signal := 'myInputDIG', pStatus := ADR(userGetIoBoolStatus), pResult := ADR(userGetIoBoolResult));
 	userGetIoBoolNow := FALSE;
 END_IF
 
 IF userGetIoLrealNow THEN
-	myRobotLink.GetIOAnalog(signal := 'myInputANA', pStatus := ADR(userGetIoStatus), pResult := ADR(userGetIoLrealResult));
+	myRobotLink.GetIOAnalog(signal := 'myInputANA', pStatus := ADR(userGetIoLrealStatus), pResult := ADR(userGetIoLrealResult));
 	userGetIoLrealNow := FALSE;
 END_IF
 
 IF userGetIoDintNow THEN
-	myRobotLink.GetIOGroup(signal := 'myInputGRP', pStatus := ADR(userGetIoStatus), pResult := ADR(userGetIoDintResult));
+	myRobotLink.GetIOGroup(signal := 'myInputGRP', pStatus := ADR(userGetIoDintStatus), pResult := ADR(userGetIoDintResult));
 	userGetIoDintNow := FALSE;
 END_IF
 
@@ -212,9 +216,12 @@ END_IF
       <LineId Id="46" Count="4" />
       <LineId Id="62" Count="3" />
       <LineId Id="61" Count="0" />
+      <LineId Id="435" Count="0" />
       <LineId Id="68" Count="0" />
       <LineId Id="139" Count="2" />
-      <LineId Id="151" Count="4" />
+      <LineId Id="151" Count="0" />
+      <LineId Id="436" Count="0" />
+      <LineId Id="152" Count="3" />
       <LineId Id="169" Count="9" />
       <LineId Id="147" Count="0" />
       <LineId Id="137" Count="0" />
