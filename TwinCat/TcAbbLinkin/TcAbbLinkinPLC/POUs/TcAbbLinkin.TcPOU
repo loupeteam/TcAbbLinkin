@@ -481,8 +481,10 @@ CASE configuration.rwsVersion OF
 		request.uri := CONCAT(request.uri, '?json=1');
 
 	ABBLINKIN_RWS_API_VERSION.V2:	
-		request.uri := 'todo';
-		request.uri := CONCAT(request.uri, signal);
+		request.uri := '/rw/rapid/symbol/';
+		request.uri := CONCAT(request.uri, signal);		// e.g. signal='RAPID/T_ROB1/Module1/myRapidString'
+		request.uri := CONCAT(request.uri, '/data');
+		
 END_CASE
 
 // Add Request to Queue, and Set Busy (or Error) Status
@@ -518,7 +520,7 @@ CASE configuration.rwsVersion OF
 	ABBLINKIN_RWS_API_VERSION.V1:
 		valuePath := '_embedded/_state#0/value';
 	ABBLINKIN_RWS_API_VERSION.V2:
-		valuePath := 'todo';
+		valuePath := 'state#0/value';
 END_CASE
 
 jsonRoot := httpRequest.GetJsonDomContent(jsonDomParser);
@@ -1259,8 +1261,8 @@ CASE configuration.rwsVersion OF
 		request.httpBody := 'ctrl-state=motoroff';
 
 	ABBLINKIN_RWS_API_VERSION.V2:	
-		request.uri := 'todo';
-		request.httpBody := 'todo';
+		request.uri := '/rw/panel/ctrl-state';
+		request.httpBody := 'ctrl-state=motoroff';
 		
 END_CASE
 
@@ -1306,8 +1308,8 @@ CASE configuration.rwsVersion OF
 		request.httpBody := 'ctrl-state=motoron';
 
 	ABBLINKIN_RWS_API_VERSION.V2:	
-		request.uri := 'todo';
-		request.httpBody := 'todo';
+		request.uri := '/rw/panel/ctrl-state';
+		request.httpBody := 'ctrl-state=motoron';
 		
 END_CASE
 
@@ -1353,8 +1355,8 @@ CASE configuration.rwsVersion OF
 		request.httpBody := '';
 
 	ABBLINKIN_RWS_API_VERSION.V2:	
-		request.uri := 'todo';
-		request.httpBody := 'todo';
+		request.uri := '/rw/rapid/execution/resetpp';
+		request.httpBody := '';
 		
 END_CASE
 
@@ -1406,8 +1408,14 @@ CASE configuration.rwsVersion OF
 		request.httpBody := CONCAT(request.httpBody, '&alltaskbytsp=false');
 
 	ABBLINKIN_RWS_API_VERSION.V2:	
-		request.uri := 'todo';
-		request.httpBody := 'todo';
+		request.uri := '/rw/rapid/execution/start';
+		request.httpBody := '';
+		request.httpBody := CONCAT(request.httpBody, 'regain=continue');
+		request.httpBody := CONCAT(request.httpBody, '&execmode=continue');
+		request.httpBody := CONCAT(request.httpBody, '&condition=none');
+		request.httpBody := CONCAT(request.httpBody, '&cycle=once');
+		request.httpBody := CONCAT(request.httpBody, '&stopatbp=disabled');
+		request.httpBody := CONCAT(request.httpBody, '&alltaskbytsp=false');
 		
 END_CASE
 
@@ -1453,8 +1461,8 @@ CASE configuration.rwsVersion OF
 		request.httpBody := '';
 
 	ABBLINKIN_RWS_API_VERSION.V2:	
-		request.uri := 'todo';
-		request.httpBody := 'todo';
+		request.uri := '/rw/rapid/execution/stop';
+		request.httpBody := '';
 		
 END_CASE
 
@@ -1619,7 +1627,10 @@ CASE configuration.rwsVersion OF
 		request.uri := concat(request.uri, '?action=set');
 		
 	ABBLINKIN_RWS_API_VERSION.V2:
-		;// todo
+		request.uri := '/rw/rapid/symbol/';
+		request.uri := concat(request.uri, name);
+		request.uri := concat(request.uri, '/data');
+		
 END_CASE
 
 request.httpBody := 'value=';
@@ -1917,8 +1928,9 @@ END_IF]]></ST>
       <LineId Id="93" Count="0" />
       <LineId Id="97" Count="1" />
       <LineId Id="89" Count="0" />
-      <LineId Id="95" Count="1" />
+      <LineId Id="141" Count="2" />
       <LineId Id="90" Count="0" />
+      <LineId Id="144" Count="0" />
       <LineId Id="79" Count="0" />
       <LineId Id="99" Count="6" />
       <LineId Id="114" Count="0" />
@@ -2347,7 +2359,7 @@ END_IF]]></ST>
       <LineId Id="40" Count="0" />
       <LineId Id="47" Count="0" />
       <LineId Id="41" Count="0" />
-      <LineId Id="48" Count="1" />
+      <LineId Id="70" Count="1" />
       <LineId Id="44" Count="0" />
       <LineId Id="50" Count="0" />
       <LineId Id="45" Count="0" />
@@ -2387,9 +2399,9 @@ END_IF]]></ST>
       <LineId Id="101" Count="0" />
       <LineId Id="96" Count="4" />
       <LineId Id="41" Count="0" />
-      <LineId Id="48" Count="1" />
-      <LineId Id="44" Count="0" />
-      <LineId Id="50" Count="0" />
+      <LineId Id="48" Count="0" />
+      <LineId Id="110" Count="6" />
+      <LineId Id="49" Count="1" />
       <LineId Id="45" Count="0" />
       <LineId Id="33" Count="0" />
       <LineId Id="51" Count="8" />
@@ -2472,7 +2484,11 @@ END_IF]]></ST>
     <LineIds Name="TcAbbLinkin.SetSymbol">
       <LineId Id="14" Count="7" />
       <LineId Id="134" Count="1" />
-      <LineId Id="22" Count="23" />
+      <LineId Id="22" Count="9" />
+      <LineId Id="157" Count="2" />
+      <LineId Id="32" Count="0" />
+      <LineId Id="160" Count="0" />
+      <LineId Id="34" Count="11" />
       <LineId Id="47" Count="2" />
       <LineId Id="51" Count="2" />
       <LineId Id="55" Count="2" />
