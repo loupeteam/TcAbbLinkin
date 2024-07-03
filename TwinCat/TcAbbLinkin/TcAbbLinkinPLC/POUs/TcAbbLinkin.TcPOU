@@ -268,17 +268,17 @@ _clearRequestStatus(pStatus);
 // Check that one and only one pointer is populated
 pointersSet := 0;
 IF (pResultBOOL <> 0) THEN 
-	request.results.dataType := ABBLINKIN_RESULT_TYPE_Typ._BOOL;
+	request.results.dataType := ABBLINKIN_DATA_TYPE_Typ._BOOL;
 	request.results.pDataBool := pResultBool;
 	pointersSet := pointersSet + 1; 
 END_IF
 IF (pResultDINT <> 0) THEN
-	request.results.dataType := ABBLINKIN_RESULT_TYPE_Typ._DINT;
+	request.results.dataType := ABBLINKIN_DATA_TYPE_Typ._DINT;
 	request.results.pDataDint := pResultDint;
 	pointersSet := pointersSet + 1;
 END_IF
 IF (pResultLREAL <> 0) THEN
-	request.results.dataType := ABBLINKIN_RESULT_TYPE_Typ._LREAL;
+	request.results.dataType := ABBLINKIN_DATA_TYPE_Typ._LREAL;
 	request.results.pDataLreal := pResultLreal;
 	pointersSet := pointersSet + 1;
 END_IF
@@ -318,7 +318,7 @@ IF _requestQueueAdd(request) THEN
 	_getIO := TRUE;
 ELSE
 	pStatus^.error := TRUE;
-	pStatus^.errorMsg := TO_STRING(ABBLINKIN_COMMAND_TYPE.GET_STATE);
+	pStatus^.errorMsg := TO_STRING(request.command);
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' could not be added to request Queue');
 	_getIO := FALSE;
 END_IF
@@ -360,11 +360,11 @@ IF (jsonValue <> 0) THEN
 	valueString := jsonDomParser.GetString(jsonValue);
 	
 	CASE request.results.dataType OF
-			ABBLINKIN_RESULT_TYPE_Typ._BOOL:
+			ABBLINKIN_DATA_TYPE_Typ._BOOL:
 				request.results.pDataBool^ := INT_TO_BOOL(STRING_TO_INT(valueString));
-			ABBLINKIN_RESULT_TYPE_Typ._DINT:
+			ABBLINKIN_DATA_TYPE_Typ._DINT:
 				request.results.pDataDint^ := STRING_TO_DINT(valueString);
-			ABBLINKIN_RESULT_TYPE_Typ._LREAL:
+			ABBLINKIN_DATA_TYPE_Typ._LREAL:
 				request.results.pDataLreal^ := STRING_TO_LREAL(valueString);
 	ELSE
 		; // error todo
@@ -566,6 +566,10 @@ END_IF
 _httpHeader.AddField('Cookie', cookieValue, FALSE);
 
 
+// Content-Type
+_httpHeader.AddField('Content-Type', 'application/x-www-form-urlencoded', FALSE);
+
+
 ]]></ST>
       </Implementation>
     </Method>
@@ -719,7 +723,7 @@ CASE _state OF
 	ABBLINKIN_STATE.SEND_REQUEST:
 		
 		_setHeader(ABBLINKIN_AUTH_HEADER_VALUE.NONE);
-		retVal := _httpRequest.SendRequest(_currentRequest.uri, _httpClient, _currentRequest.httpMethod, _currentRequest.pContent, _currentRequest.contentSize, _httpHeader);
+		retVal := _httpRequest.SendRequest(_currentRequest.uri, _httpClient, _currentRequest.httpMethod, ADR(_currentRequest.httpBody), LEN(_currentRequest.httpBody), _httpHeader);
 		
 		IF retVal = FALSE THEN
 			_currentRequest.pStatus^.busy := FALSE;
@@ -1045,7 +1049,7 @@ IF _requestQueueAdd(request) THEN
 	GetState := TRUE;
 ELSE
 	pStatus^.error := TRUE;
-	pStatus^.errorMsg := TO_STRING(ABBLINKIN_COMMAND_TYPE.GET_STATE);
+	pStatus^.errorMsg := TO_STRING(request.command);
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' could not be added to request Queue');
 	GetState := FALSE;
 END_IF
@@ -1119,10 +1123,109 @@ END_VAR
     <Method Name="SetIO" Id="{ce5e4a58-9783-46a9-ba0d-44594affd7f4}">
       <Declaration><![CDATA[METHOD SetIO : BOOL
 VAR_INPUT
+	signal : STRING;
+	value : ANY;
+	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
 END_VAR
-]]></Declaration>
+VAR
+	request: AbbLinkinRequest_Typ;
+	pBool: POINTER TO BOOL;
+	pSint: POINTER TO SINT;
+	pUsint: POINTER TO USINT;
+	pInt: POINTER TO INT;
+	pUint: POINTER TO UINT;
+	pDint: POINTER TO DINT;
+	pUdint: POINTER TO UDINT;
+	pReal: POINTER TO REAL;
+	pLreal: POINTER TO LREAL;
+END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[]]></ST>
+        <ST><![CDATA[
+// Check for invalid status pointer
+IF pStatus = 0 THEN
+	SetIO := FALSE;
+	RETURN;
+END_IF;
+
+// Clear Status
+_clearRequestStatus(pStatus);
+request.command := ABBLINKIN_COMMAND_TYPE.SET_IO;
+request.httpMethod :=  ETcIotHttpRequestType.HTTP_POST;
+
+CASE configuration.rwsVersion OF
+	ABBLINKIN_RWS_API_VERSION.V1:
+		request.uri := '/rw/iosystem/signals/';
+		request.uri := concat(request.uri, signal);
+		request.uri := concat(request.uri, '?action=set');
+		
+	ABBLINKIN_RWS_API_VERSION.V2:
+		;// todo
+END_CASE
+
+request.httpBody := 'lvalue=';
+CASE value.TypeClass OF 
+	__SYSTEM.TYPE_CLASS.TYPE_BOOL:
+		pBool := value.pValue;
+		IF pBool^ THEN
+			request.httpBody := CONCAT(request.httpBody, '1');
+		ELSE
+			request.httpBody := CONCAT(request.httpBody, '0');
+		END_IF;
+		
+		
+	__SYSTEM.TYPE_CLASS.TYPE_SINT:
+		pSint := value.pValue;
+		request.httpBody := CONCAT(request.httpBody, SINT_TO_STRING(pSint^));
+		
+	__SYSTEM.TYPE_CLASS.TYPE_USINT:
+		pUsint := value.pValue;
+		request.httpBody := CONCAT(request.httpBody, USINT_TO_STRING(pUsint^));
+		
+	__SYSTEM.TYPE_CLASS.TYPE_INT:
+		pInt := value.pValue;
+		request.httpBody := CONCAT(request.httpBody, INT_TO_STRING(pInt^));
+		
+	__SYSTEM.TYPE_CLASS.TYPE_UINT:
+		pUint := value.pValue;
+		request.httpBody := CONCAT(request.httpBody, UINT_TO_STRING(pUint^));
+		
+	__SYSTEM.TYPE_CLASS.TYPE_DINT:
+		pDint := value.pValue;
+		request.httpBody := CONCAT(request.httpBody, DINT_TO_STRING(pDint^));
+		
+	__SYSTEM.TYPE_CLASS.TYPE_UDINT:
+		pUdint := value.pValue;
+		request.httpBody := CONCAT(request.httpBody, UDINT_TO_STRING(pUdint^));
+		
+		
+	__SYSTEM.TYPE_CLASS.TYPE_REAL:
+		pReal := value.pValue;
+		request.httpBody := CONCAT(request.httpBody, REAL_TO_STRING(pReal^));
+		
+	__SYSTEM.TYPE_CLASS.TYPE_LREAL:
+		pLreal := value.pValue;
+		request.httpBody := CONCAT(request.httpBody, LREAL_TO_STRING(pLreal^));
+		
+ELSE
+	pStatus^.error := TRUE;
+	pStatus^.errorMsg := TO_STRING(ABBLINKIN_COMMAND_TYPE.SET_IO);
+	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' was passed an unsupported "value" datatype');
+	SetIO := FALSE;
+	RETURN;
+END_CASE
+
+request.pStatus := pStatus;
+
+// Set Busy (or Error) Status
+IF _requestQueueAdd(request) THEN
+	pStatus^.busy := TRUE;
+	SetIO := TRUE;
+ELSE
+	pStatus^.error := TRUE;
+	pStatus^.errorMsg := TO_STRING(request.command);
+	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' could not be added to request Queue');
+	SetIO := FALSE;
+END_IF]]></ST>
       </Implementation>
     </Method>
     <Method Name="SetSymbol" Id="{bc0a5da5-b662-4b6f-a5f4-f2caf9d05bbf}">
@@ -1266,7 +1369,9 @@ END_VAR
       <LineId Id="78" Count="0" />
       <LineId Id="113" Count="0" />
       <LineId Id="79" Count="0" />
-      <LineId Id="99" Count="10" />
+      <LineId Id="99" Count="6" />
+      <LineId Id="114" Count="0" />
+      <LineId Id="107" Count="2" />
       <LineId Id="80" Count="2" />
       <LineId Id="35" Count="0" />
       <LineId Id="23" Count="0" />
@@ -1403,7 +1508,11 @@ END_VAR
       <LineId Id="91" Count="0" />
       <LineId Id="115" Count="0" />
       <LineId Id="88" Count="0" />
-      <LineId Id="15" Count="1" />
+      <LineId Id="127" Count="1" />
+      <LineId Id="15" Count="0" />
+      <LineId Id="130" Count="0" />
+      <LineId Id="129" Count="0" />
+      <LineId Id="16" Count="0" />
       <LineId Id="8" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin._storeCookies">
@@ -1667,7 +1776,8 @@ END_VAR
       <LineId Id="56" Count="0" />
       <LineId Id="87" Count="0" />
       <LineId Id="61" Count="1" />
-      <LineId Id="68" Count="1" />
+      <LineId Id="112" Count="0" />
+      <LineId Id="69" Count="0" />
       <LineId Id="88" Count="0" />
       <LineId Id="60" Count="0" />
       <LineId Id="86" Count="0" />
@@ -1695,7 +1805,63 @@ END_VAR
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.SetIO">
-      <LineId Id="5" Count="0" />
+      <LineId Id="17" Count="7" />
+      <LineId Id="13" Count="0" />
+      <LineId Id="26" Count="1" />
+      <LineId Id="111" Count="0" />
+      <LineId Id="115" Count="2" />
+      <LineId Id="120" Count="0" />
+      <LineId Id="122" Count="0" />
+      <LineId Id="119" Count="0" />
+      <LineId Id="118" Count="0" />
+      <LineId Id="114" Count="0" />
+      <LineId Id="113" Count="0" />
+      <LineId Id="107" Count="0" />
+      <LineId Id="48" Count="1" />
+      <LineId Id="64" Count="0" />
+      <LineId Id="125" Count="0" />
+      <LineId Id="80" Count="1" />
+      <LineId Id="83" Count="0" />
+      <LineId Id="82" Count="0" />
+      <LineId Id="63" Count="0" />
+      <LineId Id="85" Count="0" />
+      <LineId Id="102" Count="0" />
+      <LineId Id="75" Count="0" />
+      <LineId Id="128" Count="0" />
+      <LineId Id="87" Count="0" />
+      <LineId Id="86" Count="0" />
+      <LineId Id="76" Count="0" />
+      <LineId Id="140" Count="0" />
+      <LineId Id="88" Count="2" />
+      <LineId Id="141" Count="0" />
+      <LineId Id="91" Count="0" />
+      <LineId Id="70" Count="0" />
+      <LineId Id="92" Count="0" />
+      <LineId Id="142" Count="0" />
+      <LineId Id="93" Count="0" />
+      <LineId Id="71" Count="0" />
+      <LineId Id="96" Count="0" />
+      <LineId Id="143" Count="0" />
+      <LineId Id="97" Count="0" />
+      <LineId Id="72" Count="0" />
+      <LineId Id="94" Count="0" />
+      <LineId Id="144" Count="0" />
+      <LineId Id="95" Count="0" />
+      <LineId Id="73" Count="1" />
+      <LineId Id="55" Count="0" />
+      <LineId Id="145" Count="0" />
+      <LineId Id="98" Count="0" />
+      <LineId Id="101" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="146" Count="0" />
+      <LineId Id="99" Count="1" />
+      <LineId Id="103" Count="3" />
+      <LineId Id="77" Count="0" />
+      <LineId Id="123" Count="0" />
+      <LineId Id="51" Count="0" />
+      <LineId Id="158" Count="1" />
+      <LineId Id="148" Count="9" />
+      <LineId Id="15" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.SetSymbol">
       <LineId Id="5" Count="0" />

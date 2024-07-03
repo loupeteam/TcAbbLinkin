@@ -22,6 +22,18 @@ VAR
 	userGetIoDintNow : BOOL;
 	userGetIoDintResult : DINT;
 	
+	userGetIoStatus: AbbLinkinRequestStatus_Typ;
+	
+	userSetIoBoolNow : BOOL;
+	userSetIoBoolValue: BOOL := 1;
+	userSetIoBoolStatus: AbbLinkinRequestStatus_Typ;
+	userSetIoDintNow : BOOL;
+	userSetIoDintValue: DINT := 57;
+	userSetIoDintStatus: AbbLinkinRequestStatus_Typ;
+	userSetIoLrealNow : BOOL;
+	userSetIoLrealValue: LREAL := 41.123456;
+	userSetIoLrealStatus: AbbLinkinRequestStatus_Typ;
+	
 	
 END_VAR
 ]]></Declaration>
@@ -58,21 +70,33 @@ IF userGetStateNow THEN
 END_IF
 
 IF userGetIoBoolNow THEN
-	myRobotLink.GetIODigital(signal := 'myInputDIG', pStatus := ADR(userGetStateStatus), pResult := ADR(userGetIoBoolResult));
+	myRobotLink.GetIODigital(signal := 'myInputDIG', pStatus := ADR(userGetIoStatus), pResult := ADR(userGetIoBoolResult));
 	userGetIoBoolNow := FALSE;
 END_IF
 
 IF userGetIoLrealNow THEN
-	myRobotLink.GetIOAnalog(signal := 'myInputANA', pStatus := ADR(userGetStateStatus), pResult := ADR(userGetIoLrealResult));
+	myRobotLink.GetIOAnalog(signal := 'myInputANA', pStatus := ADR(userGetIoStatus), pResult := ADR(userGetIoLrealResult));
 	userGetIoLrealNow := FALSE;
 END_IF
 
 IF userGetIoDintNow THEN
-	myRobotLink.GetIOGroup(signal := 'myInputGRP', pStatus := ADR(userGetStateStatus), pResult := ADR(userGetIoDintResult));
+	myRobotLink.GetIOGroup(signal := 'myInputGRP', pStatus := ADR(userGetIoStatus), pResult := ADR(userGetIoDintResult));
 	userGetIoDintNow := FALSE;
 END_IF
 
 
+IF userSetIoBoolNow THEN
+	myRobotLink.SetIO('myInputDIG', userSetIoBoolValue, ADR(userSetIoBoolStatus));
+	userSetIoBoolNow := FALSE;
+END_IF
+IF userSetIoDintNow THEN
+	myRobotLink.SetIO('myInputGRP', userSetIoDintValue, ADR(userSetIoDintStatus));
+	userSetIoDintNow := FALSE;
+END_IF
+IF userSetIoLrealNow THEN
+	myRobotLink.SetIO('myInputANA', userSetIoLrealValue, ADR(userSetIoLrealStatus));
+	userSetIoLrealNow := FALSE;
+END_IF
 
 
 IF userAckErrorNow THEN
@@ -96,7 +120,10 @@ END_IF
       <LineId Id="151" Count="4" />
       <LineId Id="169" Count="9" />
       <LineId Id="147" Count="0" />
-      <LineId Id="137" Count="1" />
+      <LineId Id="137" Count="0" />
+      <LineId Id="194" Count="3" />
+      <LineId Id="208" Count="7" />
+      <LineId Id="138" Count="0" />
       <LineId Id="136" Count="0" />
       <LineId Id="76" Count="0" />
       <LineId Id="73" Count="2" />

@@ -6,8 +6,7 @@ STRUCT
 	command		: ABBLINKIN_COMMAND_TYPE;
 	uri			: STRING;
 	httpMethod	: ETcIotHttpRequestType;
-	pContent	: PVOID;
-	contentSize	: UDINT;
+	httpBody	: STRING_EX_LEN := '';
 	pStatus		: POINTER TO AbbLinkinRequestStatus_Typ;
 	results		: AbbLinkinGetterResults_Typ;
 END_STRUCT
