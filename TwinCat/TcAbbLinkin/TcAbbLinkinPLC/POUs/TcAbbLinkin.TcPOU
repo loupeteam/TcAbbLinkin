@@ -296,6 +296,7 @@ ELSIF pointersSet >= 2 THEN
 	_getIO := FALSE;
 END_IF;
 
+request.pStatus := pStatus;
 request.command := ABBLINKIN_COMMAND_TYPE.GET_IO;
 request.httpMethod :=  ETcIotHttpRequestType.HTTP_Get;
 
@@ -310,9 +311,7 @@ CASE configuration.rwsVersion OF
 		request.uri := CONCAT(request.uri, signal);
 END_CASE
 
-request.pStatus := pStatus;
-
-// Set Busy (or Error) Status
+// Add Request to Queue, and Set Busy (or Error) Status
 IF _requestQueueAdd(request) THEN
 	pStatus^.busy := TRUE;
 	_getIO := TRUE;
@@ -471,6 +470,7 @@ ELSIF pointersSet >= 2 THEN
 	_getSymbol := FALSE;
 END_IF;
 
+request.pStatus := pStatus;
 request.command := ABBLINKIN_COMMAND_TYPE.GET_SYMBOL;
 request.httpMethod :=  ETcIotHttpRequestType.HTTP_Get;
 
@@ -485,9 +485,7 @@ CASE configuration.rwsVersion OF
 		request.uri := CONCAT(request.uri, signal);
 END_CASE
 
-request.pStatus := pStatus;
-
-// Set Busy (or Error) Status
+// Add Request to Queue, and Set Busy (or Error) Status
 IF _requestQueueAdd(request) THEN
 	pStatus^.busy := TRUE;
 	_getSymbol := TRUE;
@@ -1150,7 +1148,7 @@ IF pResultState = 0 THEN
 	RETURN;
 END_IF
 
-
+request.pStatus := pStatus;
 request.command := ABBLINKIN_COMMAND_TYPE.GET_STATE;
 request.httpMethod :=  ETcIotHttpRequestType.HTTP_Get;
 
@@ -1162,10 +1160,9 @@ CASE configuration.rwsVersion OF
 		request.uri := '/rw/rapid/execution';
 END_CASE
 
-request.pStatus := pStatus;
 request.results.pDataString := pResultState;
 
-// Set Busy (or Error) Status
+// Add Request to Queue, and Set Busy (or Error) Status
 IF _requestQueueAdd(request) THEN
 	pStatus^.busy := TRUE;
 	GetState := TRUE;
@@ -1233,46 +1230,242 @@ END_VAR
     <Method Name="PowerOff" Id="{7e704635-bfa1-4267-9db0-7f188918765f}">
       <Declaration><![CDATA[METHOD PowerOff : BOOL
 VAR_INPUT
+	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+END_VAR
+
+VAR
+	request: AbbLinkinRequest_Typ;
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[]]></ST>
+        <ST><![CDATA[IF pStatus = 0 THEN
+	PowerOff := FALSE;
+	RETURN;
+END_IF;
+
+// Clear Status
+_clearRequestStatus(pStatus);
+
+request.pStatus := pStatus;
+request.command := ABBLINKIN_COMMAND_TYPE.POWER_OFF;
+request.httpMethod :=  ETcIotHttpRequestType.HTTP_POST;
+
+CASE configuration.rwsVersion OF
+	ABBLINKIN_RWS_API_VERSION.V1:
+		request.uri := '/rw/panel/ctrlstate?action=setctrlstate&json=1';
+		request.httpBody := 'ctrl-state=motoroff';
+
+	ABBLINKIN_RWS_API_VERSION.V2:	
+		request.uri := 'todo';
+		request.httpBody := 'todo';
+		
+END_CASE
+
+// Add Request to Queue, and Set Busy (or Error) Status
+IF _requestQueueAdd(request) THEN
+	pStatus^.busy := TRUE;
+	PowerOff := TRUE;
+ELSE
+	pStatus^.error := TRUE;
+	pStatus^.errorMsg := TO_STRING(request.command);
+	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' could not be added to request Queue');
+	PowerOff := FALSE;
+END_IF
+]]></ST>
       </Implementation>
     </Method>
-    <Method Name="PowerOn" Id="{e270cd96-8004-4691-9cb0-f9c8d0300c0b}">
+    <Method Name="PowerOn" Id="{af5386e8-963b-4ad9-be85-5e9b6c633ca2}">
       <Declaration><![CDATA[METHOD PowerOn : BOOL
 VAR_INPUT
+	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+END_VAR
+
+VAR
+	request: AbbLinkinRequest_Typ;
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[]]></ST>
+        <ST><![CDATA[IF pStatus = 0 THEN
+	PowerOn := FALSE;
+	RETURN;
+END_IF;
+
+// Clear Status
+_clearRequestStatus(pStatus);
+
+request.pStatus := pStatus;
+request.command := ABBLINKIN_COMMAND_TYPE.POWER_ON;
+request.httpMethod :=  ETcIotHttpRequestType.HTTP_POST;
+
+CASE configuration.rwsVersion OF
+	ABBLINKIN_RWS_API_VERSION.V1:
+		request.uri := '/rw/panel/ctrlstate?action=setctrlstate&json=1';
+		request.httpBody := 'ctrl-state=motoron';
+
+	ABBLINKIN_RWS_API_VERSION.V2:	
+		request.uri := 'todo';
+		request.httpBody := 'todo';
+		
+END_CASE
+
+// Add Request to Queue, and Set Busy (or Error) Status
+IF _requestQueueAdd(request) THEN
+	pStatus^.busy := TRUE;
+	PowerOn := TRUE;
+ELSE
+	pStatus^.error := TRUE;
+	pStatus^.errorMsg := TO_STRING(request.command);
+	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' could not be added to request Queue');
+	PowerOn := FALSE;
+END_IF
+]]></ST>
       </Implementation>
     </Method>
-    <Method Name="RapidReset" Id="{8680bb07-92fa-45e4-93ac-a5f26d92aefb}">
+    <Method Name="RapidReset" Id="{e080191b-cd26-4298-a719-9d96ed9cd49e}">
       <Declaration><![CDATA[METHOD RapidReset : BOOL
 VAR_INPUT
+	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+END_VAR
+
+VAR
+	request: AbbLinkinRequest_Typ;
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[]]></ST>
+        <ST><![CDATA[IF pStatus = 0 THEN
+	RapidReset := FALSE;
+	RETURN;
+END_IF;
+
+// Clear Status
+_clearRequestStatus(pStatus);
+
+request.pStatus := pStatus;
+request.command := ABBLINKIN_COMMAND_TYPE.RAPID_RESET;
+request.httpMethod :=  ETcIotHttpRequestType.HTTP_POST;
+
+CASE configuration.rwsVersion OF
+	ABBLINKIN_RWS_API_VERSION.V1:
+		request.uri := '/rw/rapid/execution?action=resetpp&json=1';
+		request.httpBody := '';
+
+	ABBLINKIN_RWS_API_VERSION.V2:	
+		request.uri := 'todo';
+		request.httpBody := 'todo';
+		
+END_CASE
+
+// Add Request to Queue, and Set Busy (or Error) Status
+IF _requestQueueAdd(request) THEN
+	pStatus^.busy := TRUE;
+	RapidReset := TRUE;
+ELSE
+	pStatus^.error := TRUE;
+	pStatus^.errorMsg := TO_STRING(request.command);
+	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' could not be added to request Queue');
+	RapidReset := FALSE;
+END_IF
+]]></ST>
       </Implementation>
     </Method>
-    <Method Name="RapidStart" Id="{2acbd226-93a7-4d9b-8ddf-34c3d2ee1221}">
+    <Method Name="RapidStart" Id="{3bbfc09a-b007-47b4-80b0-3bd61acb2173}">
       <Declaration><![CDATA[METHOD RapidStart : BOOL
 VAR_INPUT
+	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+END_VAR
+
+VAR
+	request: AbbLinkinRequest_Typ;
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[]]></ST>
+        <ST><![CDATA[IF pStatus = 0 THEN
+	RapidStart := FALSE;
+	RETURN;
+END_IF;
+
+// Clear Status
+_clearRequestStatus(pStatus);
+
+request.pStatus := pStatus;
+request.command := ABBLINKIN_COMMAND_TYPE.RAPID_START;
+request.httpMethod :=  ETcIotHttpRequestType.HTTP_POST;
+
+CASE configuration.rwsVersion OF
+	ABBLINKIN_RWS_API_VERSION.V1:
+		request.uri := '/rw/rapid/execution?action=start&json=1';
+		request.httpBody := '';
+		request.httpBody := CONCAT(request.httpBody, 'regain=continue');
+		request.httpBody := CONCAT(request.httpBody, '&execmode=continue');
+		request.httpBody := CONCAT(request.httpBody, '&condition=none');
+		request.httpBody := CONCAT(request.httpBody, '&cycle=once');
+		request.httpBody := CONCAT(request.httpBody, '&stopatbp=disabled');
+		request.httpBody := CONCAT(request.httpBody, '&alltaskbytsp=false');
+
+	ABBLINKIN_RWS_API_VERSION.V2:	
+		request.uri := 'todo';
+		request.httpBody := 'todo';
+		
+END_CASE
+
+// Add Request to Queue, and Set Busy (or Error) Status
+IF _requestQueueAdd(request) THEN
+	pStatus^.busy := TRUE;
+	RapidStart := TRUE;
+ELSE
+	pStatus^.error := TRUE;
+	pStatus^.errorMsg := TO_STRING(request.command);
+	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' could not be added to request Queue');
+	RapidStart := FALSE;
+END_IF
+]]></ST>
       </Implementation>
     </Method>
-    <Method Name="RapidStop" Id="{648edf84-4daf-4e8c-8ad5-61b6305b08fb}">
+    <Method Name="RapidStop" Id="{2b770e99-7d38-409f-b1ad-b5b0b0d97576}">
       <Declaration><![CDATA[METHOD RapidStop : BOOL
 VAR_INPUT
+	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+END_VAR
+
+VAR
+	request: AbbLinkinRequest_Typ;
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[]]></ST>
+        <ST><![CDATA[IF pStatus = 0 THEN
+	RapidStop := FALSE;
+	RETURN;
+END_IF;
+
+// Clear Status
+_clearRequestStatus(pStatus);
+
+request.pStatus := pStatus;
+request.command := ABBLINKIN_COMMAND_TYPE.RAPID_STOP;
+request.httpMethod :=  ETcIotHttpRequestType.HTTP_POST;
+
+CASE configuration.rwsVersion OF
+	ABBLINKIN_RWS_API_VERSION.V1:
+		request.uri := '/rw/rapid/execution?action=stop&json=1';
+		request.httpBody := '';
+
+	ABBLINKIN_RWS_API_VERSION.V2:	
+		request.uri := 'todo';
+		request.httpBody := 'todo';
+		
+END_CASE
+
+// Add Request to Queue, and Set Busy (or Error) Status
+IF _requestQueueAdd(request) THEN
+	pStatus^.busy := TRUE;
+	RapidStop := TRUE;
+ELSE
+	pStatus^.error := TRUE;
+	pStatus^.errorMsg := TO_STRING(request.command);
+	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' could not be added to request Queue');
+	RapidStop := FALSE;
+END_IF
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="SetIO" Id="{ce5e4a58-9783-46a9-ba0d-44594affd7f4}">
@@ -1304,6 +1497,8 @@ END_IF;
 
 // Clear Status
 _clearRequestStatus(pStatus);
+
+request.pStatus := pStatus;
 request.command := ABBLINKIN_COMMAND_TYPE.SET_IO;
 request.httpMethod :=  ETcIotHttpRequestType.HTTP_POST;
 
@@ -1361,9 +1556,7 @@ ELSE
 	RETURN;
 END_CASE
 
-request.pStatus := pStatus;
-
-// Set Busy (or Error) Status
+// Add Request to Queue, and Set Busy (or Error) Status
 IF _requestQueueAdd(request) THEN
 	pStatus^.busy := TRUE;
 	SetIO := TRUE;
@@ -1408,6 +1601,8 @@ END_IF;
 
 // Clear Status
 _clearRequestStatus(pStatus);
+
+request.pStatus := pStatus;
 request.command := ABBLINKIN_COMMAND_TYPE.SET_SYMBOL;
 request.httpMethod :=  ETcIotHttpRequestType.HTTP_POST;
 
@@ -1476,9 +1671,7 @@ ELSE
 	RETURN;
 END_CASE
 
-request.pStatus := pStatus;
-
-// Set Busy (or Error) Status
+// Add Request to Queue, and Set Busy (or Error) Status
 IF _requestQueueAdd(request) THEN
 	pStatus^.busy := TRUE;
 	SetSymbol := TRUE;
@@ -1585,7 +1778,7 @@ END_IF]]></ST>
       <LineId Id="25" Count="2" />
       <LineId Id="22" Count="0" />
       <LineId Id="40" Count="1" />
-      <LineId Id="29" Count="0" />
+      <LineId Id="115" Count="0" />
       <LineId Id="42" Count="0" />
       <LineId Id="30" Count="0" />
       <LineId Id="46" Count="0" />
@@ -1612,6 +1805,7 @@ END_IF]]></ST>
       <LineId Id="60" Count="2" />
       <LineId Id="54" Count="0" />
       <LineId Id="37" Count="0" />
+      <LineId Id="117" Count="0" />
       <LineId Id="77" Count="0" />
       <LineId Id="83" Count="4" />
       <LineId Id="93" Count="0" />
@@ -1619,8 +1813,6 @@ END_IF]]></ST>
       <LineId Id="89" Count="0" />
       <LineId Id="95" Count="1" />
       <LineId Id="90" Count="0" />
-      <LineId Id="78" Count="0" />
-      <LineId Id="113" Count="0" />
       <LineId Id="79" Count="0" />
       <LineId Id="99" Count="6" />
       <LineId Id="114" Count="0" />
@@ -1713,6 +1905,7 @@ END_IF]]></ST>
       <LineId Id="60" Count="2" />
       <LineId Id="54" Count="0" />
       <LineId Id="37" Count="0" />
+      <LineId Id="128" Count="0" />
       <LineId Id="77" Count="0" />
       <LineId Id="83" Count="4" />
       <LineId Id="93" Count="0" />
@@ -1720,8 +1913,6 @@ END_IF]]></ST>
       <LineId Id="89" Count="0" />
       <LineId Id="95" Count="1" />
       <LineId Id="90" Count="0" />
-      <LineId Id="78" Count="0" />
-      <LineId Id="113" Count="0" />
       <LineId Id="79" Count="0" />
       <LineId Id="99" Count="6" />
       <LineId Id="114" Count="0" />
@@ -2076,7 +2267,7 @@ END_IF]]></ST>
       <LineId Id="90" Count="0" />
       <LineId Id="95" Count="0" />
       <LineId Id="83" Count="0" />
-      <LineId Id="103" Count="0" />
+      <LineId Id="115" Count="0" />
       <LineId Id="65" Count="0" />
       <LineId Id="20" Count="0" />
       <LineId Id="10" Count="0" />
@@ -2087,9 +2278,9 @@ END_IF]]></ST>
       <LineId Id="35" Count="0" />
       <LineId Id="34" Count="0" />
       <LineId Id="36" Count="0" />
-      <LineId Id="32" Count="0" />
-      <LineId Id="47" Count="0" />
-      <LineId Id="45" Count="1" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="113" Count="0" />
+      <LineId Id="46" Count="0" />
       <LineId Id="58" Count="0" />
       <LineId Id="70" Count="0" />
       <LineId Id="57" Count="0" />
@@ -2119,22 +2310,105 @@ END_IF]]></ST>
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.PowerOff">
+      <LineId Id="15" Count="5" />
       <LineId Id="5" Count="0" />
+      <LineId Id="61" Count="0" />
+      <LineId Id="34" Count="1" />
+      <LineId Id="30" Count="1" />
+      <LineId Id="36" Count="1" />
+      <LineId Id="40" Count="0" />
+      <LineId Id="47" Count="0" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="48" Count="1" />
+      <LineId Id="44" Count="0" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="33" Count="0" />
+      <LineId Id="51" Count="8" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="60" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.PowerOn">
+      <LineId Id="15" Count="5" />
       <LineId Id="5" Count="0" />
+      <LineId Id="61" Count="0" />
+      <LineId Id="34" Count="1" />
+      <LineId Id="30" Count="1" />
+      <LineId Id="36" Count="1" />
+      <LineId Id="40" Count="0" />
+      <LineId Id="47" Count="0" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="48" Count="1" />
+      <LineId Id="44" Count="0" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="33" Count="0" />
+      <LineId Id="51" Count="8" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="60" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.RapidReset">
+      <LineId Id="15" Count="5" />
       <LineId Id="5" Count="0" />
+      <LineId Id="61" Count="0" />
+      <LineId Id="34" Count="1" />
+      <LineId Id="30" Count="1" />
+      <LineId Id="36" Count="1" />
+      <LineId Id="40" Count="0" />
+      <LineId Id="78" Count="0" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="48" Count="1" />
+      <LineId Id="44" Count="0" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="33" Count="0" />
+      <LineId Id="51" Count="8" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="60" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.RapidStart">
+      <LineId Id="15" Count="5" />
       <LineId Id="5" Count="0" />
+      <LineId Id="61" Count="0" />
+      <LineId Id="34" Count="1" />
+      <LineId Id="30" Count="1" />
+      <LineId Id="36" Count="1" />
+      <LineId Id="40" Count="0" />
+      <LineId Id="78" Count="0" />
+      <LineId Id="101" Count="0" />
+      <LineId Id="96" Count="4" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="48" Count="1" />
+      <LineId Id="44" Count="0" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="33" Count="0" />
+      <LineId Id="51" Count="8" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="60" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.RapidStop">
+      <LineId Id="15" Count="5" />
       <LineId Id="5" Count="0" />
+      <LineId Id="61" Count="0" />
+      <LineId Id="34" Count="1" />
+      <LineId Id="30" Count="1" />
+      <LineId Id="36" Count="1" />
+      <LineId Id="40" Count="0" />
+      <LineId Id="78" Count="0" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="48" Count="1" />
+      <LineId Id="44" Count="0" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="33" Count="0" />
+      <LineId Id="51" Count="8" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="60" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.SetIO">
       <LineId Id="17" Count="7" />
+      <LineId Id="161" Count="1" />
       <LineId Id="13" Count="0" />
       <LineId Id="26" Count="1" />
       <LineId Id="111" Count="0" />
@@ -2181,13 +2455,14 @@ END_IF]]></ST>
       <LineId Id="103" Count="3" />
       <LineId Id="77" Count="0" />
       <LineId Id="123" Count="0" />
-      <LineId Id="51" Count="0" />
-      <LineId Id="158" Count="1" />
+      <LineId Id="159" Count="0" />
       <LineId Id="148" Count="9" />
       <LineId Id="15" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.SetSymbol">
-      <LineId Id="14" Count="31" />
+      <LineId Id="14" Count="7" />
+      <LineId Id="134" Count="1" />
+      <LineId Id="22" Count="23" />
       <LineId Id="47" Count="2" />
       <LineId Id="51" Count="2" />
       <LineId Id="55" Count="2" />
@@ -2206,7 +2481,8 @@ END_IF]]></ST>
       <LineId Id="125" Count="0" />
       <LineId Id="78" Count="0" />
       <LineId Id="133" Count="0" />
-      <LineId Id="79" Count="19" />
+      <LineId Id="79" Count="6" />
+      <LineId Id="88" Count="10" />
       <LineId Id="5" Count="0" />
     </LineIds>
   </POU>

@@ -62,6 +62,18 @@ VAR
 	userSetSymbolWStringStatus: AbbLinkinRequestStatus_Typ;
 	
 	
+	userPowerOffNow : BOOL;
+	userPowerOffStatus: AbbLinkinRequestStatus_Typ;
+	userPowerOnNow : BOOL;
+	userPowerOnStatus: AbbLinkinRequestStatus_Typ;
+	userRapidResetNow : BOOL;
+	userRapidResetStatus: AbbLinkinRequestStatus_Typ;
+	userRapidStopNow : BOOL;
+	userRapidStopStatus: AbbLinkinRequestStatus_Typ;
+	userRapidStartNow : BOOL;
+	userRapidStartStatus: AbbLinkinRequestStatus_Typ;
+	
+	
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -162,6 +174,28 @@ IF userSetSymbolWStringNow THEN
 END_IF
 
 
+IF userPowerOffNow THEN
+	myRobotLink.PowerOff(ADR(userPowerOffStatus));
+	userPowerOffNow := FALSE;
+END_IF
+IF userPowerOnNow THEN
+	myRobotLink.PowerOn(ADR(userPowerOnStatus));
+	userPowerOnNow := FALSE;
+END_IF
+IF userRapidResetNow THEN
+	myRobotLink.RapidReset(ADR(userRapidResetStatus));
+	userRapidResetNow := FALSE;
+END_IF
+IF userRapidStopNow THEN
+	myRobotLink.RapidStop(ADR(userRapidStopStatus));
+	userRapidStopNow := FALSE;
+END_IF
+IF userRapidStartNow THEN
+	myRobotLink.RapidStart(ADR(userRapidStartStatus));
+	userRapidStartNow := FALSE;
+END_IF
+
+
 IF userAckErrorNow THEN
 	myRobotLink.AckError();
 	userAckErrorNow := FALSE;
@@ -194,6 +228,11 @@ END_IF
       <LineId Id="270" Count="11" />
       <LineId Id="286" Count="7" />
       <LineId Id="266" Count="0" />
+      <LineId Id="317" Count="0" />
+      <LineId Id="327" Count="3" />
+      <LineId Id="335" Count="3" />
+      <LineId Id="343" Count="11" />
+      <LineId Id="318" Count="0" />
       <LineId Id="136" Count="0" />
       <LineId Id="76" Count="0" />
       <LineId Id="73" Count="2" />
