@@ -134,7 +134,7 @@ CASE command OF
 		_getStateRespCallbackSuccess(httpRequest, request);
 		
 	ABBLINKIN_COMMAND_TYPE.GET_SYMBOL:
-		;//TODO
+		_getSymbolRespCallbackSuccess(httpRequest, request);
 		
 	ABBLINKIN_COMMAND_TYPE.MOTORS_OFF:
 		;//TODO
@@ -322,11 +322,6 @@ ELSE
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' could not be added to request Queue');
 	_getIO := FALSE;
 END_IF
-
-
-
-
-
 ]]></ST>
       </Implementation>
     </Method>
@@ -345,8 +340,6 @@ VAR
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
-// RWS V1: https://developercenter.robotstudio.com/api/rwsApi/rapid_execution_get_page.html
-
 CASE configuration.rwsVersion OF 
 	ABBLINKIN_RWS_API_VERSION.V1:
 		valuePath := '_embedded/_state#0/lvalue';
@@ -360,12 +353,12 @@ IF (jsonValue <> 0) THEN
 	valueString := jsonDomParser.GetString(jsonValue);
 	
 	CASE request.results.dataType OF
-			ABBLINKIN_DATA_TYPE_Typ._BOOL:
-				request.results.pDataBool^ := INT_TO_BOOL(STRING_TO_INT(valueString));
-			ABBLINKIN_DATA_TYPE_Typ._DINT:
-				request.results.pDataDint^ := STRING_TO_DINT(valueString);
-			ABBLINKIN_DATA_TYPE_Typ._LREAL:
-				request.results.pDataLreal^ := STRING_TO_LREAL(valueString);
+		ABBLINKIN_DATA_TYPE_Typ._BOOL:
+			request.results.pDataBool^ := INT_TO_BOOL(STRING_TO_INT(valueString));
+		ABBLINKIN_DATA_TYPE_Typ._DINT:
+			request.results.pDataDint^ := STRING_TO_DINT(valueString);
+		ABBLINKIN_DATA_TYPE_Typ._LREAL:
+			request.results.pDataLreal^ := STRING_TO_LREAL(valueString);
 	ELSE
 		; // error todo
 	END_CASE
@@ -373,8 +366,6 @@ ELSE
 	request.pStatus^.error := TRUE;
 	request.pStatus^.errorID := 0;
 	request.pStatus^.errorMsg := 'Unable to parse RWS json response';
-	//request.pResults^.dataType := ABBLINKIN_RESULT_TYPE_Typ._NONE;
-	//request.pResults^.dataLen := 0;
 END_IF
 
 
@@ -397,8 +388,6 @@ VAR
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
-// RWS V1: https://developercenter.robotstudio.com/api/rwsApi/rapid_execution_get_page.html
-
 CASE configuration.rwsVersion OF 
 	ABBLINKIN_RWS_API_VERSION.V1:
 		valuePath := '_embedded/_state#0/ctrlexecstate';
@@ -425,6 +414,139 @@ END_IF
 
 
 _getStateRespCallbackSuccess := TRUE;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="_getSymbol" Id="{d9ba7421-7242-4767-a53d-8b068c42b046}">
+      <Declaration><![CDATA[METHOD PRIVATE _getSymbol : BOOL
+VAR_INPUT
+	signal : STRING;
+	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pResultBool : POINTER TO BOOL := 0;
+	pResultLreal : POINTER TO LREAL := 0;
+	pResultString : POINTER TO STRING := 0;
+END_VAR
+
+VAR
+	request: AbbLinkinRequest_Typ;
+	pointersSet: INT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF pStatus = 0 THEN
+	_getSymbol := FALSE;
+	RETURN;
+END_IF;
+
+// Clear Status
+_clearRequestStatus(pStatus);
+
+// Check that one and only one pointer is populated
+pointersSet := 0;
+IF (pResultBOOL <> 0) THEN 
+	request.results.dataType := ABBLINKIN_DATA_TYPE_Typ._BOOL;
+	request.results.pDataBool := pResultBool;
+	pointersSet := pointersSet + 1; 
+END_IF
+IF (pResultLREAL <> 0) THEN
+	request.results.dataType := ABBLINKIN_DATA_TYPE_Typ._LREAL;
+	request.results.pDataLreal := pResultLreal;
+	pointersSet := pointersSet + 1;
+END_IF
+IF (pResultSTRING <> 0) THEN
+	request.results.dataType := ABBLINKIN_DATA_TYPE_Typ._STRING;
+	request.results.pDataString := pResultString;
+	pointersSet := pointersSet + 1;
+END_IF
+
+
+IF pointersSet = 0 THEN
+	pStatus^.error := TRUE;
+	pStatus^.errorMsg := TO_STRING(ABBLINKIN_COMMAND_TYPE.GET_SYMBOL);
+	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ': No result pointer set');
+	_getSymbol := FALSE;
+ELSIF pointersSet >= 2 THEN
+	pStatus^.error := TRUE;
+	pStatus^.errorMsg := TO_STRING(ABBLINKIN_COMMAND_TYPE.GET_SYMBOL);
+	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ': Two or more result pointer set');
+	_getSymbol := FALSE;
+END_IF;
+
+request.command := ABBLINKIN_COMMAND_TYPE.GET_SYMBOL;
+request.httpMethod :=  ETcIotHttpRequestType.HTTP_Get;
+
+CASE configuration.rwsVersion OF
+	ABBLINKIN_RWS_API_VERSION.V1:
+		request.uri := '/rw/rapid/symbol/data/';
+		request.uri := CONCAT(request.uri, signal);		// e.g. signal='RAPID/T_ROB1/Module1/myRapidString'
+		request.uri := CONCAT(request.uri, '?json=1');
+
+	ABBLINKIN_RWS_API_VERSION.V2:	
+		request.uri := 'todo';
+		request.uri := CONCAT(request.uri, signal);
+END_CASE
+
+request.pStatus := pStatus;
+
+// Set Busy (or Error) Status
+IF _requestQueueAdd(request) THEN
+	pStatus^.busy := TRUE;
+	_getSymbol := TRUE;
+ELSE
+	pStatus^.error := TRUE;
+	pStatus^.errorMsg := TO_STRING(request.command);
+	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' could not be added to request Queue');
+	_getSymbol := FALSE;
+END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="_getSymbolRespCallbackSuccess" Id="{ef9782bf-23a7-46c0-9904-995a74b6e086}" FolderPath="responseCallbacks\">
+      <Declaration><![CDATA[METHOD PRIVATE _getSymbolRespCallbackSuccess : BOOL
+VAR_IN_OUT
+	httpRequest : 	FB_IotHttpRequest;
+	request : AbbLinkinRequest_Typ;
+END_VAR
+VAR
+	jsonDomParser : FB_JsonDomParser;
+	jsonRoot : SJsonValue;
+	jsonValue : SJsonValue;
+	valuePath : STRING;
+	valueString : STRING;
+	valueStringNoQuotes : STRING;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+CASE configuration.rwsVersion OF 
+	ABBLINKIN_RWS_API_VERSION.V1:
+		valuePath := '_embedded/_state#0/value';
+	ABBLINKIN_RWS_API_VERSION.V2:
+		valuePath := 'todo';
+END_CASE
+
+jsonRoot := httpRequest.GetJsonDomContent(jsonDomParser);
+jsonValue := jsonDomParser.FindMemberPath(jsonRoot, valuePath);
+IF (jsonValue <> 0) THEN
+	valueString := jsonDomParser.GetString(jsonValue);
+	
+	CASE request.results.dataType OF
+		ABBLINKIN_DATA_TYPE_Typ._BOOL:
+			request.results.pDataBool^ := STRING_TO_BOOL(valueString);
+		ABBLINKIN_DATA_TYPE_Typ._LREAL:
+			request.results.pDataLreal^ := STRING_TO_LREAL(valueString);
+		ABBLINKIN_DATA_TYPE_Typ._STRING:
+			valueStringNoQuotes := MID(valueString, len(valueString) - 2, 2); // MID removes beginning and ending double-quote (") characters
+			request.results.pDataString^ := valueStringNoQuotes;
+	ELSE
+		; // error todo
+	END_CASE
+ELSE
+	request.pStatus^.error := TRUE;
+	request.pStatus^.errorID := 0;
+	request.pStatus^.errorMsg := 'Unable to parse RWS json response';
+END_IF
+
+
+_getSymbolRespCallbackSuccess := TRUE;
 ]]></ST>
       </Implementation>
     </Method>
@@ -1057,13 +1179,46 @@ END_IF
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="GetSymbol" Id="{85af9ad1-0b82-4752-9ea8-7aabc8bae9aa}">
-      <Declaration><![CDATA[METHOD GetSymbol : BOOL
+    <Method Name="GetSymbolBool" Id="{85af9ad1-0b82-4752-9ea8-7aabc8bae9aa}">
+      <Declaration><![CDATA[METHOD GetSymbolBool : BOOL
 VAR_INPUT
+	signal : STRING;
+	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pResult : POINTER TO BOOL;
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[]]></ST>
+        <ST><![CDATA[
+GetSymbolBool:= _getSymbol(signal, pStatus, pResultBool := pResult, pResultLreal := 0, pResultString := 0);
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="GetSymbolNum" Id="{c73eb3bb-bcb7-4caf-a2b4-caeb0155d5ab}">
+      <Declaration><![CDATA[METHOD GetSymbolNum : BOOL
+VAR_INPUT
+	signal : STRING;
+	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pResult : POINTER TO LREAL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+GetSymbolNum := _getSymbol(signal, pStatus, pResultBool := 0, pResultLreal := pResult, pResultString := 0);
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="GetSymbolString" Id="{003e92a6-59fd-4b99-8992-f758da147260}">
+      <Declaration><![CDATA[METHOD GetSymbolString : BOOL
+VAR_INPUT
+	signal : STRING;
+	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pResult : POINTER TO STRING;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+GetSymbolString := _getSymbol(signal, pStatus, pResultBool := 0, pResultLreal := 0, pResultString := pResult);
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="IOWatchInit" Id="{73cfccc7-56e4-4d35-a07c-3dccb64e2e07}">
@@ -1372,15 +1527,10 @@ END_VAR
       <LineId Id="99" Count="6" />
       <LineId Id="114" Count="0" />
       <LineId Id="107" Count="2" />
-      <LineId Id="80" Count="2" />
-      <LineId Id="35" Count="0" />
-      <LineId Id="23" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin._getIORespCallbackSuccess">
       <LineId Id="32" Count="0" />
-      <LineId Id="12" Count="0" />
-      <LineId Id="53" Count="0" />
       <LineId Id="52" Count="0" />
       <LineId Id="56" Count="0" />
       <LineId Id="58" Count="0" />
@@ -1402,8 +1552,6 @@ END_VAR
       <LineId Id="30" Count="0" />
       <LineId Id="62" Count="0" />
       <LineId Id="65" Count="0" />
-      <LineId Id="67" Count="0" />
-      <LineId Id="50" Count="0" />
       <LineId Id="31" Count="0" />
       <LineId Id="23" Count="0" />
       <LineId Id="80" Count="1" />
@@ -1412,8 +1560,6 @@ END_VAR
     </LineIds>
     <LineIds Name="TcAbbLinkin._getStateRespCallbackSuccess">
       <LineId Id="32" Count="0" />
-      <LineId Id="12" Count="0" />
-      <LineId Id="53" Count="0" />
       <LineId Id="52" Count="0" />
       <LineId Id="56" Count="0" />
       <LineId Id="58" Count="0" />
@@ -1432,6 +1578,82 @@ END_VAR
       <LineId Id="65" Count="0" />
       <LineId Id="67" Count="0" />
       <LineId Id="50" Count="0" />
+      <LineId Id="31" Count="0" />
+      <LineId Id="23" Count="0" />
+      <LineId Id="80" Count="1" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="82" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin._getSymbol">
+      <LineId Id="25" Count="2" />
+      <LineId Id="22" Count="0" />
+      <LineId Id="40" Count="1" />
+      <LineId Id="29" Count="0" />
+      <LineId Id="42" Count="0" />
+      <LineId Id="30" Count="0" />
+      <LineId Id="46" Count="0" />
+      <LineId Id="48" Count="0" />
+      <LineId Id="64" Count="0" />
+      <LineId Id="110" Count="0" />
+      <LineId Id="66" Count="0" />
+      <LineId Id="65" Count="0" />
+      <LineId Id="49" Count="0" />
+      <LineId Id="76" Count="0" />
+      <LineId Id="111" Count="0" />
+      <LineId Id="67" Count="0" />
+      <LineId Id="70" Count="0" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="75" Count="0" />
+      <LineId Id="112" Count="0" />
+      <LineId Id="68" Count="0" />
+      <LineId Id="72" Count="0" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="43" Count="0" />
+      <LineId Id="55" Count="3" />
+      <LineId Id="36" Count="0" />
+      <LineId Id="53" Count="0" />
+      <LineId Id="60" Count="2" />
+      <LineId Id="54" Count="0" />
+      <LineId Id="37" Count="0" />
+      <LineId Id="77" Count="0" />
+      <LineId Id="83" Count="4" />
+      <LineId Id="93" Count="0" />
+      <LineId Id="97" Count="1" />
+      <LineId Id="89" Count="0" />
+      <LineId Id="95" Count="1" />
+      <LineId Id="90" Count="0" />
+      <LineId Id="78" Count="0" />
+      <LineId Id="113" Count="0" />
+      <LineId Id="79" Count="0" />
+      <LineId Id="99" Count="6" />
+      <LineId Id="114" Count="0" />
+      <LineId Id="107" Count="2" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin._getSymbolRespCallbackSuccess">
+      <LineId Id="32" Count="0" />
+      <LineId Id="52" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="58" Count="0" />
+      <LineId Id="57" Count="0" />
+      <LineId Id="59" Count="0" />
+      <LineId Id="55" Count="0" />
+      <LineId Id="15" Count="1" />
+      <LineId Id="25" Count="1" />
+      <LineId Id="47" Count="0" />
+      <LineId Id="94" Count="0" />
+      <LineId Id="97" Count="1" />
+      <LineId Id="112" Count="0" />
+      <LineId Id="104" Count="0" />
+      <LineId Id="113" Count="0" />
+      <LineId Id="108" Count="0" />
+      <LineId Id="129" Count="0" />
+      <LineId Id="114" Count="0" />
+      <LineId Id="110" Count="1" />
+      <LineId Id="115" Count="0" />
+      <LineId Id="30" Count="0" />
+      <LineId Id="62" Count="0" />
+      <LineId Id="65" Count="0" />
       <LineId Id="31" Count="0" />
       <LineId Id="23" Count="0" />
       <LineId Id="80" Count="1" />
@@ -1783,7 +2005,16 @@ END_VAR
       <LineId Id="86" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
-    <LineIds Name="TcAbbLinkin.GetSymbol">
+    <LineIds Name="TcAbbLinkin.GetSymbolBool">
+      <LineId Id="15" Count="1" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin.GetSymbolNum">
+      <LineId Id="15" Count="1" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin.GetSymbolString">
+      <LineId Id="15" Count="1" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.IOWatchInit">

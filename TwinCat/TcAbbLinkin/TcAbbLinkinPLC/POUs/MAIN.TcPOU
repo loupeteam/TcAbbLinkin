@@ -35,6 +35,17 @@ VAR
 	userSetIoLrealStatus: AbbLinkinRequestStatus_Typ;
 	
 	
+	
+	userGetSymbolBoolNow : BOOL;
+	userGetSymbolBoolResult : BOOL;
+	userGetSymbolBoolStatus: AbbLinkinRequestStatus_Typ;
+	userGetSymbolNumNow : BOOL;
+	userGetSymbolNumResult : LREAL;
+	userGetSymbolNumStatus: AbbLinkinRequestStatus_Typ;
+	userGetSymbolStringNow : BOOL;
+	userGetSymbolStringResult : STRING;
+	userGetSymbolStringStatus: AbbLinkinRequestStatus_Typ;
+	
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -99,6 +110,21 @@ IF userSetIoLrealNow THEN
 END_IF
 
 
+IF userGetSymbolBoolNow THEN
+	myRobotLink.GetSymbolBool(signal := 'RAPID/T_ROB1/Module1/myRapidBool', pStatus := ADR(userGetSymbolBoolStatus), pResult := ADR(userGetSymbolBoolResult));
+	userGetSymbolBoolNow := FALSE;
+END_IF
+IF userGetSymbolNumNow THEN
+	myRobotLink.GetSymbolNum(signal := 'RAPID/T_ROB1/Module1/myRapidNum', pStatus := ADR(userGetSymbolNumStatus), pResult := ADR(userGetSymbolNumResult));
+	userGetSymbolNumNow := FALSE;
+END_IF
+IF userGetSymbolStringNow THEN
+	myRobotLink.GetSymbolString(signal := 'RAPID/T_ROB1/Module1/myRapidString', pStatus := ADR(userGetSymbolStringStatus), pResult := ADR(userGetSymbolStringResult));
+	userGetSymbolStringNow := FALSE;
+END_IF
+
+
+
 IF userAckErrorNow THEN
 	myRobotLink.AckError();
 	userAckErrorNow := FALSE;
@@ -124,6 +150,10 @@ END_IF
       <LineId Id="194" Count="3" />
       <LineId Id="208" Count="7" />
       <LineId Id="138" Count="0" />
+      <LineId Id="230" Count="0" />
+      <LineId Id="236" Count="11" />
+      <LineId Id="234" Count="0" />
+      <LineId Id="229" Count="0" />
       <LineId Id="136" Count="0" />
       <LineId Id="76" Count="0" />
       <LineId Id="73" Count="2" />
