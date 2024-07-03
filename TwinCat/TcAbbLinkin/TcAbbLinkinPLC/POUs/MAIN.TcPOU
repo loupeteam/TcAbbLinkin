@@ -35,7 +35,6 @@ VAR
 	userSetIoLrealStatus: AbbLinkinRequestStatus_Typ;
 	
 	
-	
 	userGetSymbolBoolNow : BOOL;
 	userGetSymbolBoolResult : BOOL;
 	userGetSymbolBoolStatus: AbbLinkinRequestStatus_Typ;
@@ -45,6 +44,23 @@ VAR
 	userGetSymbolStringNow : BOOL;
 	userGetSymbolStringResult : STRING;
 	userGetSymbolStringStatus: AbbLinkinRequestStatus_Typ;
+	
+	userSetSymbolBoolNow : BOOL;
+	userSetSymbolBoolValue: BOOL := 1;
+	userSetSymbolBoolStatus: AbbLinkinRequestStatus_Typ;
+	userSetSymbolDintNow : BOOL;
+	userSetSymbolDintValue: DINT := -57;
+	userSetSymbolDintStatus: AbbLinkinRequestStatus_Typ;
+	userSetSymbolLrealNow : BOOL;
+	userSetSymbolLrealValue: LREAL := -41.123456;
+	userSetSymbolLrealStatus: AbbLinkinRequestStatus_Typ;
+	userSetSymbolStringNow : BOOL;
+	userSetSymbolStringValue: STRING := 'test String';
+	userSetSymbolStringStatus: AbbLinkinRequestStatus_Typ;
+	userSetSymbolWStringNow : BOOL;
+	userSetSymbolWStringValue: WSTRING := "test WString";
+	userSetSymbolWStringStatus: AbbLinkinRequestStatus_Typ;
+	
 	
 END_VAR
 ]]></Declaration>
@@ -124,6 +140,27 @@ IF userGetSymbolStringNow THEN
 END_IF
 
 
+IF userSetSymbolBoolNow THEN
+	myRobotLink.SetSymbol('RAPID/T_ROB1/Module1/myRapidBool', userSetSymbolBoolValue, ADR(userSetSymbolBoolStatus));
+	userSetSymbolBoolNow := FALSE;
+END_IF
+IF userSetSymbolDintNow THEN
+	myRobotLink.SetSymbol('RAPID/T_ROB1/Module1/myRapidNum', userSetSymbolDintValue, ADR(userSetSymbolDintStatus));
+	userSetSymbolDintNow := FALSE;
+END_IF
+IF userSetSymbolLrealNow THEN
+	myRobotLink.SetSymbol('RAPID/T_ROB1/Module1/myRapidNum', userSetSymbolLrealValue, ADR(userSetSymbolLrealStatus));
+	userSetSymbolLrealNow := FALSE;
+END_IF
+IF userSetSymbolStringNow THEN
+	myRobotLink.SetSymbol('RAPID/T_ROB1/Module1/myRapidString', userSetSymbolStringValue, ADR(userSetSymbolStringStatus));
+	userSetSymbolStringNow := FALSE;
+END_IF
+IF userSetSymbolWStringNow THEN
+	myRobotLink.SetSymbol('RAPID/T_ROB1/Module1/myRapidString', userSetSymbolWStringValue, ADR(userSetSymbolWStringStatus));
+	userSetSymbolWStringNow := FALSE;
+END_IF
+
 
 IF userAckErrorNow THEN
 	myRobotLink.AckError();
@@ -154,6 +191,9 @@ END_IF
       <LineId Id="236" Count="11" />
       <LineId Id="234" Count="0" />
       <LineId Id="229" Count="0" />
+      <LineId Id="270" Count="11" />
+      <LineId Id="286" Count="7" />
+      <LineId Id="266" Count="0" />
       <LineId Id="136" Count="0" />
       <LineId Id="76" Count="0" />
       <LineId Id="73" Count="2" />
