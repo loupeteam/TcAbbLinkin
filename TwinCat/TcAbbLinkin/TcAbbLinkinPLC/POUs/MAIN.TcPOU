@@ -4,14 +4,76 @@
     <Declaration><![CDATA[PROGRAM MAIN
 VAR
 	myRobotLink		: TcAbbLinkin;
-	userConnectStartNow: BOOL;
+	userConnectStartNow: BOOL := TRUE;
 	userConnectStopNow: BOOL;
 	userGetStateNow: BOOL;
 	userAckErrorNow: BOOL;
 	userSetConfigurationNow: BOOL := TRUE;
 	
 	userGetStateStatus: AbbLinkinRequestStatus_Typ;
-	userGetStateResults: AbbLinkinGetterResults_Typ;
+	userGetStateResult: STRING;
+	
+	userGetIoBoolNow : BOOL;
+	userGetIoBoolResult : BOOL;
+	
+	userGetIoLrealNow : BOOL;
+	userGetIoLrealResult : LREAL;
+	
+	userGetIoDintNow : BOOL;
+	userGetIoDintResult : DINT;
+	
+	userGetIoStatus: AbbLinkinRequestStatus_Typ;
+	
+	userSetIoBoolNow : BOOL;
+	userSetIoBoolValue: BOOL := 1;
+	userSetIoBoolStatus: AbbLinkinRequestStatus_Typ;
+	userSetIoDintNow : BOOL;
+	userSetIoDintValue: DINT := 57;
+	userSetIoDintStatus: AbbLinkinRequestStatus_Typ;
+	userSetIoLrealNow : BOOL;
+	userSetIoLrealValue: LREAL := 41.123456;
+	userSetIoLrealStatus: AbbLinkinRequestStatus_Typ;
+	
+	
+	userGetSymbolBoolNow : BOOL;
+	userGetSymbolBoolResult : BOOL;
+	userGetSymbolBoolStatus: AbbLinkinRequestStatus_Typ;
+	userGetSymbolNumNow : BOOL;
+	userGetSymbolNumResult : LREAL;
+	userGetSymbolNumStatus: AbbLinkinRequestStatus_Typ;
+	userGetSymbolStringNow : BOOL;
+	userGetSymbolStringResult : STRING;
+	userGetSymbolStringStatus: AbbLinkinRequestStatus_Typ;
+	
+	userSetSymbolBoolNow : BOOL;
+	userSetSymbolBoolValue: BOOL := 1;
+	userSetSymbolBoolStatus: AbbLinkinRequestStatus_Typ;
+	userSetSymbolDintNow : BOOL;
+	userSetSymbolDintValue: DINT := -57;
+	userSetSymbolDintStatus: AbbLinkinRequestStatus_Typ;
+	userSetSymbolLrealNow : BOOL;
+	userSetSymbolLrealValue: LREAL := -41.123456;
+	userSetSymbolLrealStatus: AbbLinkinRequestStatus_Typ;
+	userSetSymbolStringNow : BOOL;
+	userSetSymbolStringValue: STRING := 'test String';
+	userSetSymbolStringStatus: AbbLinkinRequestStatus_Typ;
+	userSetSymbolWStringNow : BOOL;
+	userSetSymbolWStringValue: WSTRING := "test WString";
+	userSetSymbolWStringStatus: AbbLinkinRequestStatus_Typ;
+	
+	
+	userPowerOffNow : BOOL;
+	userPowerOffStatus: AbbLinkinRequestStatus_Typ;
+	userPowerOnNow : BOOL;
+	userPowerOnStatus: AbbLinkinRequestStatus_Typ;
+	userRapidResetNow : BOOL;
+	userRapidResetStatus: AbbLinkinRequestStatus_Typ;
+	userRapidStopNow : BOOL;
+	userRapidStopStatus: AbbLinkinRequestStatus_Typ;
+	userRapidStartNow : BOOL;
+	userRapidStartStatus: AbbLinkinRequestStatus_Typ;
+	
+	
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -42,9 +104,97 @@ IF userConnectStopNow THEN
 END_IF
 
 IF userGetStateNow THEN
-	myRobotLink.GetState(ADR(userGetStateStatus), ADR(userGetStateResults));
+	myRobotLink.GetState(ADR(userGetStateStatus), ADR(userGetStateResult));
 	userGetStateNow := FALSE;
 END_IF
+
+IF userGetIoBoolNow THEN
+	myRobotLink.GetIODigital(signal := 'myInputDIG', pStatus := ADR(userGetIoStatus), pResult := ADR(userGetIoBoolResult));
+	userGetIoBoolNow := FALSE;
+END_IF
+
+IF userGetIoLrealNow THEN
+	myRobotLink.GetIOAnalog(signal := 'myInputANA', pStatus := ADR(userGetIoStatus), pResult := ADR(userGetIoLrealResult));
+	userGetIoLrealNow := FALSE;
+END_IF
+
+IF userGetIoDintNow THEN
+	myRobotLink.GetIOGroup(signal := 'myInputGRP', pStatus := ADR(userGetIoStatus), pResult := ADR(userGetIoDintResult));
+	userGetIoDintNow := FALSE;
+END_IF
+
+
+IF userSetIoBoolNow THEN
+	myRobotLink.SetIO('myInputDIG', userSetIoBoolValue, ADR(userSetIoBoolStatus));
+	userSetIoBoolNow := FALSE;
+END_IF
+IF userSetIoDintNow THEN
+	myRobotLink.SetIO('myInputGRP', userSetIoDintValue, ADR(userSetIoDintStatus));
+	userSetIoDintNow := FALSE;
+END_IF
+IF userSetIoLrealNow THEN
+	myRobotLink.SetIO('myInputANA', userSetIoLrealValue, ADR(userSetIoLrealStatus));
+	userSetIoLrealNow := FALSE;
+END_IF
+
+
+IF userGetSymbolBoolNow THEN
+	myRobotLink.GetSymbolBool(signal := 'RAPID/T_ROB1/Module1/myRapidBool', pStatus := ADR(userGetSymbolBoolStatus), pResult := ADR(userGetSymbolBoolResult));
+	userGetSymbolBoolNow := FALSE;
+END_IF
+IF userGetSymbolNumNow THEN
+	myRobotLink.GetSymbolNum(signal := 'RAPID/T_ROB1/Module1/myRapidNum', pStatus := ADR(userGetSymbolNumStatus), pResult := ADR(userGetSymbolNumResult));
+	userGetSymbolNumNow := FALSE;
+END_IF
+IF userGetSymbolStringNow THEN
+	myRobotLink.GetSymbolString(signal := 'RAPID/T_ROB1/Module1/myRapidString', pStatus := ADR(userGetSymbolStringStatus), pResult := ADR(userGetSymbolStringResult));
+	userGetSymbolStringNow := FALSE;
+END_IF
+
+
+IF userSetSymbolBoolNow THEN
+	myRobotLink.SetSymbol('RAPID/T_ROB1/Module1/myRapidBool', userSetSymbolBoolValue, ADR(userSetSymbolBoolStatus));
+	userSetSymbolBoolNow := FALSE;
+END_IF
+IF userSetSymbolDintNow THEN
+	myRobotLink.SetSymbol('RAPID/T_ROB1/Module1/myRapidNum', userSetSymbolDintValue, ADR(userSetSymbolDintStatus));
+	userSetSymbolDintNow := FALSE;
+END_IF
+IF userSetSymbolLrealNow THEN
+	myRobotLink.SetSymbol('RAPID/T_ROB1/Module1/myRapidNum', userSetSymbolLrealValue, ADR(userSetSymbolLrealStatus));
+	userSetSymbolLrealNow := FALSE;
+END_IF
+IF userSetSymbolStringNow THEN
+	myRobotLink.SetSymbol('RAPID/T_ROB1/Module1/myRapidString', userSetSymbolStringValue, ADR(userSetSymbolStringStatus));
+	userSetSymbolStringNow := FALSE;
+END_IF
+IF userSetSymbolWStringNow THEN
+	myRobotLink.SetSymbol('RAPID/T_ROB1/Module1/myRapidString', userSetSymbolWStringValue, ADR(userSetSymbolWStringStatus));
+	userSetSymbolWStringNow := FALSE;
+END_IF
+
+
+IF userPowerOffNow THEN
+	myRobotLink.PowerOff(ADR(userPowerOffStatus));
+	userPowerOffNow := FALSE;
+END_IF
+IF userPowerOnNow THEN
+	myRobotLink.PowerOn(ADR(userPowerOnStatus));
+	userPowerOnNow := FALSE;
+END_IF
+IF userRapidResetNow THEN
+	myRobotLink.RapidReset(ADR(userRapidResetStatus));
+	userRapidResetNow := FALSE;
+END_IF
+IF userRapidStopNow THEN
+	myRobotLink.RapidStop(ADR(userRapidStopStatus));
+	userRapidStopNow := FALSE;
+END_IF
+IF userRapidStartNow THEN
+	myRobotLink.RapidStart(ADR(userRapidStartStatus));
+	userRapidStartNow := FALSE;
+END_IF
+
 
 IF userAckErrorNow THEN
 	myRobotLink.AckError();
@@ -62,7 +212,28 @@ END_IF
       <LineId Id="46" Count="4" />
       <LineId Id="62" Count="3" />
       <LineId Id="61" Count="0" />
-      <LineId Id="68" Count="4" />
+      <LineId Id="68" Count="0" />
+      <LineId Id="139" Count="2" />
+      <LineId Id="151" Count="4" />
+      <LineId Id="169" Count="9" />
+      <LineId Id="147" Count="0" />
+      <LineId Id="137" Count="0" />
+      <LineId Id="194" Count="3" />
+      <LineId Id="208" Count="7" />
+      <LineId Id="138" Count="0" />
+      <LineId Id="230" Count="0" />
+      <LineId Id="236" Count="11" />
+      <LineId Id="234" Count="0" />
+      <LineId Id="229" Count="0" />
+      <LineId Id="270" Count="11" />
+      <LineId Id="286" Count="7" />
+      <LineId Id="266" Count="0" />
+      <LineId Id="317" Count="0" />
+      <LineId Id="327" Count="3" />
+      <LineId Id="335" Count="3" />
+      <LineId Id="343" Count="11" />
+      <LineId Id="318" Count="0" />
+      <LineId Id="136" Count="0" />
       <LineId Id="76" Count="0" />
       <LineId Id="73" Count="2" />
       <LineId Id="57" Count="0" />

@@ -13,7 +13,7 @@
 		</System>
 		<Plc>
 			<Project GUID="{D1D47807-DDC9-4C87-BA84-A94C789102DA}" Name="TcAbbLinkinPLC" PrjFilePath="TcAbbLinkinPLC\TcAbbLinkinPLC.plcproj" TmcFilePath="TcAbbLinkinPLC\TcAbbLinkinPLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="TcAbbLinkinPLC\TcAbbLinkinPLC.tmc" TmcHash="{6F5C5959-6729-C7CF-7B07-41A6F55C85F4}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="TcAbbLinkinPLC\TcAbbLinkinPLC.tmc" TmcHash="{1EEFC757-6313-FCD1-E6BA-E3FF48477C1B}">
 					<Name>TcAbbLinkinPLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Contexts>

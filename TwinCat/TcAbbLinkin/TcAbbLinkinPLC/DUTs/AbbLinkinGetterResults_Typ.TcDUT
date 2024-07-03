@@ -3,8 +3,11 @@
   <DUT Name="AbbLinkinGetterResults_Typ" Id="{c39ae275-6a6c-40ae-b6c4-efffb32a9ec5}">
     <Declaration><![CDATA[TYPE AbbLinkinGetterResults_Typ :
 STRUCT
-	data		: ARRAY[0..255] OF BYTE;
-	dataType	: INT;
+	pDataBool	: POINTER TO BOOL;
+	pDataDint	: POINTER TO DINT;
+	pDataLreal	: POINTER TO LREAL;
+	pDataString	: POINTER TO STRING;
+	dataType	: ABBLINKIN_DATA_TYPE_Typ;
 	dataLen		: INT;
 END_STRUCT
 END_TYPE
