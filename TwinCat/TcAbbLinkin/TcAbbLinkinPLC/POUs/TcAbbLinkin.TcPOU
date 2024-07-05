@@ -1019,11 +1019,11 @@ CASE _state OF
 				// Note : You can get a 503 if you try to send the same credentials repeatedly instead of 
 				// 		sending the http session cookies that the server provides after the first successful authentication			
 				errorID := _httpRequest.nStatusCode;
-				errorMsg := 'Authentication request recieved an error response (see errorID for HTTP status code).';
+				errorMsg := 'Authentication request recieved an error response (see errorID for HTTP code)';
 				_state := ABBLINKIN_STATE.ERROR;
 		ELSE			
 			errorID := _httpRequest.nStatusCode;
-			errorMsg := 'Authentication request recieved an error response (see errorID for HTTP status code).';
+			errorMsg := 'Authentication request recieved an error response (see errorID for HTTP code)';
 			_state := ABBLINKIN_STATE.ERROR;			
 		END_CASE
 	
