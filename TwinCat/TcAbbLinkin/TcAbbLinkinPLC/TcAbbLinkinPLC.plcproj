@@ -54,7 +54,7 @@
     <Compile Include="DUTs\ABBLINKIN_DATA_TYPE_Typ.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="DUTs\STRING_EX_LEN.TcDUT">
+    <Compile Include="DUTs\ABBLINKIN_STRING_EX_LEN.TcDUT">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="PlcTask.TcTTO">

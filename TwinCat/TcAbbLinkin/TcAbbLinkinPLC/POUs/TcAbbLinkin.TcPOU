@@ -54,7 +54,7 @@ VAR_INPUT
 END_VAR
 
 VAR
-	tempString : STRING_EX_LEN;
+	tempString : ABBLINKIN_STRING_EX_LEN;
 	h1_byArr: ARRAY[0..15] OF BYTE;
 	h1_hexStr: STRING;
 	h2_byArr: ARRAY[0..15] OF BYTE;
@@ -570,7 +570,7 @@ VAR_INPUT
 END_VAR
 
 VAR_IN_OUT
-	contentString : STRING_EX_LEN;
+	contentString : ABBLINKIN_STRING_EX_LEN;
 END_VAR
 
 VAR
@@ -578,7 +578,7 @@ VAR
 	keyLocation : INT;
 	firstQuoteLocation : INT;
 	secondQuoteLocation : INT;
-	tempString : STRING_EX_LEN;
+	tempString : ABBLINKIN_STRING_EX_LEN;
 	
 END_VAR]]></Declaration>
       <Implementation>
@@ -642,7 +642,7 @@ VAR
 	combinedUnPwBase64: STRING;
 	anyCookieSetYet: BOOL;
 	tempString: STRING;
-	cookieValue: STRING_EX_LEN;
+	cookieValue: ABBLINKIN_STRING_EX_LEN;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
@@ -720,9 +720,9 @@ VAR_INPUT
 	httpRequest:	FB_IotHttpRequest;
 END_VAR
 VAR
-	setCookieValue:	STRING_EX_LEN;
+	setCookieValue:	ABBLINKIN_STRING_EX_LEN;
 	Set: INT;
-	tempString:	STRING_EX_LEN;
+	tempString:	ABBLINKIN_STRING_EX_LEN;
 	setCookieValueLen: INT;
 	keyLoc : INT;
 	equalLoc: INT;
@@ -1248,16 +1248,6 @@ END_VAR
         <ST><![CDATA[
 GetSymbolString := _getSymbol(signal, pStatus, pResultBool := 0, pResultLreal := 0, pResultString := pResult);
 ]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="IOWatchInit" Id="{73cfccc7-56e4-4d35-a07c-3dccb64e2e07}">
-      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
-METHOD IOWatchInit : BOOL
-VAR_INPUT
-END_VAR
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[]]></ST>
       </Implementation>
     </Method>
     <Method Name="PowerOff" Id="{7e704635-bfa1-4267-9db0-7f188918765f}">
@@ -2360,9 +2350,6 @@ END_IF]]></ST>
     </LineIds>
     <LineIds Name="TcAbbLinkin.GetSymbolString">
       <LineId Id="15" Count="1" />
-      <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="TcAbbLinkin.IOWatchInit">
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.PowerOff">

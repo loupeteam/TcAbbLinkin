@@ -11,7 +11,7 @@ STRUCT
 	nc : STRING;
 	cnonce : STRING;
 	response : STRING;
-	authContent : STRING_EX_LEN;
+	authContent : ABBLINKIN_STRING_EX_LEN;
 END_STRUCT
 END_TYPE
 ]]></Declaration>

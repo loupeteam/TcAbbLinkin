@@ -7,7 +7,7 @@ STRUCT
 	command		: ABBLINKIN_COMMAND_TYPE;
 	uri			: STRING;
 	httpMethod	: ETcIotHttpRequestType;
-	httpBody	: STRING_EX_LEN := '';
+	httpBody	: ABBLINKIN_STRING_EX_LEN := '';
 	pStatus		: POINTER TO AbbLinkinRequestStatus_Typ;
 	results		: AbbLinkinRequestResults_Typ;
 END_STRUCT
