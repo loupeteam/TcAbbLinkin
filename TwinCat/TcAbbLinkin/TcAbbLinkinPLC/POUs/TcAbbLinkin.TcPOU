@@ -28,10 +28,12 @@ VAR
 	_auth : AbbLinkinAuth_Typ;
 	_requestQueue : AbbLinkinRequestQueue_Typ;
 	_currentRequest : AbbLinkinRequest_Typ;
+	_numRequestAttempts : UINT;
 END_VAR
 
 VAR CONSTANT
 	AUTH_URI : STRING := '/?json=1';
+	MAX_REQUESTS_ATTEMPTS : UINT := 3;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -360,8 +362,6 @@ IF (jsonValue <> 0) THEN
 			request.results.pDataDint^ := STRING_TO_DINT(valueString);
 		ABBLINKIN_DATA_TYPE_Typ._LREAL:
 			request.results.pDataLreal^ := STRING_TO_LREAL(valueString);
-	ELSE
-		; // error TODO
 	END_CASE
 ELSE
 	request.pStatus^.error := TRUE;
@@ -541,8 +541,6 @@ IF (jsonValue <> 0) THEN
 		ABBLINKIN_DATA_TYPE_Typ._STRING:
 			valueStringNoQuotes := MID(valueString, len(valueString) - 2, 2); // MID removes beginning and ending double-quote (") characters
 			request.results.pDataString^ := valueStringNoQuotes;
-	ELSE
-		; // error TODO
 	END_CASE
 ELSE
 	request.pStatus^.error := TRUE;
@@ -837,14 +835,27 @@ CASE _state OF
 				// Check for existing request
 				IF _currentRequest.pStatus <> 0	THEN 
 					IF _currentRequest.pStatus^.busy THEN
-						// This is the case when a request was sent, but a 401 Unauthorized was returned (causing re-auth steps). Here, we are retrying.
-						_state := ABBLINKIN_STATE.SEND_REQUEST;
+						// Possible scenario: a request was sent, but a 401 Unauthorized was returned (causing re-auth steps). Here, we are retrying.	
+						// Possible scenario: an error occured somewhere along the way	
+						IF _numRequestAttempts < MAX_REQUESTS_ATTEMPTS THEN
+							_state := ABBLINKIN_STATE.SEND_REQUEST;
+						ELSE
+							// Maximum number of requests sent -> terminate request
+							_currentRequest.pStatus^.busy := FALSE;
+							_currentRequest.pStatus^.done := FALSE;
+							_currentRequest.pStatus^.error := TRUE;
+							IF _currentRequest.pStatus^.errorMsg = '' THEN
+								_currentRequest.pStatus^.errorMsg := 'Maximum number of request reached';
+							END_IF
+							MEMSET(ADR(_currentRequest), 0, SIZEOF(_currentRequest));	// Zero (i.e. terminate) current Request
+						END_IF;
 					END_IF;
 				END_IF
 				
 				// Check if queue contains at least one request
 				IF _state <> ABBLINKIN_STATE.SEND_REQUEST  AND NOT _requestQueue.empty THEN
 					_currentRequest := _requestQueuePop();
+					_numRequestAttempts := 0;
 					_state := ABBLINKIN_STATE.SEND_REQUEST;
 				END_IF;
 			ELSE
@@ -857,13 +868,15 @@ CASE _state OF
 		
 		_setHeader(ABBLINKIN_AUTH_HEADER_VALUE.NONE);
 		retVal := _httpRequest.SendRequest(_currentRequest.uri, _httpClient, _currentRequest.httpMethod, ADR(_currentRequest.httpBody), INT_TO_UDINT(LEN(_currentRequest.httpBody)), _httpHeader);
+		_numRequestAttempts := _numRequestAttempts + 1;
 		
 		IF retVal = FALSE THEN
 			_currentRequest.pStatus^.busy := FALSE;
 			_currentRequest.pStatus^.error := TRUE;
 			_currentRequest.pStatus^.errorMsg := 'The request could not be sent';
+			MEMSET(ADR(_currentRequest), 0, SIZEOF(_currentRequest));	// Zero (i.e. terminate) current Request
 			
-			_state := ABBLINKIN_STATE.IDLE;	// TODO : decide if we want to retry
+			_state := ABBLINKIN_STATE.IDLE;
 		ELSE
 			_state := ABBLINKIN_STATE.WAIT_FOR_RESONSE;
 		END_IF
@@ -874,7 +887,7 @@ CASE _state OF
 			_currentRequest.pStatus^.busy := FALSE;
 			_currentRequest.pStatus^.error := TRUE;
 			_currentRequest.pStatus^.errorID := _httpRequest.eErrorId;
-			_currentRequest.pStatus^.errorMsg := 'The client request object returned an error';
+			_currentRequest.pStatus^.errorMsg := 'The client request object returned an error (see errorID)';
 			
 			_state := ABBLINKIN_STATE.IDLE;	// TODO : decide if we want to retry
 		ELSIF _httpRequest.bBusy = FALSE THEN
@@ -893,7 +906,7 @@ CASE _state OF
 				// Write and close out current request status
 				_currentRequest.pStatus^.busy := FALSE;
 				_currentRequest.pStatus^.done := NOT _currentRequest.pStatus^.error; // Set done if error false
-				MEMSET(ADR(_currentRequest), 0, SIZEOF(_currentRequest));
+				MEMSET(ADR(_currentRequest), 0, SIZEOF(_currentRequest));	// Zero (i.e. terminate) current Request
 				
 				_state := ABBLINKIN_STATE.IDLE;
 				
@@ -1858,8 +1871,7 @@ END_IF
       <LineId Id="104" Count="0" />
       <LineId Id="113" Count="0" />
       <LineId Id="108" Count="0" />
-      <LineId Id="114" Count="0" />
-      <LineId Id="110" Count="1" />
+      <LineId Id="111" Count="0" />
       <LineId Id="115" Count="0" />
       <LineId Id="30" Count="0" />
       <LineId Id="62" Count="0" />
@@ -1960,8 +1972,7 @@ END_IF
       <LineId Id="113" Count="0" />
       <LineId Id="108" Count="0" />
       <LineId Id="129" Count="0" />
-      <LineId Id="114" Count="0" />
-      <LineId Id="110" Count="1" />
+      <LineId Id="111" Count="0" />
       <LineId Id="115" Count="0" />
       <LineId Id="30" Count="0" />
       <LineId Id="62" Count="0" />
@@ -2116,14 +2127,25 @@ END_IF
       <LineId Id="447" Count="0" />
       <LineId Id="446" Count="0" />
       <LineId Id="439" Count="0" />
+      <LineId Id="660" Count="2" />
       <LineId Id="442" Count="0" />
-      <LineId Id="445" Count="0" />
+      <LineId Id="663" Count="0" />
+      <LineId Id="675" Count="0" />
+      <LineId Id="664" Count="0" />
+      <LineId Id="666" Count="0" />
+      <LineId Id="668" Count="0" />
+      <LineId Id="671" Count="0" />
+      <LineId Id="676" Count="0" />
+      <LineId Id="673" Count="0" />
+      <LineId Id="658" Count="0" />
+      <LineId Id="656" Count="0" />
       <LineId Id="444" Count="0" />
       <LineId Id="440" Count="0" />
       <LineId Id="438" Count="0" />
       <LineId Id="448" Count="0" />
       <LineId Id="433" Count="0" />
       <LineId Id="83" Count="0" />
+      <LineId Id="652" Count="0" />
       <LineId Id="157" Count="0" />
       <LineId Id="284" Count="0" />
       <LineId Id="279" Count="0" />
@@ -2134,10 +2156,13 @@ END_IF
       <LineId Id="87" Count="2" />
       <LineId Id="142" Count="0" />
       <LineId Id="92" Count="0" />
+      <LineId Id="657" Count="0" />
       <LineId Id="90" Count="0" />
       <LineId Id="96" Count="0" />
       <LineId Id="158" Count="0" />
-      <LineId Id="160" Count="1" />
+      <LineId Id="160" Count="0" />
+      <LineId Id="677" Count="0" />
+      <LineId Id="161" Count="0" />
       <LineId Id="101" Count="1" />
       <LineId Id="99" Count="1" />
       <LineId Id="98" Count="0" />
@@ -2159,7 +2184,7 @@ END_IF
       <LineId Id="643" Count="0" />
       <LineId Id="168" Count="0" />
       <LineId Id="450" Count="0" />
-      <LineId Id="452" Count="0" />
+      <LineId Id="678" Count="0" />
       <LineId Id="169" Count="0" />
       <LineId Id="139" Count="0" />
       <LineId Id="137" Count="0" />
