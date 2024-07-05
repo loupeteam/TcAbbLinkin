@@ -4,8 +4,8 @@
     <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 TYPE AbbLinkinConfiguration_Typ :
 STRUCT
-	remoteIpAddress	: STRING := '127.0.0.1';
-	remotePort 		: USINT := 80;
+	rwsIpAddress	: STRING := '127.0.0.1';
+	rwsTcpPort 		: USINT := 80;
 	rwsVersion 		: ABBLINKIN_RWS_API_VERSION;
 	rwsUsername		: STRING := 'Default User';
 	rwsPassword		: STRING := 'robotics';

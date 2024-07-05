@@ -83,8 +83,8 @@ END_VAR
       <ST><![CDATA[
 // Set configuration
 if userSetConfigurationNow then
-	myRobotLink.configuration.remoteIpAddress := '127.0.0.1';
-	myRobotLink.configuration.remotePort := 80;
+	myRobotLink.configuration.rwsIpAddress := '127.0.0.1';
+	myRobotLink.configuration.rwsTcpPort := 80;
 	myRobotLink.configuration.rwsVersion := ABBLINKIN_RWS_API_VERSION.V2;
 	myRobotLink.configuration.rwsUsername := 'Default User';
 	myRobotLink.configuration.rwsPassword := 'robotics';

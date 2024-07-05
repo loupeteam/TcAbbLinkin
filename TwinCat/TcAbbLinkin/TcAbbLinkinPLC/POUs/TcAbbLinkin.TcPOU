@@ -198,8 +198,8 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[
-_httpClient.sHostName := connectionConfig.remoteIpAddress;
-_httpClient.nHostPort := connectionConfig.remotePort;
+_httpClient.sHostName := connectionConfig.rwsIpAddress;
+_httpClient.nHostPort := connectionConfig.rwsTcpPort;
 _httpClient.bKeepAlive := TRUE;
 _httpClient.tConnectionTimeout := T#10S;
 

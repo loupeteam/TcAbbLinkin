@@ -24,7 +24,7 @@
     <Compile Include="DUTs\AbbLinkinConfiguration_Typ.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="DUTs\AbbLinkinGetterResults_Typ.TcDUT">
+    <Compile Include="DUTs\AbbLinkinRequestResults_Typ.TcDUT">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="DUTs\AbbLinkinRequest_Typ.TcDUT">
