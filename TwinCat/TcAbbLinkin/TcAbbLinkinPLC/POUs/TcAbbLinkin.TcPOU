@@ -361,7 +361,7 @@ IF (jsonValue <> 0) THEN
 		ABBLINKIN_DATA_TYPE_Typ._LREAL:
 			request.results.pDataLreal^ := STRING_TO_LREAL(valueString);
 	ELSE
-		; // error todo
+		; // error TODO
 	END_CASE
 ELSE
 	request.pStatus^.error := TRUE;
@@ -542,7 +542,7 @@ IF (jsonValue <> 0) THEN
 			valueStringNoQuotes := MID(valueString, len(valueString) - 2, 2); // MID removes beginning and ending double-quote (") characters
 			request.results.pDataString^ := valueStringNoQuotes;
 	ELSE
-		; // error todo
+		; // error TODO
 	END_CASE
 ELSE
 	request.pStatus^.error := TRUE;
@@ -868,7 +868,7 @@ CASE _state OF
 			_currentRequest.pStatus^.error := TRUE;
 			_currentRequest.pStatus^.errorMsg := 'The request could not be sent';
 			
-			_state := ABBLINKIN_STATE.IDLE;	// todo: decide if we want to retry
+			_state := ABBLINKIN_STATE.IDLE;	// TODO: decide if we want to retry
 		ELSE
 			_state := ABBLINKIN_STATE.WAIT_FOR_RESONSE;
 		END_IF
@@ -881,7 +881,7 @@ CASE _state OF
 			_currentRequest.pStatus^.errorID := _httpRequest.eErrorId;
 			_currentRequest.pStatus^.errorMsg := 'The client request object returned an error';
 			
-			_state := ABBLINKIN_STATE.IDLE;	// todo: decide if we want to retry
+			_state := ABBLINKIN_STATE.IDLE;	// TODO: decide if we want to retry
 		ELSIF _httpRequest.bBusy = FALSE THEN
 			_state := ABBLINKIN_STATE.PROCESS_RESPONSE;
 		END_IF
@@ -906,7 +906,7 @@ CASE _state OF
 				
 				// TODO: implement Authorization implementation
 				_authorized := FALSE;
-				_state := ABBLINKIN_STATE.IDLE;	// todo: decide if we want to retry
+				_state := ABBLINKIN_STATE.IDLE;	// TODO: decide if we want to retry
 								
 			400, 402..451:	// HTTP Client Error	
 				_currentRequest.pStatus^.busy := FALSE;
@@ -914,7 +914,7 @@ CASE _state OF
 				_currentRequest.pStatus^.errorID := _httpRequest.nStatusCode;
 				_currentRequest.pStatus^.errorMsg := 'The Robot responded with an error (client error, 4xx). See errorID';
 				
-				_state := ABBLINKIN_STATE.IDLE;	// todo: decide if we want to retry
+				_state := ABBLINKIN_STATE.IDLE;	// TODO: decide if we want to retry
 				
 			500..502, 504..511: // HTTP Server Error
 				_currentRequest.pStatus^.busy := FALSE;
@@ -922,7 +922,7 @@ CASE _state OF
 				_currentRequest.pStatus^.errorID := _httpRequest.nStatusCode;
 				_currentRequest.pStatus^.errorMsg := 'The Robot responded with an error (server error, 5xx). See errorID';
 				
-				_state := ABBLINKIN_STATE.IDLE;	// todo: decide if we want to retry
+				_state := ABBLINKIN_STATE.IDLE;	// TODO: decide if we want to retry
 							
 		END_CASE
 	
@@ -976,17 +976,17 @@ CASE _state OF
 					_state := ABBLINKIN_STATE.AUTH_DIGEST_RESPONSE_CALCULATE;
 				ELSE
 					// Invalid username or password
-					_state := ABBLINKIN_STATE.IDLE;	// todo: handle better	
+					_state := ABBLINKIN_STATE.IDLE;	// TODO: handle better	
 				END_IF
 				
 			503:  
 				// Note: You can get a 503 if you try to send the same credentials repeatedly instead of 
 				// 		sending the http session cookies that the server provides after the first successful authentication
 				
-				_state := ABBLINKIN_STATE.IDLE;	// todo: handle better
+				_state := ABBLINKIN_STATE.IDLE;	// TODO: handle better
 		ELSE
 			
-			_state := ABBLINKIN_STATE.IDLE;	// todo: handle better				
+			_state := ABBLINKIN_STATE.IDLE;	// TODO: handle better				
 		END_CASE
 	
 	
@@ -1000,7 +1000,7 @@ CASE _state OF
 		digestLocation := FIND(_auth.wwwAuthContent, 'Digest');
 		IF digestLocation = 0 THEN 
 			// 'Digest not found in WWW-Authenticate header. ';
-			; // error todo
+			; // error TODO
 		END_IF
 		
 		// Extract parameter values from WWW-Authenticate header
@@ -1013,12 +1013,12 @@ CASE _state OF
 			_auth.digest.qop = '' OR
 			_auth.digest.nonce = '' OR
 			_auth.digest.opaque = '') THEN
-			; // error todo 'Digest header unavailable'
+			; // error TODO 'Digest header unavailable'
 		END_IF;
  
 		// Calculate Digest response
-		_auth.digest.nc := '00000001'; // todo refine
-		_auth.digest.cnonce := 'diddLOPR'; // todo refine
+		_auth.digest.nc := '00000001'; // TODO refine
+		_auth.digest.cnonce := 'diddLOPR'; // TODO refine
 		_auth.digest.response := _calculateDigestResponse(	username := configuration.rwsUsername,
 															realm := _auth.digest.realm,
 															password := configuration.rwsPassword,
