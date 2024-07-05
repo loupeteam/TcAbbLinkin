@@ -1,7 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
-  <DUT Name="STRING_EX_LEN" Id="{ee5ab662-46b9-48e0-aa78-fcaad380107f}">
-    <Declaration><![CDATA[TYPE STRING_EX_LEN : STRING(2000); END_TYPE
-]]></Declaration>
-  </DUT>
-</TcPlcObject>

@@ -1,14 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
   <DUT Name="AbbLinkinRequest_Typ" Id="{9d01c7cf-9f93-4ceb-b209-32052c2214ca}">
-    <Declaration><![CDATA[TYPE AbbLinkinRequest_Typ :
+    <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+TYPE AbbLinkinRequest_Typ :
 STRUCT
-	command		: ABBLINKIN_COMMAND_TYPE;
-	uri			: STRING;
-	httpMethod	: ETcIotHttpRequestType;
-	httpBody	: STRING_EX_LEN := '';
-	pStatus		: POINTER TO AbbLinkinRequestStatus_Typ;
-	results		: AbbLinkinGetterResults_Typ;
+	command : ABBLINKIN_COMMAND_TYPE;
+	uri : STRING;
+	httpMethod : ETcIotHttpRequestType;
+	httpBody : ABBLINKIN_STRING_EX_LEN := '';
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
+	results : AbbLinkinRequestResults_Typ;
 END_STRUCT
 END_TYPE
 ]]></Declaration>

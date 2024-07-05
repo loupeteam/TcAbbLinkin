@@ -1,36 +1,37 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
   <POU Name="TcAbbLinkin" Id="{83aacf3c-7637-43d5-b1b4-45d5caf263aa}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK TcAbbLinkin
+    <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+FUNCTION_BLOCK TcAbbLinkin
 VAR_INPUT
 	configuration : AbbLinkinConfiguration_Typ;
 END_VAR
 VAR_OUTPUT
-	readyForCmd		: BOOL;
-	error			: BOOL;
-	errorID			: DINT;
+	readyForCmd : BOOL;
+	error : BOOL;
+	errorID : DINT;
 END_VAR
 VAR
 	_connectionEnabled : BOOL;
-	_httpClient: FB_IotHttpClient;
-	_httpRequest: FB_IotHttpRequest;
-	_httpHeader: FB_IotHttpHeaderFieldMap;
-	_httpHeader2: FB_IotHttpHeaderFieldMap;
-	_methodConnectionStartCalled: BOOL;
-	_methodConnectionStopCalled: BOOL;
-	_methodAckErrorCalled: BOOL;
-	_state: ABBLINKIN_STATE;
-	_auth: AbbLinkinAuth_Typ;
-	_requestQueue: AbbLinkinRequestQueue_Typ;
-	_currentRequest: AbbLinkinRequest_Typ;
-	_sendingEnabled: BOOL;
-	_authorized: BOOL;
-	_httpSessionCookie: STRING;
-	_ABBCXCookie: STRING;
+	_sendingEnabled : BOOL;
+	_authorized : BOOL;
+	
+	_httpClient : FB_IotHttpClient;
+	_httpRequest : FB_IotHttpRequest;
+	_httpHeader : FB_IotHttpHeaderFieldMap;
+	
+	_methodConnectionStartCalled : BOOL;
+	_methodConnectionStopCalled : BOOL;
+	_methodAckErrorCalled : BOOL;
+	
+	_state : ABBLINKIN_STATE;
+	_auth : AbbLinkinAuth_Typ;
+	_requestQueue : AbbLinkinRequestQueue_Typ;
+	_currentRequest : AbbLinkinRequest_Typ;
 END_VAR
 
 VAR CONSTANT
-	AUTH_URI: STRING := '/?json=1';
+	AUTH_URI : STRING := '/?json=1';
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -38,7 +39,8 @@ END_VAR]]></Declaration>
     <Folder Name="digestMethods" Id="{29dc1ba2-5044-4aed-a071-8839204fb61b}" />
     <Folder Name="responseCallbacks" Id="{81e09dac-321f-4653-938f-510c189b178d}" />
     <Method Name="_calculateDigestResponse" Id="{b6ba6c5c-69f4-4fe0-9917-9e6697b8c0e1}" FolderPath="digestMethods\">
-      <Declaration><![CDATA[METHOD PRIVATE _calculateDigestResponse : STRING
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD PRIVATE _calculateDigestResponse : STRING
 VAR_INPUT
 	username : STRING;
 	realm : STRING;
@@ -52,14 +54,14 @@ VAR_INPUT
 END_VAR
 
 VAR
-	tempString : STRING_EX_LEN;
-	h1_byArr: ARRAY[0..15] OF BYTE;
-	h1_hexStr: STRING;
-	h2_byArr: ARRAY[0..15] OF BYTE;
-	h2_hexStr: STRING;
-	response_byArr: ARRAY[0..15] OF BYTE;
-	response_hexStr: STRING;
-	i: INT;
+	tempString : ABBLINKIN_STRING_EX_LEN;
+	h1_byArr : ARRAY[0..15] OF BYTE;
+	h1_hexStr : STRING;
+	h2_byArr : ARRAY[0..15] OF BYTE;
+	h2_hexStr : STRING;
+	response_byArr : ARRAY[0..15] OF BYTE;
+	response_hexStr : STRING;
+	i : INT;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
@@ -70,7 +72,7 @@ tempString := CONCAT(tempString, ':');
 tempString := CONCAT(tempString, realm);
 tempString := CONCAT(tempString, ':');
 tempString := CONCAT(tempString, password);
-F_GenerateHashValue(E_HashMode.HASH_MD5, ADR(tempString), LEN(tempString), ADR(h1_byArr), SIZEOF(h1_byArr));
+F_GenerateHashValue(E_HashMode.HASH_MD5, ADR(tempString), INT_TO_UDINT(LEN(tempString)), ADR(h1_byArr), SIZEOF(h1_byArr));
 h1_hexStr := '';
 FOR i := 0 TO 15 DO
 	h1_hexStr := CONCAT(h1_hexStr, BYTE_TO_HEXSTR(h1_byArr[i], 2, TRUE));
@@ -82,7 +84,7 @@ tempString := '';
 tempString := CONCAT(tempString, httpMethod);
 tempString := CONCAT(tempString, ':');
 tempString := CONCAT(tempString, uri);
-F_GenerateHashValue(E_HashMode.HASH_MD5, ADR(tempString), LEN(tempString), ADR(h2_byArr), SIZEOF(h2_byArr));
+F_GenerateHashValue(E_HashMode.HASH_MD5, ADR(tempString), INT_TO_UDINT(LEN(tempString)), ADR(h2_byArr), SIZEOF(h2_byArr));
 h2_hexStr := '';
 FOR i := 0 TO 15 DO
 	h2_hexStr := CONCAT(h2_hexStr, BYTE_TO_HEXSTR(h2_byArr[i], 2, TRUE));
@@ -102,7 +104,7 @@ tempString := CONCAT(tempString, ':');
 tempString := CONCAT(tempString, qop);
 tempString := CONCAT(tempString, ':');
 tempString := CONCAT(tempString, h2_hexStr);
-F_GenerateHashValue(E_HashMode.HASH_MD5, ADR(tempString), LEN(tempString), ADR(response_byArr), SIZEOF(response_byArr));
+F_GenerateHashValue(E_HashMode.HASH_MD5, ADR(tempString), INT_TO_UDINT(LEN(tempString)), ADR(response_byArr), SIZEOF(response_byArr));
 response_hexStr := '';
 FOR i := 0 TO 15 DO
 	response_hexStr := CONCAT(response_hexStr, BYTE_TO_HEXSTR(response_byArr[i], 2, TRUE));
@@ -113,19 +115,18 @@ _calculateDigestResponse := response_hexStr;
       </Implementation>
     </Method>
     <Method Name="_callCommandSuccessHandler" Id="{4e7a3f83-8e9c-4794-9ff8-99e39dc09c79}">
-      <Declaration><![CDATA[METHOD PRIVATE _callCommandSuccessHandler : BOOL
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD PRIVATE _callCommandSuccessHandler : BOOL
 VAR_INPUT
 	command : ABBLINKIN_COMMAND_TYPE;
 END_VAR
 VAR_IN_OUT
 	httpRequest : FB_IotHttpRequest;
-	request: AbbLinkinRequest_Typ;
+	request : AbbLinkinRequest_Typ;
 END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[
-
-
 CASE command OF 
 	ABBLINKIN_COMMAND_TYPE.GET_IO:
 		_getIORespCallbackSuccess(httpRequest, request);
@@ -136,26 +137,20 @@ CASE command OF
 	ABBLINKIN_COMMAND_TYPE.GET_SYMBOL:
 		_getSymbolRespCallbackSuccess(httpRequest, request);
 		
-	ABBLINKIN_COMMAND_TYPE.MOTORS_OFF:
-		;//TODO
-		
-	ABBLINKIN_COMMAND_TYPE.MOTORS_ON:
-		;//TODO
-		
 	ABBLINKIN_COMMAND_TYPE.POWER_OFF:
-		;//TODO
+		;// Do Nothing
 		
 	ABBLINKIN_COMMAND_TYPE.POWER_ON:
-		;//TODO
+		;// Do Nothing
 		
 	ABBLINKIN_COMMAND_TYPE.RAPID_RESET:
-		;//TODO
+		;// Do Nothing
 		
 	ABBLINKIN_COMMAND_TYPE.RAPID_START:
-		;//TODO
+		;// Do Nothing
 		
 	ABBLINKIN_COMMAND_TYPE.RAPID_STOP:
-		;//TODO
+		;// Do Nothing
 		
 	ABBLINKIN_COMMAND_TYPE.SET_IO:
 		;// Do Nothing
@@ -168,9 +163,10 @@ END_CASE
       </Implementation>
     </Method>
     <Method Name="_clearRequestStatus" Id="{c36ff0b3-102e-47ec-ab8d-11137cae997a}">
-      <Declaration><![CDATA[METHOD PRIVATE _clearRequestStatus : BOOL
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD PRIVATE _clearRequestStatus : BOOL
 VAR_INPUT
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 END_VAR
 ]]></Declaration>
       <Implementation>
@@ -186,15 +182,16 @@ _clearRequestStatus := TRUE;
       </Implementation>
     </Method>
     <Method Name="_configureClient" Id="{4a508a3b-482e-4d68-8353-2815209fac39}">
-      <Declaration><![CDATA[METHOD PRIVATE _configureClient : BOOL
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD PRIVATE _configureClient : BOOL
 VAR_IN_OUT
-	connectionConfig:	AbbLinkinConfiguration_Typ;	
+	connectionConfig : AbbLinkinConfiguration_Typ;	
 END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[
-_httpClient.sHostName := connectionConfig.remoteIpAddress;
-_httpClient.nHostPort := connectionConfig.remotePort;
+_httpClient.sHostName := connectionConfig.rwsIpAddress;
+_httpClient.nHostPort := connectionConfig.rwsTcpPort;
 _httpClient.bKeepAlive := TRUE;
 _httpClient.tConnectionTimeout := T#10S;
 
@@ -204,32 +201,35 @@ CASE connectionConfig.rwsVersion OF
 		_httpClient.stTLS.bNoServerCertCheck := FALSE;
 		
 	ABBLINKIN_RWS_API_VERSION.V2:
+		// TODO : Correctly configure for TLS/HTTPS connection
+	
 		//_httpClient.stTLS.aPskKey := 0;
 		_httpClient.stTLS.bNoServerCertCheck := FALSE;
 		//_httpClient.stTLS.nPskKeyLen := 0;
 		//_httpClient.stTLS.sCA := '';
 		//_httpClient.stTLS.sCert := '';
-	//	_httpClient.stTLS.sCiphers := 'TLS_AES_128_GCM_SHA256';
+		_httpClient.stTLS.sCiphers := 'TLS_AES_128_GCM_SHA256';
 		//_httpClient.stTLS.sCrl := '';
 		//_httpClient.stTLS.sKeyFile := '';
 		//_httpClient.stTLS.sKeyPwd := '';
 		//_httpClient.stTLS.sPskIdentity := '';
-	//	_httpClient.stTLS.sVersion := 'tlsv1.3';
+		_httpClient.stTLS.sVersion := 'tlsv1.3';
 		
 END_CASE
 ]]></ST>
       </Implementation>
     </Method>
     <Method Name="_encodeBase64" Id="{3fa22cec-5508-414f-9012-9c1691dace64}">
-      <Declaration><![CDATA[METHOD PRIVATE _encodeBase64 : STRING
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD PRIVATE _encodeBase64 : STRING
 VAR_INPUT
-	rawText: STRING;
+	rawText : STRING;
 END_VAR
 VAR
-	_jsonDomParser : 	FB_JsonDomParser;
-	_jsonRoot :	SJsonValue;
-	_jsonValue: SJsonValue;
-	_jsonValue2: SJsonValue;
+	_jsonDomParser : FB_JsonDomParser;
+	_jsonRoot : SJsonValue;
+	_jsonValue : SJsonValue;
+	_jsonValue2 : SJsonValue;
 END_VAR
 
 ]]></Declaration>
@@ -243,18 +243,19 @@ _encodeBase64 := _jsonDomParser.GetString(_jsonValue2);
       </Implementation>
     </Method>
     <Method Name="_getIO" Id="{bd29dab4-cb08-45fe-84ff-e3737f6110e8}">
-      <Declaration><![CDATA[METHOD PRIVATE _getIO : BOOL
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD PRIVATE _getIO : BOOL
 VAR_INPUT
 	signal : STRING;
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 	pResultBool : POINTER TO BOOL := 0;
 	pResultDint : POINTER TO DINT := 0;
 	pResultLreal : POINTER TO LREAL := 0;
 END_VAR
 
 VAR
-	request: AbbLinkinRequest_Typ;
-	pointersSet: INT;
+	request : AbbLinkinRequest_Typ;
+	pointersSet : INT;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[IF pStatus = 0 THEN
@@ -287,12 +288,12 @@ END_IF
 IF pointersSet = 0 THEN
 	pStatus^.error := TRUE;
 	pStatus^.errorMsg := TO_STRING(ABBLINKIN_COMMAND_TYPE.GET_STATE);
-	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ': No result pointer set');
+	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' : No result pointer set');
 	_getIO := FALSE;
 ELSIF pointersSet >= 2 THEN
 	pStatus^.error := TRUE;
 	pStatus^.errorMsg := TO_STRING(ABBLINKIN_COMMAND_TYPE.GET_STATE);
-	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ': Two or more result pointer set');
+	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' : Two or more result pointer set');
 	_getIO := FALSE;
 END_IF;
 
@@ -325,9 +326,10 @@ END_IF
       </Implementation>
     </Method>
     <Method Name="_getIORespCallbackSuccess" Id="{8de14980-869f-4f0b-8bbf-fcfda3d0e6d3}" FolderPath="responseCallbacks\">
-      <Declaration><![CDATA[METHOD PRIVATE _getIORespCallbackSuccess : BOOL
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD PRIVATE _getIORespCallbackSuccess : BOOL
 VAR_IN_OUT
-	httpRequest : 	FB_IotHttpRequest;
+	httpRequest : FB_IotHttpRequest;
 	request : AbbLinkinRequest_Typ;
 END_VAR
 VAR
@@ -359,7 +361,7 @@ IF (jsonValue <> 0) THEN
 		ABBLINKIN_DATA_TYPE_Typ._LREAL:
 			request.results.pDataLreal^ := STRING_TO_LREAL(valueString);
 	ELSE
-		; // error todo
+		; // error TODO
 	END_CASE
 ELSE
 	request.pStatus^.error := TRUE;
@@ -373,9 +375,10 @@ _getIORespCallbackSuccess := TRUE;
       </Implementation>
     </Method>
     <Method Name="_getStateRespCallbackSuccess" Id="{70e217fe-2d07-46fe-9a64-f1eb329f34c5}" FolderPath="responseCallbacks\">
-      <Declaration><![CDATA[METHOD PRIVATE _getStateRespCallbackSuccess : BOOL
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD PRIVATE _getStateRespCallbackSuccess : BOOL
 VAR_IN_OUT
-	httpRequest : 	FB_IotHttpRequest;
+	httpRequest : FB_IotHttpRequest;
 	request : AbbLinkinRequest_Typ;
 END_VAR
 VAR
@@ -417,18 +420,19 @@ _getStateRespCallbackSuccess := TRUE;
       </Implementation>
     </Method>
     <Method Name="_getSymbol" Id="{d9ba7421-7242-4767-a53d-8b068c42b046}">
-      <Declaration><![CDATA[METHOD PRIVATE _getSymbol : BOOL
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD PRIVATE _getSymbol : BOOL
 VAR_INPUT
 	signal : STRING;
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 	pResultBool : POINTER TO BOOL := 0;
 	pResultLreal : POINTER TO LREAL := 0;
 	pResultString : POINTER TO STRING := 0;
 END_VAR
 
 VAR
-	request: AbbLinkinRequest_Typ;
-	pointersSet: INT;
+	request : AbbLinkinRequest_Typ;
+	pointersSet : INT;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[IF pStatus = 0 THEN
@@ -461,12 +465,12 @@ END_IF
 IF pointersSet = 0 THEN
 	pStatus^.error := TRUE;
 	pStatus^.errorMsg := TO_STRING(ABBLINKIN_COMMAND_TYPE.GET_SYMBOL);
-	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ': No result pointer set');
+	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' : No result pointer set');
 	_getSymbol := FALSE;
 ELSIF pointersSet >= 2 THEN
 	pStatus^.error := TRUE;
 	pStatus^.errorMsg := TO_STRING(ABBLINKIN_COMMAND_TYPE.GET_SYMBOL);
-	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ': Two or more result pointer set');
+	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' : Two or more result pointer set');
 	_getSymbol := FALSE;
 END_IF;
 
@@ -501,9 +505,10 @@ END_IF
       </Implementation>
     </Method>
     <Method Name="_getSymbolRespCallbackSuccess" Id="{ef9782bf-23a7-46c0-9904-995a74b6e086}" FolderPath="responseCallbacks\">
-      <Declaration><![CDATA[METHOD PRIVATE _getSymbolRespCallbackSuccess : BOOL
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD PRIVATE _getSymbolRespCallbackSuccess : BOOL
 VAR_IN_OUT
-	httpRequest : 	FB_IotHttpRequest;
+	httpRequest : FB_IotHttpRequest;
 	request : AbbLinkinRequest_Typ;
 END_VAR
 VAR
@@ -537,7 +542,7 @@ IF (jsonValue <> 0) THEN
 			valueStringNoQuotes := MID(valueString, len(valueString) - 2, 2); // MID removes beginning and ending double-quote (") characters
 			request.results.pDataString^ := valueStringNoQuotes;
 	ELSE
-		; // error todo
+		; // error TODO
 	END_CASE
 ELSE
 	request.pStatus^.error := TRUE;
@@ -551,14 +556,15 @@ _getSymbolRespCallbackSuccess := TRUE;
       </Implementation>
     </Method>
     <Method Name="_parseWwwAuthForParameter" Id="{3381c2f0-a73a-48c3-a8d7-1dfd534075ee}" FolderPath="digestMethods\">
-      <Declaration><![CDATA[METHOD PRIVATE _parseWwwAuthForParameter : STRING
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD PRIVATE _parseWwwAuthForParameter : STRING
 
 VAR_INPUT
-	keyString :	STRING;
+	keyString : STRING;
 END_VAR
 
 VAR_IN_OUT
-	contentString : STRING_EX_LEN;
+	contentString : ABBLINKIN_STRING_EX_LEN;
 END_VAR
 
 VAR
@@ -566,8 +572,7 @@ VAR
 	keyLocation : INT;
 	firstQuoteLocation : INT;
 	secondQuoteLocation : INT;
-	tempString : STRING_EX_LEN;
-	
+	tempString : ABBLINKIN_STRING_EX_LEN;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
@@ -586,14 +591,15 @@ _parseWwwAuthForParameter := MID(contentString, secondQuoteLocation - firstQuote
       </Implementation>
     </Method>
     <Method Name="_requestQueueAdd" Id="{04fd7ebd-e8f9-46c7-bc9e-2330c22267da}">
-      <Declaration><![CDATA[METHOD PRIVATE _requestQueueAdd : BOOL
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD PRIVATE _requestQueueAdd : BOOL
 VAR_INPUT
 	request : AbbLinkinRequest_Typ;
 END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[
-// Note: the requestQueue and this method are temporary implementations. It is not a real queue as shown.
+// Note : the requestQueue and this method are temporary implementations. It is not a real queue as shown.
 
 _requestQueue.request := request;
 _requestQueue.empty := FALSE;
@@ -603,13 +609,14 @@ _requestQueueAdd := TRUE;
       </Implementation>
     </Method>
     <Method Name="_requestQueuePop" Id="{daa4e678-3558-4037-bf7f-bd7a40f193a5}">
-      <Declaration><![CDATA[METHOD PRIVATE _requestQueuePop : AbbLinkinRequest_Typ
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD PRIVATE _requestQueuePop : AbbLinkinRequest_Typ
 VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[
-// Note: the requestQueue and this method are temporary implementations. It is not a real queue as shown.
+// Note : the requestQueue and this method are temporary implementations. It is not a real queue as shown.
 
 _requestQueue.empty := TRUE;
 _requestQueuePop := _requestQueue.request;
@@ -617,17 +624,18 @@ _requestQueuePop := _requestQueue.request;
       </Implementation>
     </Method>
     <Method Name="_setHeader" Id="{03deb409-7be0-4e61-9c99-83e8f97b30dc}">
-      <Declaration><![CDATA[METHOD PRIVATE _setHeader : BOOL
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD PRIVATE _setHeader : BOOL
 VAR_INPUT
 	authorizationValue : ABBLINKIN_AUTH_HEADER_VALUE;
 END_VAR
 VAR
 	authValue : STRING;
-	combinedUnPwRaw: STRING;
-	combinedUnPwBase64: STRING;
-	anyCookieSetYet: BOOL;
-	tempString: STRING;
-	cookieValue: STRING_EX_LEN;
+	combinedUnPwRaw : STRING;
+	combinedUnPwBase64 : STRING;
+	anyCookieSetYet : BOOL;
+	tempString : STRING;
+	cookieValue : ABBLINKIN_STRING_EX_LEN;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
@@ -663,25 +671,23 @@ END_CASE
 // Cookie
 anyCookieSetYet := FALSE;
 cookieValue := '';
-IF LEN(_httpSessionCookie) > 0 THEN
+IF LEN(_auth.httpSessionCookie) > 0 THEN
 	tempString := '';
 	tempString := CONCAT(tempString, '-http-session-='); 
-	tempString := CONCAT(tempString, _httpSessionCookie); 
+	tempString := CONCAT(tempString, _auth.httpSessionCookie); 
 	cookieValue := CONCAT(cookieValue, tempString);
-	//_httpHeader.AddField('Cookie', tempString, anyCookieSetYet);
 	anyCookieSetYet := TRUE;
 END_IF
 
-IF LEN(_ABBCXCookie) > 0 THEN
+IF LEN(_auth.ABBCXCookie) > 0 THEN
 	IF anyCookieSetYet THEN
 		tempString := '; ';
 	ELSE
 		tempString := '';	
 	END_IF
 	tempString := CONCAT(tempString, 'ABBCX='); 
-	tempString := CONCAT(tempString, _ABBCXCookie); 
-	cookieValue := CONCAT(cookieValue, tempString);	
-	//_httpHeader.AddField('Cookie', tempString, anyCookieSetYet);
+	tempString := CONCAT(tempString, _auth.ABBCXCookie); 
+	cookieValue := CONCAT(cookieValue, tempString);
 	anyCookieSetYet := TRUE;
 END_IF
 
@@ -699,28 +705,29 @@ END_CASE
       </Implementation>
     </Method>
     <Method Name="_storeCookies" Id="{495ad33e-c453-424c-aeee-f8fc1c4fb6d3}">
-      <Declaration><![CDATA[METHOD PRIVATE _storeCookies : BOOL
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD PRIVATE _storeCookies : BOOL
 VAR_INPUT
-	httpRequest:	FB_IotHttpRequest;
+	httpRequest : FB_IotHttpRequest;
 END_VAR
 VAR
-	setCookieValue:	STRING_EX_LEN;
-	Set: INT;
-	tempString:	STRING_EX_LEN;
-	setCookieValueLen: INT;
+	setCookieValue : ABBLINKIN_STRING_EX_LEN;
+	Set : INT;
+	tempString : ABBLINKIN_STRING_EX_LEN;
+	setCookieValueLen : INT;
 	keyLoc : INT;
-	equalLoc: INT;
+	equalLoc : INT;
 	semicolonLoc : INT;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
 IF httpRequest.GetHeaderField('Set-Cookie', ADR(setCookieValue), SIZEOF(setCookieValue)-1) THEN 
 	
-	// NOTE: if there are multiple 'Set-Cookie' headers, they will all be contained in one value, separated by a newline
+	// NOTE : if there are multiple 'Set-Cookie' headers, they will all be contained in one value, separated by a newline
 	//		e.g. 'token1=Beckhoff$Ntoken2=IoT' per https://infosys.beckhoff.com/content/1033/tf6760_tc3_iot_https_rest/9335286283.html
 	// Real header examples from RWS:
-	//		Set-Cookie: -http-session-=1::http.session::241eb766f25fa09a53f749ebbafb9aa9; path=/; domain=127.0.0.1; httponly\r\n
-	//		Set-Cookie: ABBCX=12; path=/; domain=127.0.0.1; httponly\r\n
+	//		Set-Cookie: -http-session-=1: : http.session: : 241eb766f25fa09a53f749ebbafb9aa9; path=/; domain=127.0.0.1; httponly\r\n
+	//		Set-Cookie : ABBCX=12; path=/; domain=127.0.0.1; httponly\r\n
 	
 	setCookieValueLen := len(setCookieValue);
 		
@@ -730,7 +737,7 @@ IF httpRequest.GetHeaderField('Set-Cookie', ADR(setCookieValue), SIZEOF(setCooki
 	equalLoc := FIND(tempString, '=') + keyLoc;
 	tempString := RIGHT(setCookieValue, setCookieValueLen - equalLoc);
 	semicolonLoc := FIND(tempString, ';') + equalLoc;
-	_httpSessionCookie := MID(setCookieValue, semicolonLoc - equalLoc - 1, equalLoc + 1);
+	_auth.httpSessionCookie := MID(setCookieValue, semicolonLoc - equalLoc - 1, equalLoc + 1);
 	
 	
 	// ABBCX
@@ -739,18 +746,16 @@ IF httpRequest.GetHeaderField('Set-Cookie', ADR(setCookieValue), SIZEOF(setCooki
 	equalLoc := FIND(tempString, '=') + keyLoc;
 	tempString := RIGHT(setCookieValue, setCookieValueLen - equalLoc);
 	semicolonLoc := FIND(tempString, ';') + equalLoc;
-	_ABBCXCookie := MID(setCookieValue, semicolonLoc - equalLoc - 1, equalLoc + 1);
+	_auth.ABBCXCookie := MID(setCookieValue, semicolonLoc - equalLoc - 1, equalLoc + 1);
 	
 	
 END_IF
-
-
-
 ]]></ST>
       </Implementation>
     </Method>
     <Method Name="AckError" Id="{e7f175da-d890-48da-a6d6-1a4277b5b980}">
-      <Declaration><![CDATA[METHOD AckError : BOOL
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD AckError : BOOL
 VAR_INPUT
 END_VAR
 ]]></Declaration>
@@ -761,14 +766,15 @@ _methodAckErrorCalled := TRUE;
       </Implementation>
     </Method>
     <Method Name="ConnectionStart" Id="{ae04014b-99d1-4864-b820-dd29eedcb99e}">
-      <Declaration><![CDATA[METHOD ConnectionStart : BOOL
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD ConnectionStart : BOOL
 VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[
 // If Connection is already enabled, disable and disconnect
-// Reference: https://infosys.beckhoff.com/content/1033/tf6760_tc3_iot_https_rest/9298409995.html?id=3568786990275794598
+// Reference : https://infosys.beckhoff.com/content/1033/tf6760_tc3_iot_https_rest/9298409995.html?id=3568786990275794598
 IF _connectionEnabled THEN
 	_connectionEnabled := FALSE;
 	_httpClient.Disconnect();
@@ -783,7 +789,8 @@ _methodConnectionStartCalled := TRUE;
       </Implementation>
     </Method>
     <Method Name="ConnectionStop" Id="{fb28cdfe-8e1b-44f1-869a-b019fa3c0b7f}">
-      <Declaration><![CDATA[METHOD ConnectionStop : BOOL
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD ConnectionStop : BOOL
 VAR_INPUT
 END_VAR
 ]]></Declaration>
@@ -796,13 +803,14 @@ _methodConnectionStopCalled := TRUE;
       </Implementation>
     </Method>
     <Method Name="Cyclic" Id="{b14f94df-ed21-4275-9dc6-f78c593c481d}">
-      <Declaration><![CDATA[METHOD Cyclic : BOOL
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD Cyclic : BOOL
 VAR_INPUT
 END_VAR
 
 VAR
-	retVal: BOOL;
-	digestLocation: INT;
+	retVal : BOOL;
+	digestLocation : INT;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
@@ -848,14 +856,14 @@ CASE _state OF
 	ABBLINKIN_STATE.SEND_REQUEST:
 		
 		_setHeader(ABBLINKIN_AUTH_HEADER_VALUE.NONE);
-		retVal := _httpRequest.SendRequest(_currentRequest.uri, _httpClient, _currentRequest.httpMethod, ADR(_currentRequest.httpBody), LEN(_currentRequest.httpBody), _httpHeader);
+		retVal := _httpRequest.SendRequest(_currentRequest.uri, _httpClient, _currentRequest.httpMethod, ADR(_currentRequest.httpBody), INT_TO_UDINT(LEN(_currentRequest.httpBody)), _httpHeader);
 		
 		IF retVal = FALSE THEN
 			_currentRequest.pStatus^.busy := FALSE;
 			_currentRequest.pStatus^.error := TRUE;
 			_currentRequest.pStatus^.errorMsg := 'The request could not be sent';
 			
-			_state := ABBLINKIN_STATE.IDLE;	// todo: decide if we want to retry
+			_state := ABBLINKIN_STATE.IDLE;	// TODO : decide if we want to retry
 		ELSE
 			_state := ABBLINKIN_STATE.WAIT_FOR_RESONSE;
 		END_IF
@@ -868,7 +876,7 @@ CASE _state OF
 			_currentRequest.pStatus^.errorID := _httpRequest.eErrorId;
 			_currentRequest.pStatus^.errorMsg := 'The client request object returned an error';
 			
-			_state := ABBLINKIN_STATE.IDLE;	// todo: decide if we want to retry
+			_state := ABBLINKIN_STATE.IDLE;	// TODO : decide if we want to retry
 		ELSIF _httpRequest.bBusy = FALSE THEN
 			_state := ABBLINKIN_STATE.PROCESS_RESPONSE;
 		END_IF
@@ -879,7 +887,7 @@ CASE _state OF
 		
 			200..204 : // HTTP Success
 			
-				// TODO: requestType-specific processing here
+				// TODO : requestType-specific processing here
 				_callCommandSuccessHandler(_currentRequest.command, _httpRequest, _currentRequest);
 				
 				// Write and close out current request status
@@ -891,9 +899,9 @@ CASE _state OF
 				
 			401, 503: // HTTP Error - "Unauthorized" 
 				
-				// TODO: implement Authorization implementation
+				// TODO : implement Authorization implementation
 				_authorized := FALSE;
-				_state := ABBLINKIN_STATE.IDLE;	// todo: decide if we want to retry
+				_state := ABBLINKIN_STATE.IDLE;	// TODO : decide if we want to retry
 								
 			400, 402..451:	// HTTP Client Error	
 				_currentRequest.pStatus^.busy := FALSE;
@@ -901,7 +909,7 @@ CASE _state OF
 				_currentRequest.pStatus^.errorID := _httpRequest.nStatusCode;
 				_currentRequest.pStatus^.errorMsg := 'The Robot responded with an error (client error, 4xx). See errorID';
 				
-				_state := ABBLINKIN_STATE.IDLE;	// todo: decide if we want to retry
+				_state := ABBLINKIN_STATE.IDLE;	// TODO : decide if we want to retry
 				
 			500..502, 504..511: // HTTP Server Error
 				_currentRequest.pStatus^.busy := FALSE;
@@ -909,7 +917,7 @@ CASE _state OF
 				_currentRequest.pStatus^.errorID := _httpRequest.nStatusCode;
 				_currentRequest.pStatus^.errorMsg := 'The Robot responded with an error (server error, 5xx). See errorID';
 				
-				_state := ABBLINKIN_STATE.IDLE;	// todo: decide if we want to retry
+				_state := ABBLINKIN_STATE.IDLE;	// TODO : decide if we want to retry
 							
 		END_CASE
 	
@@ -930,7 +938,7 @@ CASE _state OF
 		retVal := _httpRequest.SendRequest(AUTH_URI, _httpClient, ETcIotHttpRequestType.HTTP_Get, 0, 0, _httpHeader);
 		
 		IF retVal = FALSE THEN
-			_state := ABBLINKIN_STATE.IDLE;	// TODO: handle error better
+			_state := ABBLINKIN_STATE.IDLE;	// TODO : handle error better
 		ELSE
 			_state := ABBLINKIN_STATE.AUTH_WAIT_FOR_RESONSE;
 		END_IF
@@ -938,7 +946,7 @@ CASE _state OF
 	ABBLINKIN_STATE.AUTH_WAIT_FOR_RESONSE:
 		
 		IF _httpRequest.bError THEN
-			_state := ABBLINKIN_STATE.IDLE;	// TODO: handle error better
+			_state := ABBLINKIN_STATE.IDLE;	// TODO : handle error better
 		ELSIF _httpRequest.bBusy = FALSE THEN
 			_state := ABBLINKIN_STATE.AUTH_PROCESS_RESPONSE;
 		END_IF
@@ -963,17 +971,17 @@ CASE _state OF
 					_state := ABBLINKIN_STATE.AUTH_DIGEST_RESPONSE_CALCULATE;
 				ELSE
 					// Invalid username or password
-					_state := ABBLINKIN_STATE.IDLE;	// todo: handle better	
+					_state := ABBLINKIN_STATE.IDLE;	// TODO : handle better	
 				END_IF
 				
 			503:  
-				// Note: You can get a 503 if you try to send the same credentials repeatedly instead of 
+				// Note : You can get a 503 if you try to send the same credentials repeatedly instead of 
 				// 		sending the http session cookies that the server provides after the first successful authentication
 				
-				_state := ABBLINKIN_STATE.IDLE;	// todo: handle better
+				_state := ABBLINKIN_STATE.IDLE;	// TODO : handle better
 		ELSE
 			
-			_state := ABBLINKIN_STATE.IDLE;	// todo: handle better				
+			_state := ABBLINKIN_STATE.IDLE;	// TODO : handle better				
 		END_CASE
 	
 	
@@ -987,7 +995,7 @@ CASE _state OF
 		digestLocation := FIND(_auth.wwwAuthContent, 'Digest');
 		IF digestLocation = 0 THEN 
 			// 'Digest not found in WWW-Authenticate header. ';
-			; // error todo
+			; // error TODO
 		END_IF
 		
 		// Extract parameter values from WWW-Authenticate header
@@ -1000,12 +1008,12 @@ CASE _state OF
 			_auth.digest.qop = '' OR
 			_auth.digest.nonce = '' OR
 			_auth.digest.opaque = '') THEN
-			; // error todo 'Digest header unavailable'
+			; // error TODO 'Digest header unavailable'
 		END_IF;
  
 		// Calculate Digest response
-		_auth.digest.nc := '00000001'; // todo refine
-		_auth.digest.cnonce := 'diddLOPR'; // todo refine
+		_auth.digest.nc := '00000001'; // TODO refine
+		_auth.digest.cnonce := 'diddLOPR'; // TODO refine
 		_auth.digest.response := _calculateDigestResponse(	username := configuration.rwsUsername,
 															realm := _auth.digest.realm,
 															password := configuration.rwsPassword,
@@ -1044,16 +1052,13 @@ CASE _state OF
 		retVal := _httpRequest.SendRequest(AUTH_URI, _httpClient, ETcIotHttpRequestType.HTTP_Get, 0, 0, _httpHeader);
 		
 		IF retVal = FALSE THEN
-			_state := ABBLINKIN_STATE.IDLE;	// TODO: handle error better
+			_state := ABBLINKIN_STATE.IDLE;	// TODO : handle error better
 		ELSE
 			_state := ABBLINKIN_STATE.AUTH_WAIT_FOR_RESONSE;
 		END_IF
 		
 	
 END_CASE
-
-
-
 
 
 // Handle Methods
@@ -1082,10 +1087,11 @@ END_IF
       </Implementation>
     </Method>
     <Method Name="GetIOAnalog" Id="{424a197a-bbbf-4f2e-8c17-41d394c583bb}">
-      <Declaration><![CDATA[METHOD GetIOAnalog : BOOL
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD GetIOAnalog : BOOL
 VAR_INPUT
 	signal : STRING;
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 	pResult : POINTER TO LREAL;
 END_VAR
 ]]></Declaration>
@@ -1096,10 +1102,11 @@ GetIOAnalog:= _getIO(signal, pStatus, pResultBOOL := 0, pResultDINT := 0, pResul
       </Implementation>
     </Method>
     <Method Name="GetIODigital" Id="{9be63dba-bb17-4051-930b-859270d1ab9b}">
-      <Declaration><![CDATA[METHOD GetIODigital : BOOL
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD GetIODigital : BOOL
 VAR_INPUT
 	signal : STRING;
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 	pResult : POINTER TO BOOL;
 END_VAR
 ]]></Declaration>
@@ -1110,10 +1117,11 @@ GetIODigital := _getIO(signal, pStatus, pResultBOOL := pResult, pResultDINT := 0
       </Implementation>
     </Method>
     <Method Name="GetIOGroup" Id="{7a4347af-368e-48dc-876d-605869fae69a}">
-      <Declaration><![CDATA[METHOD GetIOGroup : BOOL
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD GetIOGroup : BOOL
 VAR_INPUT
 	signal : STRING;
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 	pResult : POINTER TO DINT;
 END_VAR
 ]]></Declaration>
@@ -1124,14 +1132,15 @@ GetIOGroup := _getIO(signal, pStatus, pResultBOOL := 0, pResultDINT := pResult, 
       </Implementation>
     </Method>
     <Method Name="GetState" Id="{39878dda-bc14-4b8b-833d-1d9c4ab2cc84}">
-      <Declaration><![CDATA[METHOD GetState : BOOL
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD GetState : BOOL
 VAR_INPUT
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 	pResultState : POINTER TO STRING;
 END_VAR
 
 VAR
-	request: AbbLinkinRequest_Typ;
+	request : AbbLinkinRequest_Typ;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
@@ -1177,15 +1186,15 @@ ELSE
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' could not be added to request Queue');
 	GetState := FALSE;
 END_IF
-
 ]]></ST>
       </Implementation>
     </Method>
     <Method Name="GetSymbolBool" Id="{85af9ad1-0b82-4752-9ea8-7aabc8bae9aa}">
-      <Declaration><![CDATA[METHOD GetSymbolBool : BOOL
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD GetSymbolBool : BOOL
 VAR_INPUT
 	signal : STRING;
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 	pResult : POINTER TO BOOL;
 END_VAR
 ]]></Declaration>
@@ -1196,10 +1205,11 @@ GetSymbolBool:= _getSymbol(signal, pStatus, pResultBool := pResult, pResultLreal
       </Implementation>
     </Method>
     <Method Name="GetSymbolNum" Id="{c73eb3bb-bcb7-4caf-a2b4-caeb0155d5ab}">
-      <Declaration><![CDATA[METHOD GetSymbolNum : BOOL
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD GetSymbolNum : BOOL
 VAR_INPUT
 	signal : STRING;
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 	pResult : POINTER TO LREAL;
 END_VAR
 ]]></Declaration>
@@ -1210,10 +1220,11 @@ GetSymbolNum := _getSymbol(signal, pStatus, pResultBool := 0, pResultLreal := pR
       </Implementation>
     </Method>
     <Method Name="GetSymbolString" Id="{003e92a6-59fd-4b99-8992-f758da147260}">
-      <Declaration><![CDATA[METHOD GetSymbolString : BOOL
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD GetSymbolString : BOOL
 VAR_INPUT
 	signal : STRING;
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 	pResult : POINTER TO STRING;
 END_VAR
 ]]></Declaration>
@@ -1223,23 +1234,15 @@ GetSymbolString := _getSymbol(signal, pStatus, pResultBool := 0, pResultLreal :=
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="IOWatchInit" Id="{73cfccc7-56e4-4d35-a07c-3dccb64e2e07}">
-      <Declaration><![CDATA[METHOD IOWatchInit : BOOL
-VAR_INPUT
-END_VAR
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[]]></ST>
-      </Implementation>
-    </Method>
     <Method Name="PowerOff" Id="{7e704635-bfa1-4267-9db0-7f188918765f}">
-      <Declaration><![CDATA[METHOD PowerOff : BOOL
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD PowerOff : BOOL
 VAR_INPUT
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 END_VAR
 
 VAR
-	request: AbbLinkinRequest_Typ;
+	request : AbbLinkinRequest_Typ;
 END_VAR
 ]]></Declaration>
       <Implementation>
@@ -1280,13 +1283,14 @@ END_IF
       </Implementation>
     </Method>
     <Method Name="PowerOn" Id="{af5386e8-963b-4ad9-be85-5e9b6c633ca2}">
-      <Declaration><![CDATA[METHOD PowerOn : BOOL
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD PowerOn : BOOL
 VAR_INPUT
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 END_VAR
 
 VAR
-	request: AbbLinkinRequest_Typ;
+	request : AbbLinkinRequest_Typ;
 END_VAR
 ]]></Declaration>
       <Implementation>
@@ -1327,13 +1331,14 @@ END_IF
       </Implementation>
     </Method>
     <Method Name="RapidReset" Id="{e080191b-cd26-4298-a719-9d96ed9cd49e}">
-      <Declaration><![CDATA[METHOD RapidReset : BOOL
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD RapidReset : BOOL
 VAR_INPUT
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 END_VAR
 
 VAR
-	request: AbbLinkinRequest_Typ;
+	request : AbbLinkinRequest_Typ;
 END_VAR
 ]]></Declaration>
       <Implementation>
@@ -1374,13 +1379,14 @@ END_IF
       </Implementation>
     </Method>
     <Method Name="RapidStart" Id="{3bbfc09a-b007-47b4-80b0-3bd61acb2173}">
-      <Declaration><![CDATA[METHOD RapidStart : BOOL
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD RapidStart : BOOL
 VAR_INPUT
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 END_VAR
 
 VAR
-	request: AbbLinkinRequest_Typ;
+	request : AbbLinkinRequest_Typ;
 END_VAR
 ]]></Declaration>
       <Implementation>
@@ -1433,13 +1439,14 @@ END_IF
       </Implementation>
     </Method>
     <Method Name="RapidStop" Id="{2b770e99-7d38-409f-b1ad-b5b0b0d97576}">
-      <Declaration><![CDATA[METHOD RapidStop : BOOL
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD RapidStop : BOOL
 VAR_INPUT
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 END_VAR
 
 VAR
-	request: AbbLinkinRequest_Typ;
+	request : AbbLinkinRequest_Typ;
 END_VAR
 ]]></Declaration>
       <Implementation>
@@ -1480,23 +1487,24 @@ END_IF
       </Implementation>
     </Method>
     <Method Name="SetIO" Id="{ce5e4a58-9783-46a9-ba0d-44594affd7f4}">
-      <Declaration><![CDATA[METHOD SetIO : BOOL
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD SetIO : BOOL
 VAR_INPUT
 	signal : STRING;
 	value : ANY;
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 END_VAR
 VAR
-	request: AbbLinkinRequest_Typ;
-	pBool: POINTER TO BOOL;
-	pSint: POINTER TO SINT;
-	pUsint: POINTER TO USINT;
-	pInt: POINTER TO INT;
-	pUint: POINTER TO UINT;
-	pDint: POINTER TO DINT;
-	pUdint: POINTER TO UDINT;
-	pReal: POINTER TO REAL;
-	pLreal: POINTER TO LREAL;
+	request : AbbLinkinRequest_Typ;
+	pBool : POINTER TO BOOL;
+	pSint : POINTER TO SINT;
+	pUsint : POINTER TO USINT;
+	pInt : POINTER TO INT;
+	pUint : POINTER TO UINT;
+	pDint : POINTER TO DINT;
+	pUdint : POINTER TO UDINT;
+	pReal : POINTER TO REAL;
+	pLreal : POINTER TO LREAL;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
@@ -1579,30 +1587,32 @@ ELSE
 	pStatus^.errorMsg := TO_STRING(request.command);
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' could not be added to request Queue');
 	SetIO := FALSE;
-END_IF]]></ST>
+END_IF
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="SetSymbol" Id="{bc0a5da5-b662-4b6f-a5f4-f2caf9d05bbf}">
-      <Declaration><![CDATA[METHOD SetSymbol : BOOL
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD SetSymbol : BOOL
 VAR_INPUT
 	name : STRING;
 	value : ANY;
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 END_VAR
 
 VAR
-	request: AbbLinkinRequest_Typ;
-	pBool: POINTER TO BOOL;
-	pSint: POINTER TO SINT;
-	pUsint: POINTER TO USINT;
-	pInt: POINTER TO INT;
-	pUint: POINTER TO UINT;
-	pDint: POINTER TO DINT;
-	pUdint: POINTER TO UDINT;
-	pReal: POINTER TO REAL;
-	pLreal: POINTER TO LREAL;
-	pString: POINTER TO STRING;
-	pWString: POINTER TO WSTRING;
+	request : AbbLinkinRequest_Typ;
+	pBool : POINTER TO BOOL;
+	pSint : POINTER TO SINT;
+	pUsint : POINTER TO USINT;
+	pInt : POINTER TO INT;
+	pUint : POINTER TO UINT;
+	pDint : POINTER TO DINT;
+	pUdint : POINTER TO UDINT;
+	pReal : POINTER TO REAL;
+	pLreal : POINTER TO LREAL;
+	pString : POINTER TO STRING;
+	pWString : POINTER TO WSTRING;
 END_VAR
 ]]></Declaration>
       <Implementation>
@@ -1697,7 +1707,8 @@ ELSE
 	pStatus^.errorMsg := TO_STRING(request.command);
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' could not be added to request Queue');
 	SetSymbol := FALSE;
-END_IF]]></ST>
+END_IF
+]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="TcAbbLinkin">
@@ -1725,7 +1736,6 @@ END_IF]]></ST>
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin._callCommandSuccessHandler">
-      <LineId Id="10" Count="1" />
       <LineId Id="13" Count="0" />
       <LineId Id="18" Count="0" />
       <LineId Id="33" Count="0" />
@@ -1737,12 +1747,6 @@ END_IF]]></ST>
       <LineId Id="24" Count="0" />
       <LineId Id="36" Count="0" />
       <LineId Id="57" Count="0" />
-      <LineId Id="25" Count="0" />
-      <LineId Id="37" Count="0" />
-      <LineId Id="56" Count="0" />
-      <LineId Id="26" Count="0" />
-      <LineId Id="38" Count="0" />
-      <LineId Id="55" Count="0" />
       <LineId Id="27" Count="0" />
       <LineId Id="39" Count="0" />
       <LineId Id="54" Count="0" />
@@ -1781,6 +1785,7 @@ END_IF]]></ST>
       <LineId Id="9" Count="4" />
       <LineId Id="24" Count="0" />
       <LineId Id="15" Count="5" />
+      <LineId Id="48" Count="1" />
       <LineId Id="32" Count="9" />
       <LineId Id="31" Count="0" />
       <LineId Id="42" Count="0" />
@@ -2022,7 +2027,6 @@ END_IF]]></ST>
       <LineId Id="100" Count="0" />
       <LineId Id="96" Count="0" />
       <LineId Id="80" Count="0" />
-      <LineId Id="113" Count="0" />
       <LineId Id="90" Count="0" />
       <LineId Id="81" Count="0" />
       <LineId Id="92" Count="0" />
@@ -2032,7 +2036,6 @@ END_IF]]></ST>
       <LineId Id="108" Count="0" />
       <LineId Id="102" Count="0" />
       <LineId Id="104" Count="1" />
-      <LineId Id="114" Count="0" />
       <LineId Id="95" Count="0" />
       <LineId Id="91" Count="0" />
       <LineId Id="115" Count="0" />
@@ -2067,7 +2070,6 @@ END_IF]]></ST>
       <LineId Id="17" Count="0" />
       <LineId Id="54" Count="1" />
       <LineId Id="16" Count="0" />
-      <LineId Id="8" Count="2" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.AckError">
@@ -2239,9 +2241,7 @@ END_IF]]></ST>
       <LineId Id="401" Count="0" />
       <LineId Id="276" Count="1" />
       <LineId Id="76" Count="0" />
-      <LineId Id="75" Count="0" />
-      <LineId Id="223" Count="0" />
-      <LineId Id="191" Count="1" />
+      <LineId Id="191" Count="0" />
       <LineId Id="29" Count="2" />
       <LineId Id="41" Count="0" />
       <LineId Id="32" Count="0" />
@@ -2312,7 +2312,6 @@ END_IF]]></ST>
       <LineId Id="69" Count="0" />
       <LineId Id="88" Count="0" />
       <LineId Id="60" Count="0" />
-      <LineId Id="86" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.GetSymbolBool">
@@ -2325,9 +2324,6 @@ END_IF]]></ST>
     </LineIds>
     <LineIds Name="TcAbbLinkin.GetSymbolString">
       <LineId Id="15" Count="1" />
-      <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="TcAbbLinkin.IOWatchInit">
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.PowerOff">
@@ -2480,6 +2476,7 @@ END_IF]]></ST>
       <LineId Id="159" Count="0" />
       <LineId Id="148" Count="9" />
       <LineId Id="15" Count="0" />
+      <LineId Id="202" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.SetSymbol">
       <LineId Id="14" Count="7" />
@@ -2510,6 +2507,7 @@ END_IF]]></ST>
       <LineId Id="79" Count="6" />
       <LineId Id="88" Count="10" />
       <LineId Id="5" Count="0" />
+      <LineId Id="183" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>
