@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
   <POU Name="MAIN" Id="{af726fc5-8ad0-4774-86c1-258758d62ada}" SpecialFunc="None">
-    <Declaration><![CDATA[PROGRAM MAIN
+    <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+PROGRAM MAIN
 VAR
 	myRobotLink		: TcAbbLinkin;
 	userSetConfigurationNow: BOOL := TRUE;

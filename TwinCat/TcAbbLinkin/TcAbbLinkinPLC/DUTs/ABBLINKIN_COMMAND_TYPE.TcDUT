@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
   <DUT Name="ABBLINKIN_COMMAND_TYPE" Id="{d7d89884-2a0b-4df0-8653-de60d8f0522a}">
-    <Declaration><![CDATA[{attribute 'qualified_only'}
+    <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+{attribute 'qualified_only'}
 {attribute 'strict'}
 TYPE ABBLINKIN_COMMAND_TYPE :
 (

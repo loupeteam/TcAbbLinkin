@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
   <DUT Name="ABBLINKIN_RWS_API_VERSION" Id="{34efa19d-f9cb-43b8-bfe7-6b289ebee141}">
-    <Declaration><![CDATA[{attribute 'qualified_only'}
+    <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+{attribute 'qualified_only'}
 {attribute 'strict'}
 TYPE ABBLINKIN_RWS_API_VERSION :
 (
