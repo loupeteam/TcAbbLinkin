@@ -264,7 +264,7 @@ END_VAR]]></Declaration>
         <ST><![CDATA[IF pStatus = 0 THEN
 	_getIO := FALSE;
 	RETURN;
-END_IF;
+END_IF
 
 // Clear Status
 _clearRequestStatus(pStatus);
@@ -298,7 +298,7 @@ ELSIF pointersSet >= 2 THEN
 	pStatus^.errorMsg := TO_STRING(ABBLINKIN_COMMAND_TYPE.GET_STATE);
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' : Two or more result pointer set');
 	_getIO := FALSE;
-END_IF;
+END_IF
 
 request.pStatus := pStatus;
 request.command := ABBLINKIN_COMMAND_TYPE.GET_IO;
@@ -439,7 +439,7 @@ END_VAR]]></Declaration>
         <ST><![CDATA[IF pStatus = 0 THEN
 	_getSymbol := FALSE;
 	RETURN;
-END_IF;
+END_IF
 
 // Clear Status
 _clearRequestStatus(pStatus);
@@ -473,7 +473,7 @@ ELSIF pointersSet >= 2 THEN
 	pStatus^.errorMsg := TO_STRING(ABBLINKIN_COMMAND_TYPE.GET_SYMBOL);
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' : Two or more result pointer set');
 	_getSymbol := FALSE;
-END_IF;
+END_IF
 
 request.pStatus := pStatus;
 request.command := ABBLINKIN_COMMAND_TYPE.GET_SYMBOL;
@@ -851,8 +851,8 @@ CASE _state OF
 								_currentRequest.pStatus^.errorMsg := 'Maximum number of request reached';
 							END_IF
 							MEMSET(ADR(_currentRequest), 0, SIZEOF(_currentRequest));	// Zero (i.e. terminate) current Request
-						END_IF;
-					END_IF;
+						END_IF
+					END_IF
 				END_IF
 				
 				// Check if queue contains at least one request
@@ -860,11 +860,11 @@ CASE _state OF
 					_currentRequest := _requestQueuePop();
 					_numRequestAttempts := 0;
 					_state := ABBLINKIN_STATE.SEND_REQUEST;
-				END_IF;
+				END_IF
 			ELSE
 				// Start Auth sequence within state machine
 				_state := ABBLINKIN_STATE.AUTH_SEND_REQUEST;
-			END_IF;
+			END_IF
 		END_IF
 		
 	ABBLINKIN_STATE.SEND_REQUEST:
@@ -1203,7 +1203,7 @@ END_VAR]]></Declaration>
 IF pStatus = 0 THEN
 	GetState := FALSE;
 	RETURN;
-END_IF;
+END_IF
 
 // Clear Status
 _clearRequestStatus(pStatus);
@@ -1304,7 +1304,7 @@ END_VAR
         <ST><![CDATA[IF pStatus = 0 THEN
 	PowerOff := FALSE;
 	RETURN;
-END_IF;
+END_IF
 
 // Clear Status
 _clearRequestStatus(pStatus);
@@ -1352,7 +1352,7 @@ END_VAR
         <ST><![CDATA[IF pStatus = 0 THEN
 	PowerOn := FALSE;
 	RETURN;
-END_IF;
+END_IF
 
 // Clear Status
 _clearRequestStatus(pStatus);
@@ -1400,7 +1400,7 @@ END_VAR
         <ST><![CDATA[IF pStatus = 0 THEN
 	RapidReset := FALSE;
 	RETURN;
-END_IF;
+END_IF
 
 // Clear Status
 _clearRequestStatus(pStatus);
@@ -1448,7 +1448,7 @@ END_VAR
         <ST><![CDATA[IF pStatus = 0 THEN
 	RapidStart := FALSE;
 	RETURN;
-END_IF;
+END_IF
 
 // Clear Status
 _clearRequestStatus(pStatus);
@@ -1508,7 +1508,7 @@ END_VAR
         <ST><![CDATA[IF pStatus = 0 THEN
 	RapidStop := FALSE;
 	RETURN;
-END_IF;
+END_IF
 
 // Clear Status
 _clearRequestStatus(pStatus);
@@ -1567,7 +1567,7 @@ END_VAR]]></Declaration>
 IF pStatus = 0 THEN
 	SetIO := FALSE;
 	RETURN;
-END_IF;
+END_IF
 
 // Clear Status
 _clearRequestStatus(pStatus);
@@ -1597,7 +1597,7 @@ CASE value.TypeClass OF
 			request.httpBody := CONCAT(request.httpBody, '1');
 		ELSE
 			request.httpBody := CONCAT(request.httpBody, '0');
-		END_IF;
+		END_IF
 		
 	__SYSTEM.TYPE_CLASS.TYPE_SINT:
 		pSint := value.pValue;
@@ -1676,7 +1676,7 @@ END_VAR
 IF pStatus = 0 THEN
 	SetSymbol := FALSE;
 	RETURN;
-END_IF;
+END_IF
 
 // Clear Status
 _clearRequestStatus(pStatus);
@@ -1706,7 +1706,7 @@ CASE value.TypeClass OF
 			request.httpBody := CONCAT(request.httpBody, 'TRUE');
 		ELSE
 			request.httpBody := CONCAT(request.httpBody, 'FALSE');
-		END_IF;
+		END_IF
 		
 	__SYSTEM.TYPE_CLASS.TYPE_SINT:
 		pSint := value.pValue;
