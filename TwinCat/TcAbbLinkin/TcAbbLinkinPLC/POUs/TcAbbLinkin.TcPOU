@@ -10,6 +10,7 @@ VAR_OUTPUT
 	readyForCmd : BOOL;
 	error : BOOL;
 	errorID : DINT;
+	errorMsg : STRING;
 END_VAR
 VAR
 	_connectionEnabled : BOOL;
@@ -28,10 +29,12 @@ VAR
 	_auth : AbbLinkinAuth_Typ;
 	_requestQueue : AbbLinkinRequestQueue_Typ;
 	_currentRequest : AbbLinkinRequest_Typ;
+	_numRequestAttempts : UINT;
 END_VAR
 
 VAR CONSTANT
 	AUTH_URI : STRING := '/?json=1';
+	MAX_REQUESTS_ATTEMPTS : UINT := 3;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -261,7 +264,7 @@ END_VAR]]></Declaration>
         <ST><![CDATA[IF pStatus = 0 THEN
 	_getIO := FALSE;
 	RETURN;
-END_IF;
+END_IF
 
 // Clear Status
 _clearRequestStatus(pStatus);
@@ -295,7 +298,7 @@ ELSIF pointersSet >= 2 THEN
 	pStatus^.errorMsg := TO_STRING(ABBLINKIN_COMMAND_TYPE.GET_STATE);
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' : Two or more result pointer set');
 	_getIO := FALSE;
-END_IF;
+END_IF
 
 request.pStatus := pStatus;
 request.command := ABBLINKIN_COMMAND_TYPE.GET_IO;
@@ -360,8 +363,6 @@ IF (jsonValue <> 0) THEN
 			request.results.pDataDint^ := STRING_TO_DINT(valueString);
 		ABBLINKIN_DATA_TYPE_Typ._LREAL:
 			request.results.pDataLreal^ := STRING_TO_LREAL(valueString);
-	ELSE
-		; // error TODO
 	END_CASE
 ELSE
 	request.pStatus^.error := TRUE;
@@ -438,7 +439,7 @@ END_VAR]]></Declaration>
         <ST><![CDATA[IF pStatus = 0 THEN
 	_getSymbol := FALSE;
 	RETURN;
-END_IF;
+END_IF
 
 // Clear Status
 _clearRequestStatus(pStatus);
@@ -472,7 +473,7 @@ ELSIF pointersSet >= 2 THEN
 	pStatus^.errorMsg := TO_STRING(ABBLINKIN_COMMAND_TYPE.GET_SYMBOL);
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' : Two or more result pointer set');
 	_getSymbol := FALSE;
-END_IF;
+END_IF
 
 request.pStatus := pStatus;
 request.command := ABBLINKIN_COMMAND_TYPE.GET_SYMBOL;
@@ -541,8 +542,6 @@ IF (jsonValue <> 0) THEN
 		ABBLINKIN_DATA_TYPE_Typ._STRING:
 			valueStringNoQuotes := MID(valueString, len(valueString) - 2, 2); // MID removes beginning and ending double-quote (") characters
 			request.results.pDataString^ := valueStringNoQuotes;
-	ELSE
-		; // error TODO
 	END_CASE
 ELSE
 	request.pStatus^.error := TRUE;
@@ -816,15 +815,17 @@ END_VAR]]></Declaration>
         <ST><![CDATA[
 IF _connectionEnabled THEN
 	_httpClient.Execute();
+	
+	IF _httpClient.bError THEN
+		errorID := _httpClient.hrErrorCode;
+		errorMsg := 'Http Client object returned an error (see errorID)';
+		_state := ABBLINKIN_STATE.ERROR;
+	END_IF
 END_IF
 
 // Status
-_sendingEnabled := _connectionEnabled AND _httpClient.bConfigured;
+_sendingEnabled := _connectionEnabled AND _httpClient.bConfigured AND NOT error;
 readyForCmd := _sendingEnabled AND _authorized;
-
-IF NOT _sendingEnabled THEN
-	_state := ABBLINKIN_STATE.IDLE;
-END_IF
 
 
 CASE _state OF 
@@ -837,33 +838,48 @@ CASE _state OF
 				// Check for existing request
 				IF _currentRequest.pStatus <> 0	THEN 
 					IF _currentRequest.pStatus^.busy THEN
-						// This is the case when a request was sent, but a 401 Unauthorized was returned (causing re-auth steps). Here, we are retrying.
-						_state := ABBLINKIN_STATE.SEND_REQUEST;
-					END_IF;
+						// Possible scenario: a request was sent, but a 401 Unauthorized was returned (causing re-auth steps). Here, we are retrying.	
+						// Possible scenario: an error occured somewhere along the way	
+						IF _numRequestAttempts < MAX_REQUESTS_ATTEMPTS THEN
+							_state := ABBLINKIN_STATE.SEND_REQUEST;
+						ELSE
+							// Maximum number of requests sent -> terminate request
+							_currentRequest.pStatus^.busy := FALSE;
+							_currentRequest.pStatus^.done := FALSE;
+							_currentRequest.pStatus^.error := TRUE;
+							IF _currentRequest.pStatus^.errorMsg = '' THEN
+								_currentRequest.pStatus^.errorMsg := 'Maximum number of request reached';
+							END_IF
+							MEMSET(ADR(_currentRequest), 0, SIZEOF(_currentRequest));	// Zero (i.e. terminate) current Request
+						END_IF
+					END_IF
 				END_IF
 				
 				// Check if queue contains at least one request
 				IF _state <> ABBLINKIN_STATE.SEND_REQUEST  AND NOT _requestQueue.empty THEN
 					_currentRequest := _requestQueuePop();
+					_numRequestAttempts := 0;
 					_state := ABBLINKIN_STATE.SEND_REQUEST;
-				END_IF;
+				END_IF
 			ELSE
 				// Start Auth sequence within state machine
 				_state := ABBLINKIN_STATE.AUTH_SEND_REQUEST;
-			END_IF;
+			END_IF
 		END_IF
 		
 	ABBLINKIN_STATE.SEND_REQUEST:
 		
 		_setHeader(ABBLINKIN_AUTH_HEADER_VALUE.NONE);
 		retVal := _httpRequest.SendRequest(_currentRequest.uri, _httpClient, _currentRequest.httpMethod, ADR(_currentRequest.httpBody), INT_TO_UDINT(LEN(_currentRequest.httpBody)), _httpHeader);
+		_numRequestAttempts := _numRequestAttempts + 1;
 		
 		IF retVal = FALSE THEN
 			_currentRequest.pStatus^.busy := FALSE;
 			_currentRequest.pStatus^.error := TRUE;
 			_currentRequest.pStatus^.errorMsg := 'The request could not be sent';
+			MEMSET(ADR(_currentRequest), 0, SIZEOF(_currentRequest));	// Zero (i.e. terminate) current Request
 			
-			_state := ABBLINKIN_STATE.IDLE;	// TODO : decide if we want to retry
+			_state := ABBLINKIN_STATE.IDLE;
 		ELSE
 			_state := ABBLINKIN_STATE.WAIT_FOR_RESONSE;
 		END_IF
@@ -874,9 +890,10 @@ CASE _state OF
 			_currentRequest.pStatus^.busy := FALSE;
 			_currentRequest.pStatus^.error := TRUE;
 			_currentRequest.pStatus^.errorID := _httpRequest.eErrorId;
-			_currentRequest.pStatus^.errorMsg := 'The client request object returned an error';
+			_currentRequest.pStatus^.errorMsg := 'The client request object returned an error (see errorID)';
+			MEMSET(ADR(_currentRequest), 0, SIZEOF(_currentRequest));	// Zero (i.e. terminate) current Request
 			
-			_state := ABBLINKIN_STATE.IDLE;	// TODO : decide if we want to retry
+			_state := ABBLINKIN_STATE.IDLE;
 		ELSIF _httpRequest.bBusy = FALSE THEN
 			_state := ABBLINKIN_STATE.PROCESS_RESPONSE;
 		END_IF
@@ -887,38 +904,39 @@ CASE _state OF
 		
 			200..204 : // HTTP Success
 			
-				// TODO : requestType-specific processing here
+				// Command-specific success-response-processing
 				_callCommandSuccessHandler(_currentRequest.command, _httpRequest, _currentRequest);
 				
 				// Write and close out current request status
 				_currentRequest.pStatus^.busy := FALSE;
 				_currentRequest.pStatus^.done := NOT _currentRequest.pStatus^.error; // Set done if error false
-				MEMSET(ADR(_currentRequest), 0, SIZEOF(_currentRequest));
+				MEMSET(ADR(_currentRequest), 0, SIZEOF(_currentRequest));	// Zero (i.e. terminate) current Request
 				
 				_state := ABBLINKIN_STATE.IDLE;
 				
 			401, 503: // HTTP Error - "Unauthorized" 
 				
-				// TODO : implement Authorization implementation
+				// Go back to idle (will then proceed to auth steps before re-attempting)
 				_authorized := FALSE;
-				_state := ABBLINKIN_STATE.IDLE;	// TODO : decide if we want to retry
+				_state := ABBLINKIN_STATE.IDLE;
 								
 			400, 402..451:	// HTTP Client Error	
 				_currentRequest.pStatus^.busy := FALSE;
 				_currentRequest.pStatus^.error := TRUE;
 				_currentRequest.pStatus^.errorID := _httpRequest.nStatusCode;
 				_currentRequest.pStatus^.errorMsg := 'The Robot responded with an error (client error, 4xx). See errorID';
+				MEMSET(ADR(_currentRequest), 0, SIZEOF(_currentRequest));	// Zero (i.e. terminate) current Request
 				
-				_state := ABBLINKIN_STATE.IDLE;	// TODO : decide if we want to retry
+				_state := ABBLINKIN_STATE.IDLE;
 				
 			500..502, 504..511: // HTTP Server Error
 				_currentRequest.pStatus^.busy := FALSE;
 				_currentRequest.pStatus^.error := TRUE;
 				_currentRequest.pStatus^.errorID := _httpRequest.nStatusCode;
 				_currentRequest.pStatus^.errorMsg := 'The Robot responded with an error (server error, 5xx). See errorID';
+				MEMSET(ADR(_currentRequest), 0, SIZEOF(_currentRequest));	// Zero (i.e. terminate) current Request
 				
-				_state := ABBLINKIN_STATE.IDLE;	// TODO : decide if we want to retry
-							
+				_state := ABBLINKIN_STATE.IDLE;
 		END_CASE
 	
 	
@@ -938,7 +956,9 @@ CASE _state OF
 		retVal := _httpRequest.SendRequest(AUTH_URI, _httpClient, ETcIotHttpRequestType.HTTP_Get, 0, 0, _httpHeader);
 		
 		IF retVal = FALSE THEN
-			_state := ABBLINKIN_STATE.IDLE;	// TODO : handle error better
+			errorID := 0;
+			errorMsg := 'The Auth request could not be sent';
+			_state := ABBLINKIN_STATE.ERROR;
 		ELSE
 			_state := ABBLINKIN_STATE.AUTH_WAIT_FOR_RESONSE;
 		END_IF
@@ -946,7 +966,9 @@ CASE _state OF
 	ABBLINKIN_STATE.AUTH_WAIT_FOR_RESONSE:
 		
 		IF _httpRequest.bError THEN
-			_state := ABBLINKIN_STATE.IDLE;	// TODO : handle error better
+			errorID := _httpRequest.eErrorId;
+			errorMsg := 'The client request object returned an error (see errorID)';
+			_state := ABBLINKIN_STATE.ERROR;
 		ELSIF _httpRequest.bBusy = FALSE THEN
 			_state := ABBLINKIN_STATE.AUTH_PROCESS_RESPONSE;
 		END_IF
@@ -965,86 +987,99 @@ CASE _state OF
 				_state := ABBLINKIN_STATE.IDLE;
 				
 			401: // HTTP Error - "Unauthorized"
+				
+				CASE configuration.rwsVersion OF 
+					ABBLINKIN_RWS_API_VERSION.V1:
+						IF _httpRequest.GetHeaderField('WWW-Authenticate', ADR(_auth.wwwAuthContent), SIZEOF(_auth.wwwAuthContent)) THEN 
+							_state := ABBLINKIN_STATE.AUTH_DIGEST_RESPONSE_CALCULATE;
+						ELSE
+							errorID := _httpRequest.nStatusCode;
+							errorMsg := 'Unauthorized. No WWW-Authenticate header presented to digest.';
+							_state := ABBLINKIN_STATE.ERROR;
+						END_IF
+					ABBLINKIN_RWS_API_VERSION.V2:
+						errorID := _httpRequest.nStatusCode;
+						errorMsg := 'Unauthorized. No WWW-Authenticate header presented to digest.';
+						_state := ABBLINKIN_STATE.ERROR;
+				END_CASE
 
-			
-				IF _httpRequest.GetHeaderField('WWW-Authenticate', ADR(_auth.wwwAuthContent), SIZEOF(_auth.wwwAuthContent)) THEN 
-					_state := ABBLINKIN_STATE.AUTH_DIGEST_RESPONSE_CALCULATE;
-				ELSE
-					// Invalid username or password
-					_state := ABBLINKIN_STATE.IDLE;	// TODO : handle better	
-				END_IF
 				
 			503:  
 				// Note : You can get a 503 if you try to send the same credentials repeatedly instead of 
-				// 		sending the http session cookies that the server provides after the first successful authentication
-				
-				_state := ABBLINKIN_STATE.IDLE;	// TODO : handle better
-		ELSE
-			
-			_state := ABBLINKIN_STATE.IDLE;	// TODO : handle better				
+				// 		sending the http session cookies that the server provides after the first successful authentication			
+				errorID := _httpRequest.nStatusCode;
+				errorMsg := 'Authentication request recieved an error response (see errorID for HTTP status code).';
+				_state := ABBLINKIN_STATE.ERROR;
+		ELSE			
+			errorID := _httpRequest.nStatusCode;
+			errorMsg := 'Authentication request recieved an error response (see errorID for HTTP status code).';
+			_state := ABBLINKIN_STATE.ERROR;			
 		END_CASE
-	
-	
-		
 	
 	ABBLINKIN_STATE.AUTH_DIGEST_RESPONSE_CALCULATE:
 		// Calculate Digest parameters
 		
-		
 		// Verify that DIGEST in header
 		digestLocation := FIND(_auth.wwwAuthContent, 'Digest');
-		IF digestLocation = 0 THEN 
-			// 'Digest not found in WWW-Authenticate header. ';
-			; // error TODO
+		IF digestLocation = 0 THEN
+			errorID := 0;
+			errorMsg := 'Digest not found in WWW-Authenticate header';
+			_state := ABBLINKIN_STATE.ERROR;
 		END_IF
 		
-		// Extract parameter values from WWW-Authenticate header
-		_auth.digest.realm	:= _parseWwwAuthForParameter('realm', _auth.wwwAuthContent);
-		_auth.digest.qop	:= _parseWwwAuthForParameter('qop', _auth.wwwAuthContent);
-		_auth.digest.nonce	:= _parseWwwAuthForParameter('nonce', _auth.wwwAuthContent);
-		_auth.digest.opaque	:= _parseWwwAuthForParameter('opaque', _auth.wwwAuthContent);
+		IF NOT error THEN
+			// Extract parameter values from WWW-Authenticate header
+			_auth.digest.realm	:= _parseWwwAuthForParameter('realm', _auth.wwwAuthContent);
+			_auth.digest.qop	:= _parseWwwAuthForParameter('qop', _auth.wwwAuthContent);
+			_auth.digest.nonce	:= _parseWwwAuthForParameter('nonce', _auth.wwwAuthContent);
+			_auth.digest.opaque	:= _parseWwwAuthForParameter('opaque', _auth.wwwAuthContent);
+		END_IF
 		
 		IF (_auth.digest.realm = '' OR
 			_auth.digest.qop = '' OR
 			_auth.digest.nonce = '' OR
 			_auth.digest.opaque = '') THEN
-			; // error TODO 'Digest header unavailable'
-		END_IF;
+			errorID := 0;
+			errorMsg := 'Could not extract Digest parameters from WWW-Authenticate header';
+			_state := ABBLINKIN_STATE.ERROR;
+		END_IF
  
-		// Calculate Digest response
-		_auth.digest.nc := '00000001'; // TODO refine
-		_auth.digest.cnonce := 'diddLOPR'; // TODO refine
-		_auth.digest.response := _calculateDigestResponse(	username := configuration.rwsUsername,
-															realm := _auth.digest.realm,
-															password := configuration.rwsPassword,
-															httpMethod := 'GET',
-															uri := AUTH_URI,
-															nonce := _auth.digest.nonce,
-															nc := _auth.digest.nc,
-															cnonce := _auth.digest.cnonce,
-															qop := _auth.digest.qop);
-		
-		
-		// Formulate request
-		_auth.digest.authContent := 'Digest username="';
-		concat2(ADR(_auth.digest.authContent), ADR(configuration.rwsUsername), ADR(_auth.digest.authContent), SIZEOF(_auth.digest.authContent));
-		concat2(ADR(_auth.digest.authContent), ADR('", realm="'), ADR(_auth.digest.authContent), SIZEOF(_auth.digest.authContent));
-		concat2(ADR(_auth.digest.authContent), ADR(_auth.digest.realm), ADR(_auth.digest.authContent), SIZEOF(_auth.digest.authContent));
-		concat2(ADR(_auth.digest.authContent), ADR('", nonce="'), ADR(_auth.digest.authContent), SIZEOF(_auth.digest.authContent));
-		concat2(ADR(_auth.digest.authContent), ADR(_auth.digest.nonce), ADR(_auth.digest.authContent), SIZEOF(_auth.digest.authContent));
-		concat2(ADR(_auth.digest.authContent), ADR('", uri="'), ADR(_auth.digest.authContent), SIZEOF(_auth.digest.authContent));
-		concat2(ADR(_auth.digest.authContent), ADR(AUTH_URI), ADR(_auth.digest.authContent), SIZEOF(_auth.digest.authContent));
-		concat2(ADR(_auth.digest.authContent), ADR('", algorithm="MD5", qop="'), ADR(_auth.digest.authContent), SIZEOF(_auth.digest.authContent));
-		concat2(ADR(_auth.digest.authContent), ADR(_auth.digest.qop), ADR(_auth.digest.authContent), SIZEOF(_auth.digest.authContent));
-		concat2(ADR(_auth.digest.authContent), ADR('", nc="'), ADR(_auth.digest.authContent), SIZEOF(_auth.digest.authContent));
-		concat2(ADR(_auth.digest.authContent), ADR(_auth.digest.nc), ADR(_auth.digest.authContent), SIZEOF(_auth.digest.authContent));
-		concat2(ADR(_auth.digest.authContent), ADR('", cnonce="'), ADR(_auth.digest.authContent), SIZEOF(_auth.digest.authContent));
-		concat2(ADR(_auth.digest.authContent), ADR(_auth.digest.cnonce), ADR(_auth.digest.authContent), SIZEOF(_auth.digest.authContent));
-		concat2(ADR(_auth.digest.authContent), ADR('", response="'), ADR(_auth.digest.authContent), SIZEOF(_auth.digest.authContent));
-		concat2(ADR(_auth.digest.authContent), ADR(_auth.digest.response), ADR(_auth.digest.authContent), SIZEOF(_auth.digest.authContent));
-		concat2(ADR(_auth.digest.authContent), ADR('"'), ADR(_auth.digest.authContent), SIZEOF(_auth.digest.authContent));
-		
-		_state := ABBLINKIN_STATE.AUTH_DIGEST_RESPONSE_SEND;
+		IF NOT error THEN
+			// Calculate Digest response
+			_auth.digest.nc := '00000001';	// TODO refine
+			_auth.digest.cnonce := 'diddLOPR'; // TODO refine
+			_auth.digest.response := _calculateDigestResponse(	username := configuration.rwsUsername,
+																realm := _auth.digest.realm,
+																password := configuration.rwsPassword,
+																httpMethod := 'GET',
+																uri := AUTH_URI,
+																nonce := _auth.digest.nonce,
+																nc := _auth.digest.nc,
+																cnonce := _auth.digest.cnonce,
+																qop := _auth.digest.qop);
+			
+			
+			// Formulate request
+			_auth.digest.authContent := 'Digest username="';
+			concat2(ADR(_auth.digest.authContent), ADR(configuration.rwsUsername), ADR(_auth.digest.authContent), SIZEOF(_auth.digest.authContent));
+			concat2(ADR(_auth.digest.authContent), ADR('", realm="'), ADR(_auth.digest.authContent), SIZEOF(_auth.digest.authContent));
+			concat2(ADR(_auth.digest.authContent), ADR(_auth.digest.realm), ADR(_auth.digest.authContent), SIZEOF(_auth.digest.authContent));
+			concat2(ADR(_auth.digest.authContent), ADR('", nonce="'), ADR(_auth.digest.authContent), SIZEOF(_auth.digest.authContent));
+			concat2(ADR(_auth.digest.authContent), ADR(_auth.digest.nonce), ADR(_auth.digest.authContent), SIZEOF(_auth.digest.authContent));
+			concat2(ADR(_auth.digest.authContent), ADR('", uri="'), ADR(_auth.digest.authContent), SIZEOF(_auth.digest.authContent));
+			concat2(ADR(_auth.digest.authContent), ADR(AUTH_URI), ADR(_auth.digest.authContent), SIZEOF(_auth.digest.authContent));
+			concat2(ADR(_auth.digest.authContent), ADR('", algorithm="MD5", qop="'), ADR(_auth.digest.authContent), SIZEOF(_auth.digest.authContent));
+			concat2(ADR(_auth.digest.authContent), ADR(_auth.digest.qop), ADR(_auth.digest.authContent), SIZEOF(_auth.digest.authContent));
+			concat2(ADR(_auth.digest.authContent), ADR('", nc="'), ADR(_auth.digest.authContent), SIZEOF(_auth.digest.authContent));
+			concat2(ADR(_auth.digest.authContent), ADR(_auth.digest.nc), ADR(_auth.digest.authContent), SIZEOF(_auth.digest.authContent));
+			concat2(ADR(_auth.digest.authContent), ADR('", cnonce="'), ADR(_auth.digest.authContent), SIZEOF(_auth.digest.authContent));
+			concat2(ADR(_auth.digest.authContent), ADR(_auth.digest.cnonce), ADR(_auth.digest.authContent), SIZEOF(_auth.digest.authContent));
+			concat2(ADR(_auth.digest.authContent), ADR('", response="'), ADR(_auth.digest.authContent), SIZEOF(_auth.digest.authContent));
+			concat2(ADR(_auth.digest.authContent), ADR(_auth.digest.response), ADR(_auth.digest.authContent), SIZEOF(_auth.digest.authContent));
+			concat2(ADR(_auth.digest.authContent), ADR('"'), ADR(_auth.digest.authContent), SIZEOF(_auth.digest.authContent));
+			
+			_state := ABBLINKIN_STATE.AUTH_DIGEST_RESPONSE_SEND;
+		END_IF
 	
 	ABBLINKIN_STATE.AUTH_DIGEST_RESPONSE_SEND:
 	
@@ -1052,37 +1087,57 @@ CASE _state OF
 		retVal := _httpRequest.SendRequest(AUTH_URI, _httpClient, ETcIotHttpRequestType.HTTP_Get, 0, 0, _httpHeader);
 		
 		IF retVal = FALSE THEN
-			_state := ABBLINKIN_STATE.IDLE;	// TODO : handle error better
+			errorID := 0;
+			errorMsg := 'The Auth Digest request could not be sent';
+			_state := ABBLINKIN_STATE.ERROR;
 		ELSE
 			_state := ABBLINKIN_STATE.AUTH_WAIT_FOR_RESONSE;
 		END_IF
 		
 	
+	ABBLINKIN_STATE.ERROR:
+		;// User must AckError, ConnectionStart, or ConnectionStop to reset out of Error state
+	
 END_CASE
 
 
-// Handle Methods
+// Handle Resetting Methods
 
 IF _methodConnectionStartCalled THEN
-	error := _httpClient.bError;
-	errorID := _httpClient.hrErrorCode;
+	IF _httpClient.bError THEN
+		errorID := _httpClient.hrErrorCode;
+		errorMsg := 'Http Client object returned an error (see errorID)';
+		_state := ABBLINKIN_STATE.ERROR;
+	ELSE
+		errorID := 0;
+		errorMsg := '';
+		_state := ABBLINKIN_STATE.IDLE;
+	END_IF
 	
 	_methodConnectionStartCalled := FALSE;
 END_IF
 
 IF _methodConnectionStopCalled THEN
-	error := 0;
 	errorID := 0;
+	errorMsg := '';
+	_state := ABBLINKIN_STATE.IDLE;
 	
 	_methodConnectionStopCalled := FALSE;
 END_IF
 
 IF _methodAckErrorCalled THEN
-	error := 0;
 	errorID := 0;
+	errorMsg := '';
+	IF _state = ABBLINKIN_STATE.ERROR THEN
+		_state := ABBLINKIN_STATE.IDLE;
+	END_IF
 	
 	_methodAckErrorCalled := FALSE;
 END_IF
+
+// Set Error status
+error := (_state = ABBLINKIN_STATE.ERROR);
+
 ]]></ST>
       </Implementation>
     </Method>
@@ -1148,7 +1203,7 @@ END_VAR]]></Declaration>
 IF pStatus = 0 THEN
 	GetState := FALSE;
 	RETURN;
-END_IF;
+END_IF
 
 // Clear Status
 _clearRequestStatus(pStatus);
@@ -1249,7 +1304,7 @@ END_VAR
         <ST><![CDATA[IF pStatus = 0 THEN
 	PowerOff := FALSE;
 	RETURN;
-END_IF;
+END_IF
 
 // Clear Status
 _clearRequestStatus(pStatus);
@@ -1297,7 +1352,7 @@ END_VAR
         <ST><![CDATA[IF pStatus = 0 THEN
 	PowerOn := FALSE;
 	RETURN;
-END_IF;
+END_IF
 
 // Clear Status
 _clearRequestStatus(pStatus);
@@ -1345,7 +1400,7 @@ END_VAR
         <ST><![CDATA[IF pStatus = 0 THEN
 	RapidReset := FALSE;
 	RETURN;
-END_IF;
+END_IF
 
 // Clear Status
 _clearRequestStatus(pStatus);
@@ -1393,7 +1448,7 @@ END_VAR
         <ST><![CDATA[IF pStatus = 0 THEN
 	RapidStart := FALSE;
 	RETURN;
-END_IF;
+END_IF
 
 // Clear Status
 _clearRequestStatus(pStatus);
@@ -1453,7 +1508,7 @@ END_VAR
         <ST><![CDATA[IF pStatus = 0 THEN
 	RapidStop := FALSE;
 	RETURN;
-END_IF;
+END_IF
 
 // Clear Status
 _clearRequestStatus(pStatus);
@@ -1512,7 +1567,7 @@ END_VAR]]></Declaration>
 IF pStatus = 0 THEN
 	SetIO := FALSE;
 	RETURN;
-END_IF;
+END_IF
 
 // Clear Status
 _clearRequestStatus(pStatus);
@@ -1542,7 +1597,7 @@ CASE value.TypeClass OF
 			request.httpBody := CONCAT(request.httpBody, '1');
 		ELSE
 			request.httpBody := CONCAT(request.httpBody, '0');
-		END_IF;
+		END_IF
 		
 	__SYSTEM.TYPE_CLASS.TYPE_SINT:
 		pSint := value.pValue;
@@ -1621,7 +1676,7 @@ END_VAR
 IF pStatus = 0 THEN
 	SetSymbol := FALSE;
 	RETURN;
-END_IF;
+END_IF
 
 // Clear Status
 _clearRequestStatus(pStatus);
@@ -1651,7 +1706,7 @@ CASE value.TypeClass OF
 			request.httpBody := CONCAT(request.httpBody, 'TRUE');
 		ELSE
 			request.httpBody := CONCAT(request.httpBody, 'FALSE');
-		END_IF;
+		END_IF
 		
 	__SYSTEM.TYPE_CLASS.TYPE_SINT:
 		pSint := value.pValue;
@@ -1858,8 +1913,7 @@ END_IF
       <LineId Id="104" Count="0" />
       <LineId Id="113" Count="0" />
       <LineId Id="108" Count="0" />
-      <LineId Id="114" Count="0" />
-      <LineId Id="110" Count="1" />
+      <LineId Id="111" Count="0" />
       <LineId Id="115" Count="0" />
       <LineId Id="30" Count="0" />
       <LineId Id="62" Count="0" />
@@ -1960,8 +2014,7 @@ END_IF
       <LineId Id="113" Count="0" />
       <LineId Id="108" Count="0" />
       <LineId Id="129" Count="0" />
-      <LineId Id="114" Count="0" />
-      <LineId Id="110" Count="1" />
+      <LineId Id="111" Count="0" />
       <LineId Id="115" Count="0" />
       <LineId Id="30" Count="0" />
       <LineId Id="62" Count="0" />
@@ -2098,13 +2151,17 @@ END_IF
     </LineIds>
     <LineIds Name="TcAbbLinkin.Cyclic">
       <LineId Id="7" Count="1" />
-      <LineId Id="10" Count="1" />
+      <LineId Id="10" Count="0" />
+      <LineId Id="705" Count="0" />
+      <LineId Id="709" Count="0" />
+      <LineId Id="711" Count="1" />
+      <LineId Id="706" Count="0" />
+      <LineId Id="708" Count="0" />
+      <LineId Id="11" Count="0" />
       <LineId Id="63" Count="0" />
       <LineId Id="9" Count="0" />
       <LineId Id="5" Count="0" />
-      <LineId Id="64" Count="2" />
-      <LineId Id="70" Count="0" />
-      <LineId Id="69" Count="0" />
+      <LineId Id="64" Count="0" />
       <LineId Id="71" Count="0" />
       <LineId Id="73" Count="0" />
       <LineId Id="72" Count="0" />
@@ -2116,14 +2173,25 @@ END_IF
       <LineId Id="447" Count="0" />
       <LineId Id="446" Count="0" />
       <LineId Id="439" Count="0" />
+      <LineId Id="660" Count="2" />
       <LineId Id="442" Count="0" />
-      <LineId Id="445" Count="0" />
+      <LineId Id="663" Count="0" />
+      <LineId Id="675" Count="0" />
+      <LineId Id="664" Count="0" />
+      <LineId Id="666" Count="0" />
+      <LineId Id="668" Count="0" />
+      <LineId Id="671" Count="0" />
+      <LineId Id="676" Count="0" />
+      <LineId Id="673" Count="0" />
+      <LineId Id="658" Count="0" />
+      <LineId Id="656" Count="0" />
       <LineId Id="444" Count="0" />
       <LineId Id="440" Count="0" />
       <LineId Id="438" Count="0" />
       <LineId Id="448" Count="0" />
       <LineId Id="433" Count="0" />
       <LineId Id="83" Count="0" />
+      <LineId Id="652" Count="0" />
       <LineId Id="157" Count="0" />
       <LineId Id="284" Count="0" />
       <LineId Id="279" Count="0" />
@@ -2134,10 +2202,13 @@ END_IF
       <LineId Id="87" Count="2" />
       <LineId Id="142" Count="0" />
       <LineId Id="92" Count="0" />
+      <LineId Id="657" Count="0" />
       <LineId Id="90" Count="0" />
       <LineId Id="96" Count="0" />
       <LineId Id="158" Count="0" />
-      <LineId Id="160" Count="1" />
+      <LineId Id="160" Count="0" />
+      <LineId Id="677" Count="0" />
+      <LineId Id="161" Count="0" />
       <LineId Id="101" Count="1" />
       <LineId Id="99" Count="1" />
       <LineId Id="98" Count="0" />
@@ -2147,7 +2218,8 @@ END_IF
       <LineId Id="163" Count="0" />
       <LineId Id="165" Count="0" />
       <LineId Id="105" Count="0" />
-      <LineId Id="166" Count="0" />
+      <LineId Id="734" Count="0" />
+      <LineId Id="733" Count="0" />
       <LineId Id="120" Count="0" />
       <LineId Id="119" Count="0" />
       <LineId Id="106" Count="3" />
@@ -2159,24 +2231,34 @@ END_IF
       <LineId Id="643" Count="0" />
       <LineId Id="168" Count="0" />
       <LineId Id="450" Count="0" />
-      <LineId Id="452" Count="0" />
+      <LineId Id="678" Count="0" />
       <LineId Id="169" Count="0" />
       <LineId Id="139" Count="0" />
       <LineId Id="137" Count="0" />
       <LineId Id="130" Count="1" />
-      <LineId Id="140" Count="1" />
+      <LineId Id="728" Count="0" />
+      <LineId Id="141" Count="0" />
       <LineId Id="182" Count="1" />
       <LineId Id="134" Count="0" />
       <LineId Id="170" Count="2" />
-      <LineId Id="329" Count="11" />
+      <LineId Id="329" Count="0" />
+      <LineId Id="730" Count="0" />
+      <LineId Id="729" Count="0" />
+      <LineId Id="331" Count="6" />
+      <LineId Id="732" Count="0" />
+      <LineId Id="731" Count="0" />
+      <LineId Id="339" Count="0" />
       <LineId Id="128" Count="0" />
       <LineId Id="266" Count="0" />
       <LineId Id="290" Count="0" />
       <LineId Id="292" Count="15" />
-      <LineId Id="328" Count="0" />
+      <LineId Id="741" Count="1" />
+      <LineId Id="737" Count="0" />
       <LineId Id="309" Count="2" />
       <LineId Id="270" Count="0" />
-      <LineId Id="312" Count="2" />
+      <LineId Id="312" Count="1" />
+      <LineId Id="743" Count="0" />
+      <LineId Id="745" Count="1" />
       <LineId Id="320" Count="2" />
       <LineId Id="271" Count="0" />
       <LineId Id="323" Count="0" />
@@ -2190,37 +2272,45 @@ END_IF
       <LineId Id="384" Count="0" />
       <LineId Id="381" Count="0" />
       <LineId Id="354" Count="0" />
-      <LineId Id="482" Count="0" />
       <LineId Id="385" Count="0" />
-      <LineId Id="483" Count="0" />
-      <LineId Id="390" Count="0" />
-      <LineId Id="389" Count="0" />
-      <LineId Id="391" Count="1" />
+      <LineId Id="784" Count="0" />
+      <LineId Id="787" Count="0" />
+      <LineId Id="791" Count="5" />
+      <LineId Id="790" Count="0" />
+      <LineId Id="797" Count="2" />
+      <LineId Id="788" Count="0" />
+      <LineId Id="786" Count="0" />
       <LineId Id="387" Count="0" />
       <LineId Id="380" Count="0" />
       <LineId Id="378" Count="0" />
       <LineId Id="357" Count="0" />
-      <LineId Id="395" Count="0" />
+      <LineId Id="800" Count="2" />
       <LineId Id="358" Count="0" />
-      <LineId Id="394" Count="0" />
       <LineId Id="374" Count="0" />
+      <LineId Id="753" Count="1" />
       <LineId Id="383" Count="0" />
-      <LineId Id="382" Count="0" />
-      <LineId Id="376" Count="1" />
-      <LineId Id="324" Count="0" />
-      <LineId Id="326" Count="0" />
+      <LineId Id="376" Count="0" />
       <LineId Id="325" Count="0" />
       <LineId Id="422" Count="0" />
       <LineId Id="424" Count="0" />
       <LineId Id="459" Count="0" />
-      <LineId Id="469" Count="0" />
       <LineId Id="545" Count="0" />
-      <LineId Id="487" Count="6" />
-      <LineId Id="560" Count="3" />
+      <LineId Id="487" Count="1" />
+      <LineId Id="765" Count="1" />
+      <LineId Id="489" Count="0" />
+      <LineId Id="491" Count="1" />
+      <LineId Id="770" Count="4" />
+      <LineId Id="767" Count="0" />
+      <LineId Id="563" Count="0" />
       <LineId Id="548" Count="0" />
       <LineId Id="564" Count="0" />
-      <LineId Id="567" Count="4" />
+      <LineId Id="567" Count="1" />
+      <LineId Id="759" Count="0" />
+      <LineId Id="761" Count="1" />
+      <LineId Id="569" Count="0" />
+      <LineId Id="571" Count="0" />
       <LineId Id="566" Count="0" />
+      <LineId Id="775" Count="0" />
       <LineId Id="462" Count="0" />
       <LineId Id="632" Count="1" />
       <LineId Id="572" Count="8" />
@@ -2233,30 +2323,54 @@ END_IF
       <LineId Id="602" Count="1" />
       <LineId Id="582" Count="0" />
       <LineId Id="635" Count="0" />
+      <LineId Id="776" Count="0" />
       <LineId Id="425" Count="0" />
       <LineId Id="423" Count="0" />
       <LineId Id="421" Count="0" />
       <LineId Id="416" Count="0" />
-      <LineId Id="410" Count="5" />
+      <LineId Id="410" Count="1" />
+      <LineId Id="777" Count="0" />
+      <LineId Id="779" Count="0" />
+      <LineId Id="782" Count="0" />
+      <LineId Id="412" Count="0" />
+      <LineId Id="414" Count="1" />
       <LineId Id="401" Count="0" />
       <LineId Id="276" Count="1" />
+      <LineId Id="682" Count="0" />
+      <LineId Id="687" Count="0" />
+      <LineId Id="686" Count="0" />
       <LineId Id="76" Count="0" />
       <LineId Id="191" Count="0" />
       <LineId Id="29" Count="2" />
       <LineId Id="41" Count="0" />
-      <LineId Id="32" Count="0" />
-      <LineId Id="39" Count="1" />
+      <LineId Id="691" Count="1" />
+      <LineId Id="703" Count="0" />
+      <LineId Id="694" Count="0" />
+      <LineId Id="699" Count="0" />
+      <LineId Id="701" Count="1" />
+      <LineId Id="697" Count="0" />
+      <LineId Id="690" Count="0" />
+      <LineId Id="40" Count="0" />
       <LineId Id="42" Count="0" />
       <LineId Id="35" Count="0" />
       <LineId Id="34" Count="0" />
       <LineId Id="43" Count="0" />
-      <LineId Id="48" Count="4" />
+      <LineId Id="49" Count="0" />
+      <LineId Id="681" Count="0" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="724" Count="0" />
+      <LineId Id="51" Count="1" />
       <LineId Id="44" Count="0" />
-      <LineId Id="57" Count="2" />
-      <LineId Id="61" Count="0" />
+      <LineId Id="57" Count="0" />
+      <LineId Id="679" Count="1" />
+      <LineId Id="715" Count="0" />
+      <LineId Id="717" Count="2" />
       <LineId Id="122" Count="0" />
       <LineId Id="62" Count="0" />
+      <LineId Id="725" Count="1" />
       <LineId Id="15" Count="0" />
+      <LineId Id="781" Count="0" />
+      <LineId Id="727" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.GetIOAnalog">
       <LineId Id="123" Count="0" />
