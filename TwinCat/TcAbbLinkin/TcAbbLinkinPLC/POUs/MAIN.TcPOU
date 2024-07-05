@@ -4,79 +4,79 @@
     <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 PROGRAM MAIN
 VAR
-	myRobotLink		: TcAbbLinkin;
-	userSetConfigurationNow: BOOL := TRUE;
-	userConnectStartNow: BOOL := TRUE;
-	userConnectStopNow: BOOL;
+	myRobotLink : TcAbbLinkin;
+	userSetConfigurationNow : BOOL := TRUE;
+	userConnectStartNow : BOOL := TRUE;
+	userConnectStopNow : BOOL;
 	
-	userGetStateNow: BOOL;
-	userGetStateStatus: AbbLinkinRequestStatus_Typ;
-	userGetStateResult: STRING;
+	userGetStateNow : BOOL;
+	userGetStateStatus : AbbLinkinRequestStatus_Typ;
+	userGetStateResult : STRING;
 	
 	userGetIoBoolNow : BOOL;
-	userGetIoBoolStatus: AbbLinkinRequestStatus_Typ;
+	userGetIoBoolStatus : AbbLinkinRequestStatus_Typ;
 	userGetIoBoolResult : BOOL;
 	
 	userGetIoLrealNow : BOOL;
-	userGetIoLrealStatus: AbbLinkinRequestStatus_Typ;
+	userGetIoLrealStatus : AbbLinkinRequestStatus_Typ;
 	userGetIoLrealResult : LREAL;
 	
 	userGetIoDintNow : BOOL;
-	userGetIoDintStatus: AbbLinkinRequestStatus_Typ;
+	userGetIoDintStatus : AbbLinkinRequestStatus_Typ;
 	userGetIoDintResult : DINT;
 	
 	
 	userSetIoBoolNow : BOOL;
-	userSetIoBoolValue: BOOL := 1;
-	userSetIoBoolStatus: AbbLinkinRequestStatus_Typ;
+	userSetIoBoolValue : BOOL := 1;
+	userSetIoBoolStatus : AbbLinkinRequestStatus_Typ;
 	userSetIoDintNow : BOOL;
-	userSetIoDintValue: DINT := 57;
-	userSetIoDintStatus: AbbLinkinRequestStatus_Typ;
+	userSetIoDintValue : DINT := 57;
+	userSetIoDintStatus : AbbLinkinRequestStatus_Typ;
 	userSetIoLrealNow : BOOL;
-	userSetIoLrealValue: LREAL := 41.123456;
-	userSetIoLrealStatus: AbbLinkinRequestStatus_Typ;
+	userSetIoLrealValue : LREAL := 41.123456;
+	userSetIoLrealStatus : AbbLinkinRequestStatus_Typ;
 	
 	
 	userGetSymbolBoolNow : BOOL;
 	userGetSymbolBoolResult : BOOL;
-	userGetSymbolBoolStatus: AbbLinkinRequestStatus_Typ;
+	userGetSymbolBoolStatus : AbbLinkinRequestStatus_Typ;
 	userGetSymbolNumNow : BOOL;
 	userGetSymbolNumResult : LREAL;
-	userGetSymbolNumStatus: AbbLinkinRequestStatus_Typ;
+	userGetSymbolNumStatus : AbbLinkinRequestStatus_Typ;
 	userGetSymbolStringNow : BOOL;
 	userGetSymbolStringResult : STRING;
-	userGetSymbolStringStatus: AbbLinkinRequestStatus_Typ;
+	userGetSymbolStringStatus : AbbLinkinRequestStatus_Typ;
 	
 	userSetSymbolBoolNow : BOOL;
-	userSetSymbolBoolValue: BOOL := 1;
-	userSetSymbolBoolStatus: AbbLinkinRequestStatus_Typ;
+	userSetSymbolBoolValue : BOOL := 1;
+	userSetSymbolBoolStatus : AbbLinkinRequestStatus_Typ;
 	userSetSymbolDintNow : BOOL;
-	userSetSymbolDintValue: DINT := -57;
-	userSetSymbolDintStatus: AbbLinkinRequestStatus_Typ;
+	userSetSymbolDintValue : DINT := -57;
+	userSetSymbolDintStatus : AbbLinkinRequestStatus_Typ;
 	userSetSymbolLrealNow : BOOL;
-	userSetSymbolLrealValue: LREAL := -41.123456;
-	userSetSymbolLrealStatus: AbbLinkinRequestStatus_Typ;
+	userSetSymbolLrealValue : LREAL := -41.123456;
+	userSetSymbolLrealStatus : AbbLinkinRequestStatus_Typ;
 	userSetSymbolStringNow : BOOL;
-	userSetSymbolStringValue: STRING := 'test String';
-	userSetSymbolStringStatus: AbbLinkinRequestStatus_Typ;
+	userSetSymbolStringValue : STRING := 'test String';
+	userSetSymbolStringStatus : AbbLinkinRequestStatus_Typ;
 	userSetSymbolWStringNow : BOOL;
-	userSetSymbolWStringValue: WSTRING := "test WString";
-	userSetSymbolWStringStatus: AbbLinkinRequestStatus_Typ;
+	userSetSymbolWStringValue : WSTRING := "test WString";
+	userSetSymbolWStringStatus : AbbLinkinRequestStatus_Typ;
 	
 	
 	userPowerOffNow : BOOL;
-	userPowerOffStatus: AbbLinkinRequestStatus_Typ;
+	userPowerOffStatus : AbbLinkinRequestStatus_Typ;
 	userPowerOnNow : BOOL;
-	userPowerOnStatus: AbbLinkinRequestStatus_Typ;
+	userPowerOnStatus : AbbLinkinRequestStatus_Typ;
 	userRapidResetNow : BOOL;
-	userRapidResetStatus: AbbLinkinRequestStatus_Typ;
+	userRapidResetStatus : AbbLinkinRequestStatus_Typ;
 	userRapidStopNow : BOOL;
-	userRapidStopStatus: AbbLinkinRequestStatus_Typ;
+	userRapidStopStatus : AbbLinkinRequestStatus_Typ;
 	userRapidStartNow : BOOL;
-	userRapidStartStatus: AbbLinkinRequestStatus_Typ;
+	userRapidStartStatus : AbbLinkinRequestStatus_Typ;
 	
 	
-	userAckErrorNow: BOOL;
+	userAckErrorNow : BOOL;
 END_VAR
 ]]></Declaration>
     <Implementation>

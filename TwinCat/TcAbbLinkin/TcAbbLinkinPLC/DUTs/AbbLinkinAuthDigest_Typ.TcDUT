@@ -5,8 +5,8 @@
 TYPE AbbLinkinAuthDigest_Typ :
 STRUCT
 	realm : STRING;
-	qop : 	STRING;
-	nonce :	STRING;
+	qop : STRING;
+	nonce : STRING;
 	opaque : STRING;
 	nc : STRING;
 	cnonce : STRING;

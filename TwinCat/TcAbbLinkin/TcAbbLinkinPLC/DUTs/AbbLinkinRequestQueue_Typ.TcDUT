@@ -4,8 +4,8 @@
     <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 TYPE AbbLinkinRequestQueue_Typ :
 STRUCT
-	request	: AbbLinkinRequest_Typ;
-	empty	: BOOL := TRUE;
+	request : AbbLinkinRequest_Typ;
+	empty : BOOL := TRUE;
 END_STRUCT
 END_TYPE
 ]]></Declaration>

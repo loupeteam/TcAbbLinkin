@@ -4,12 +4,12 @@
     <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 TYPE AbbLinkinRequest_Typ :
 STRUCT
-	command		: ABBLINKIN_COMMAND_TYPE;
-	uri			: STRING;
-	httpMethod	: ETcIotHttpRequestType;
-	httpBody	: ABBLINKIN_STRING_EX_LEN := '';
-	pStatus		: POINTER TO AbbLinkinRequestStatus_Typ;
-	results		: AbbLinkinRequestResults_Typ;
+	command : ABBLINKIN_COMMAND_TYPE;
+	uri : STRING;
+	httpMethod : ETcIotHttpRequestType;
+	httpBody : ABBLINKIN_STRING_EX_LEN := '';
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
+	results : AbbLinkinRequestResults_Typ;
 END_STRUCT
 END_TYPE
 ]]></Declaration>

@@ -4,11 +4,11 @@
     <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 TYPE AbbLinkinRequestStatus_Typ :
 STRUCT
-	busy		: BOOL;
-	done		: BOOL;
-	error		: BOOL;
-	errorID		: DINT;
-	errorMsg	: STRING;
+	busy : BOOL;
+	done : BOOL;
+	error : BOOL;
+	errorID : DINT;
+	errorMsg : STRING;
 END_STRUCT
 END_TYPE
 ]]></Declaration>

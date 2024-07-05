@@ -4,11 +4,11 @@
     <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 TYPE AbbLinkinAuth_Typ :
 STRUCT
-	numAttempts	: 		UINT;
-	wwwAuthContent :	ABBLINKIN_STRING_EX_LEN;
-	digest : 			AbbLinkinAuthDigest_Typ;
-	httpSessionCookie: STRING;
-	ABBCXCookie: 		STRING;
+	numAttempts : UINT;
+	wwwAuthContent : ABBLINKIN_STRING_EX_LEN;
+	digest : AbbLinkinAuthDigest_Typ;
+	httpSessionCookie : STRING;
+	ABBCXCookie : STRING;
 END_STRUCT
 END_TYPE
 ]]></Declaration>

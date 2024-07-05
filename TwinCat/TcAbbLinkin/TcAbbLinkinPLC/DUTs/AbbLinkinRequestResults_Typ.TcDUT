@@ -4,12 +4,12 @@
     <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 TYPE AbbLinkinRequestResults_Typ :
 STRUCT
-	pDataBool	: POINTER TO BOOL;
-	pDataDint	: POINTER TO DINT;
-	pDataLreal	: POINTER TO LREAL;
-	pDataString	: POINTER TO STRING;
-	dataType	: ABBLINKIN_DATA_TYPE_Typ;
-	dataLen		: INT;
+	pDataBool : POINTER TO BOOL;
+	pDataDint : POINTER TO DINT;
+	pDataLreal : POINTER TO LREAL;
+	pDataString : POINTER TO STRING;
+	dataType : ABBLINKIN_DATA_TYPE_Typ;
+	dataLen : INT;
 END_STRUCT
 END_TYPE
 ]]></Declaration>

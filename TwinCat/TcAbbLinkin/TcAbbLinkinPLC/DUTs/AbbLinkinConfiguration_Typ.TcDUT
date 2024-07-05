@@ -4,11 +4,11 @@
     <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 TYPE AbbLinkinConfiguration_Typ :
 STRUCT
-	rwsIpAddress	: STRING := '127.0.0.1';
-	rwsTcpPort 		: USINT := 80;
-	rwsVersion 		: ABBLINKIN_RWS_API_VERSION;
-	rwsUsername		: STRING := 'Default User';
-	rwsPassword		: STRING := 'robotics';
+	rwsIpAddress : STRING := '127.0.0.1';
+	rwsTcpPort : USINT := 80;
+	rwsVersion : ABBLINKIN_RWS_API_VERSION;
+	rwsUsername : STRING := 'Default User';
+	rwsPassword : STRING := 'robotics';
 END_STRUCT
 END_TYPE
 ]]></Declaration>

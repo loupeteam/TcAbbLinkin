@@ -7,31 +7,31 @@ VAR_INPUT
 	configuration : AbbLinkinConfiguration_Typ;
 END_VAR
 VAR_OUTPUT
-	readyForCmd		: BOOL;
-	error			: BOOL;
-	errorID			: DINT;
+	readyForCmd : BOOL;
+	error : BOOL;
+	errorID : DINT;
 END_VAR
 VAR
 	_connectionEnabled : BOOL;
-	_sendingEnabled: BOOL;
-	_authorized: BOOL;
+	_sendingEnabled : BOOL;
+	_authorized : BOOL;
 	
-	_httpClient: FB_IotHttpClient;
-	_httpRequest: FB_IotHttpRequest;
-	_httpHeader: FB_IotHttpHeaderFieldMap;
+	_httpClient : FB_IotHttpClient;
+	_httpRequest : FB_IotHttpRequest;
+	_httpHeader : FB_IotHttpHeaderFieldMap;
 	
-	_methodConnectionStartCalled: BOOL;
-	_methodConnectionStopCalled: BOOL;
-	_methodAckErrorCalled: BOOL;
+	_methodConnectionStartCalled : BOOL;
+	_methodConnectionStopCalled : BOOL;
+	_methodAckErrorCalled : BOOL;
 	
-	_state: ABBLINKIN_STATE;
-	_auth: AbbLinkinAuth_Typ;
-	_requestQueue: AbbLinkinRequestQueue_Typ;
-	_currentRequest: AbbLinkinRequest_Typ;
+	_state : ABBLINKIN_STATE;
+	_auth : AbbLinkinAuth_Typ;
+	_requestQueue : AbbLinkinRequestQueue_Typ;
+	_currentRequest : AbbLinkinRequest_Typ;
 END_VAR
 
 VAR CONSTANT
-	AUTH_URI: STRING := '/?json=1';
+	AUTH_URI : STRING := '/?json=1';
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -55,13 +55,13 @@ END_VAR
 
 VAR
 	tempString : ABBLINKIN_STRING_EX_LEN;
-	h1_byArr: ARRAY[0..15] OF BYTE;
-	h1_hexStr: STRING;
-	h2_byArr: ARRAY[0..15] OF BYTE;
-	h2_hexStr: STRING;
-	response_byArr: ARRAY[0..15] OF BYTE;
-	response_hexStr: STRING;
-	i: INT;
+	h1_byArr : ARRAY[0..15] OF BYTE;
+	h1_hexStr : STRING;
+	h2_byArr : ARRAY[0..15] OF BYTE;
+	h2_hexStr : STRING;
+	response_byArr : ARRAY[0..15] OF BYTE;
+	response_hexStr : STRING;
+	i : INT;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
@@ -122,7 +122,7 @@ VAR_INPUT
 END_VAR
 VAR_IN_OUT
 	httpRequest : FB_IotHttpRequest;
-	request: AbbLinkinRequest_Typ;
+	request : AbbLinkinRequest_Typ;
 END_VAR
 ]]></Declaration>
       <Implementation>
@@ -166,7 +166,7 @@ END_CASE
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD PRIVATE _clearRequestStatus : BOOL
 VAR_INPUT
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 END_VAR
 ]]></Declaration>
       <Implementation>
@@ -185,7 +185,7 @@ _clearRequestStatus := TRUE;
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD PRIVATE _configureClient : BOOL
 VAR_IN_OUT
-	connectionConfig:	AbbLinkinConfiguration_Typ;	
+	connectionConfig : AbbLinkinConfiguration_Typ;	
 END_VAR
 ]]></Declaration>
       <Implementation>
@@ -201,7 +201,7 @@ CASE connectionConfig.rwsVersion OF
 		_httpClient.stTLS.bNoServerCertCheck := FALSE;
 		
 	ABBLINKIN_RWS_API_VERSION.V2:
-		// TODO: Correctly configure for TLS/HTTPS connection
+		// TODO : Correctly configure for TLS/HTTPS connection
 	
 		//_httpClient.stTLS.aPskKey := 0;
 		_httpClient.stTLS.bNoServerCertCheck := FALSE;
@@ -223,13 +223,13 @@ END_CASE
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD PRIVATE _encodeBase64 : STRING
 VAR_INPUT
-	rawText: STRING;
+	rawText : STRING;
 END_VAR
 VAR
-	_jsonDomParser : 	FB_JsonDomParser;
-	_jsonRoot :	SJsonValue;
-	_jsonValue: SJsonValue;
-	_jsonValue2: SJsonValue;
+	_jsonDomParser : FB_JsonDomParser;
+	_jsonRoot : SJsonValue;
+	_jsonValue : SJsonValue;
+	_jsonValue2 : SJsonValue;
 END_VAR
 
 ]]></Declaration>
@@ -247,15 +247,15 @@ _encodeBase64 := _jsonDomParser.GetString(_jsonValue2);
 METHOD PRIVATE _getIO : BOOL
 VAR_INPUT
 	signal : STRING;
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 	pResultBool : POINTER TO BOOL := 0;
 	pResultDint : POINTER TO DINT := 0;
 	pResultLreal : POINTER TO LREAL := 0;
 END_VAR
 
 VAR
-	request: AbbLinkinRequest_Typ;
-	pointersSet: INT;
+	request : AbbLinkinRequest_Typ;
+	pointersSet : INT;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[IF pStatus = 0 THEN
@@ -288,12 +288,12 @@ END_IF
 IF pointersSet = 0 THEN
 	pStatus^.error := TRUE;
 	pStatus^.errorMsg := TO_STRING(ABBLINKIN_COMMAND_TYPE.GET_STATE);
-	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ': No result pointer set');
+	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' : No result pointer set');
 	_getIO := FALSE;
 ELSIF pointersSet >= 2 THEN
 	pStatus^.error := TRUE;
 	pStatus^.errorMsg := TO_STRING(ABBLINKIN_COMMAND_TYPE.GET_STATE);
-	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ': Two or more result pointer set');
+	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' : Two or more result pointer set');
 	_getIO := FALSE;
 END_IF;
 
@@ -329,7 +329,7 @@ END_IF
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD PRIVATE _getIORespCallbackSuccess : BOOL
 VAR_IN_OUT
-	httpRequest : 	FB_IotHttpRequest;
+	httpRequest : FB_IotHttpRequest;
 	request : AbbLinkinRequest_Typ;
 END_VAR
 VAR
@@ -378,7 +378,7 @@ _getIORespCallbackSuccess := TRUE;
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD PRIVATE _getStateRespCallbackSuccess : BOOL
 VAR_IN_OUT
-	httpRequest : 	FB_IotHttpRequest;
+	httpRequest : FB_IotHttpRequest;
 	request : AbbLinkinRequest_Typ;
 END_VAR
 VAR
@@ -424,15 +424,15 @@ _getStateRespCallbackSuccess := TRUE;
 METHOD PRIVATE _getSymbol : BOOL
 VAR_INPUT
 	signal : STRING;
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 	pResultBool : POINTER TO BOOL := 0;
 	pResultLreal : POINTER TO LREAL := 0;
 	pResultString : POINTER TO STRING := 0;
 END_VAR
 
 VAR
-	request: AbbLinkinRequest_Typ;
-	pointersSet: INT;
+	request : AbbLinkinRequest_Typ;
+	pointersSet : INT;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[IF pStatus = 0 THEN
@@ -465,12 +465,12 @@ END_IF
 IF pointersSet = 0 THEN
 	pStatus^.error := TRUE;
 	pStatus^.errorMsg := TO_STRING(ABBLINKIN_COMMAND_TYPE.GET_SYMBOL);
-	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ': No result pointer set');
+	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' : No result pointer set');
 	_getSymbol := FALSE;
 ELSIF pointersSet >= 2 THEN
 	pStatus^.error := TRUE;
 	pStatus^.errorMsg := TO_STRING(ABBLINKIN_COMMAND_TYPE.GET_SYMBOL);
-	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ': Two or more result pointer set');
+	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' : Two or more result pointer set');
 	_getSymbol := FALSE;
 END_IF;
 
@@ -508,7 +508,7 @@ END_IF
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD PRIVATE _getSymbolRespCallbackSuccess : BOOL
 VAR_IN_OUT
-	httpRequest : 	FB_IotHttpRequest;
+	httpRequest : FB_IotHttpRequest;
 	request : AbbLinkinRequest_Typ;
 END_VAR
 VAR
@@ -560,7 +560,7 @@ _getSymbolRespCallbackSuccess := TRUE;
 METHOD PRIVATE _parseWwwAuthForParameter : STRING
 
 VAR_INPUT
-	keyString :	STRING;
+	keyString : STRING;
 END_VAR
 
 VAR_IN_OUT
@@ -599,7 +599,7 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[
-// Note: the requestQueue and this method are temporary implementations. It is not a real queue as shown.
+// Note : the requestQueue and this method are temporary implementations. It is not a real queue as shown.
 
 _requestQueue.request := request;
 _requestQueue.empty := FALSE;
@@ -616,7 +616,7 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[
-// Note: the requestQueue and this method are temporary implementations. It is not a real queue as shown.
+// Note : the requestQueue and this method are temporary implementations. It is not a real queue as shown.
 
 _requestQueue.empty := TRUE;
 _requestQueuePop := _requestQueue.request;
@@ -631,11 +631,11 @@ VAR_INPUT
 END_VAR
 VAR
 	authValue : STRING;
-	combinedUnPwRaw: STRING;
-	combinedUnPwBase64: STRING;
-	anyCookieSetYet: BOOL;
-	tempString: STRING;
-	cookieValue: ABBLINKIN_STRING_EX_LEN;
+	combinedUnPwRaw : STRING;
+	combinedUnPwBase64 : STRING;
+	anyCookieSetYet : BOOL;
+	tempString : STRING;
+	cookieValue : ABBLINKIN_STRING_EX_LEN;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
@@ -708,26 +708,26 @@ END_CASE
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD PRIVATE _storeCookies : BOOL
 VAR_INPUT
-	httpRequest:	FB_IotHttpRequest;
+	httpRequest : FB_IotHttpRequest;
 END_VAR
 VAR
-	setCookieValue:	ABBLINKIN_STRING_EX_LEN;
-	Set: INT;
-	tempString:	ABBLINKIN_STRING_EX_LEN;
-	setCookieValueLen: INT;
+	setCookieValue : ABBLINKIN_STRING_EX_LEN;
+	Set : INT;
+	tempString : ABBLINKIN_STRING_EX_LEN;
+	setCookieValueLen : INT;
 	keyLoc : INT;
-	equalLoc: INT;
+	equalLoc : INT;
 	semicolonLoc : INT;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
 IF httpRequest.GetHeaderField('Set-Cookie', ADR(setCookieValue), SIZEOF(setCookieValue)-1) THEN 
 	
-	// NOTE: if there are multiple 'Set-Cookie' headers, they will all be contained in one value, separated by a newline
+	// NOTE : if there are multiple 'Set-Cookie' headers, they will all be contained in one value, separated by a newline
 	//		e.g. 'token1=Beckhoff$Ntoken2=IoT' per https://infosys.beckhoff.com/content/1033/tf6760_tc3_iot_https_rest/9335286283.html
 	// Real header examples from RWS:
-	//		Set-Cookie: -http-session-=1::http.session::241eb766f25fa09a53f749ebbafb9aa9; path=/; domain=127.0.0.1; httponly\r\n
-	//		Set-Cookie: ABBCX=12; path=/; domain=127.0.0.1; httponly\r\n
+	//		Set-Cookie: -http-session-=1: : http.session: : 241eb766f25fa09a53f749ebbafb9aa9; path=/; domain=127.0.0.1; httponly\r\n
+	//		Set-Cookie : ABBCX=12; path=/; domain=127.0.0.1; httponly\r\n
 	
 	setCookieValueLen := len(setCookieValue);
 		
@@ -774,7 +774,7 @@ END_VAR
       <Implementation>
         <ST><![CDATA[
 // If Connection is already enabled, disable and disconnect
-// Reference: https://infosys.beckhoff.com/content/1033/tf6760_tc3_iot_https_rest/9298409995.html?id=3568786990275794598
+// Reference : https://infosys.beckhoff.com/content/1033/tf6760_tc3_iot_https_rest/9298409995.html?id=3568786990275794598
 IF _connectionEnabled THEN
 	_connectionEnabled := FALSE;
 	_httpClient.Disconnect();
@@ -809,8 +809,8 @@ VAR_INPUT
 END_VAR
 
 VAR
-	retVal: BOOL;
-	digestLocation: INT;
+	retVal : BOOL;
+	digestLocation : INT;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
@@ -863,7 +863,7 @@ CASE _state OF
 			_currentRequest.pStatus^.error := TRUE;
 			_currentRequest.pStatus^.errorMsg := 'The request could not be sent';
 			
-			_state := ABBLINKIN_STATE.IDLE;	// TODO: decide if we want to retry
+			_state := ABBLINKIN_STATE.IDLE;	// TODO : decide if we want to retry
 		ELSE
 			_state := ABBLINKIN_STATE.WAIT_FOR_RESONSE;
 		END_IF
@@ -876,7 +876,7 @@ CASE _state OF
 			_currentRequest.pStatus^.errorID := _httpRequest.eErrorId;
 			_currentRequest.pStatus^.errorMsg := 'The client request object returned an error';
 			
-			_state := ABBLINKIN_STATE.IDLE;	// TODO: decide if we want to retry
+			_state := ABBLINKIN_STATE.IDLE;	// TODO : decide if we want to retry
 		ELSIF _httpRequest.bBusy = FALSE THEN
 			_state := ABBLINKIN_STATE.PROCESS_RESPONSE;
 		END_IF
@@ -887,7 +887,7 @@ CASE _state OF
 		
 			200..204 : // HTTP Success
 			
-				// TODO: requestType-specific processing here
+				// TODO : requestType-specific processing here
 				_callCommandSuccessHandler(_currentRequest.command, _httpRequest, _currentRequest);
 				
 				// Write and close out current request status
@@ -899,9 +899,9 @@ CASE _state OF
 				
 			401, 503: // HTTP Error - "Unauthorized" 
 				
-				// TODO: implement Authorization implementation
+				// TODO : implement Authorization implementation
 				_authorized := FALSE;
-				_state := ABBLINKIN_STATE.IDLE;	// TODO: decide if we want to retry
+				_state := ABBLINKIN_STATE.IDLE;	// TODO : decide if we want to retry
 								
 			400, 402..451:	// HTTP Client Error	
 				_currentRequest.pStatus^.busy := FALSE;
@@ -909,7 +909,7 @@ CASE _state OF
 				_currentRequest.pStatus^.errorID := _httpRequest.nStatusCode;
 				_currentRequest.pStatus^.errorMsg := 'The Robot responded with an error (client error, 4xx). See errorID';
 				
-				_state := ABBLINKIN_STATE.IDLE;	// TODO: decide if we want to retry
+				_state := ABBLINKIN_STATE.IDLE;	// TODO : decide if we want to retry
 				
 			500..502, 504..511: // HTTP Server Error
 				_currentRequest.pStatus^.busy := FALSE;
@@ -917,7 +917,7 @@ CASE _state OF
 				_currentRequest.pStatus^.errorID := _httpRequest.nStatusCode;
 				_currentRequest.pStatus^.errorMsg := 'The Robot responded with an error (server error, 5xx). See errorID';
 				
-				_state := ABBLINKIN_STATE.IDLE;	// TODO: decide if we want to retry
+				_state := ABBLINKIN_STATE.IDLE;	// TODO : decide if we want to retry
 							
 		END_CASE
 	
@@ -938,7 +938,7 @@ CASE _state OF
 		retVal := _httpRequest.SendRequest(AUTH_URI, _httpClient, ETcIotHttpRequestType.HTTP_Get, 0, 0, _httpHeader);
 		
 		IF retVal = FALSE THEN
-			_state := ABBLINKIN_STATE.IDLE;	// TODO: handle error better
+			_state := ABBLINKIN_STATE.IDLE;	// TODO : handle error better
 		ELSE
 			_state := ABBLINKIN_STATE.AUTH_WAIT_FOR_RESONSE;
 		END_IF
@@ -946,7 +946,7 @@ CASE _state OF
 	ABBLINKIN_STATE.AUTH_WAIT_FOR_RESONSE:
 		
 		IF _httpRequest.bError THEN
-			_state := ABBLINKIN_STATE.IDLE;	// TODO: handle error better
+			_state := ABBLINKIN_STATE.IDLE;	// TODO : handle error better
 		ELSIF _httpRequest.bBusy = FALSE THEN
 			_state := ABBLINKIN_STATE.AUTH_PROCESS_RESPONSE;
 		END_IF
@@ -971,17 +971,17 @@ CASE _state OF
 					_state := ABBLINKIN_STATE.AUTH_DIGEST_RESPONSE_CALCULATE;
 				ELSE
 					// Invalid username or password
-					_state := ABBLINKIN_STATE.IDLE;	// TODO: handle better	
+					_state := ABBLINKIN_STATE.IDLE;	// TODO : handle better	
 				END_IF
 				
 			503:  
-				// Note: You can get a 503 if you try to send the same credentials repeatedly instead of 
+				// Note : You can get a 503 if you try to send the same credentials repeatedly instead of 
 				// 		sending the http session cookies that the server provides after the first successful authentication
 				
-				_state := ABBLINKIN_STATE.IDLE;	// TODO: handle better
+				_state := ABBLINKIN_STATE.IDLE;	// TODO : handle better
 		ELSE
 			
-			_state := ABBLINKIN_STATE.IDLE;	// TODO: handle better				
+			_state := ABBLINKIN_STATE.IDLE;	// TODO : handle better				
 		END_CASE
 	
 	
@@ -1052,7 +1052,7 @@ CASE _state OF
 		retVal := _httpRequest.SendRequest(AUTH_URI, _httpClient, ETcIotHttpRequestType.HTTP_Get, 0, 0, _httpHeader);
 		
 		IF retVal = FALSE THEN
-			_state := ABBLINKIN_STATE.IDLE;	// TODO: handle error better
+			_state := ABBLINKIN_STATE.IDLE;	// TODO : handle error better
 		ELSE
 			_state := ABBLINKIN_STATE.AUTH_WAIT_FOR_RESONSE;
 		END_IF
@@ -1091,7 +1091,7 @@ END_IF
 METHOD GetIOAnalog : BOOL
 VAR_INPUT
 	signal : STRING;
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 	pResult : POINTER TO LREAL;
 END_VAR
 ]]></Declaration>
@@ -1106,7 +1106,7 @@ GetIOAnalog:= _getIO(signal, pStatus, pResultBOOL := 0, pResultDINT := 0, pResul
 METHOD GetIODigital : BOOL
 VAR_INPUT
 	signal : STRING;
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 	pResult : POINTER TO BOOL;
 END_VAR
 ]]></Declaration>
@@ -1121,7 +1121,7 @@ GetIODigital := _getIO(signal, pStatus, pResultBOOL := pResult, pResultDINT := 0
 METHOD GetIOGroup : BOOL
 VAR_INPUT
 	signal : STRING;
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 	pResult : POINTER TO DINT;
 END_VAR
 ]]></Declaration>
@@ -1135,12 +1135,12 @@ GetIOGroup := _getIO(signal, pStatus, pResultBOOL := 0, pResultDINT := pResult, 
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD GetState : BOOL
 VAR_INPUT
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 	pResultState : POINTER TO STRING;
 END_VAR
 
 VAR
-	request: AbbLinkinRequest_Typ;
+	request : AbbLinkinRequest_Typ;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
@@ -1194,7 +1194,7 @@ END_IF
 METHOD GetSymbolBool : BOOL
 VAR_INPUT
 	signal : STRING;
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 	pResult : POINTER TO BOOL;
 END_VAR
 ]]></Declaration>
@@ -1209,7 +1209,7 @@ GetSymbolBool:= _getSymbol(signal, pStatus, pResultBool := pResult, pResultLreal
 METHOD GetSymbolNum : BOOL
 VAR_INPUT
 	signal : STRING;
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 	pResult : POINTER TO LREAL;
 END_VAR
 ]]></Declaration>
@@ -1224,7 +1224,7 @@ GetSymbolNum := _getSymbol(signal, pStatus, pResultBool := 0, pResultLreal := pR
 METHOD GetSymbolString : BOOL
 VAR_INPUT
 	signal : STRING;
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 	pResult : POINTER TO STRING;
 END_VAR
 ]]></Declaration>
@@ -1238,11 +1238,11 @@ GetSymbolString := _getSymbol(signal, pStatus, pResultBool := 0, pResultLreal :=
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD PowerOff : BOOL
 VAR_INPUT
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 END_VAR
 
 VAR
-	request: AbbLinkinRequest_Typ;
+	request : AbbLinkinRequest_Typ;
 END_VAR
 ]]></Declaration>
       <Implementation>
@@ -1286,11 +1286,11 @@ END_IF
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD PowerOn : BOOL
 VAR_INPUT
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 END_VAR
 
 VAR
-	request: AbbLinkinRequest_Typ;
+	request : AbbLinkinRequest_Typ;
 END_VAR
 ]]></Declaration>
       <Implementation>
@@ -1334,11 +1334,11 @@ END_IF
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD RapidReset : BOOL
 VAR_INPUT
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 END_VAR
 
 VAR
-	request: AbbLinkinRequest_Typ;
+	request : AbbLinkinRequest_Typ;
 END_VAR
 ]]></Declaration>
       <Implementation>
@@ -1382,11 +1382,11 @@ END_IF
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD RapidStart : BOOL
 VAR_INPUT
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 END_VAR
 
 VAR
-	request: AbbLinkinRequest_Typ;
+	request : AbbLinkinRequest_Typ;
 END_VAR
 ]]></Declaration>
       <Implementation>
@@ -1442,11 +1442,11 @@ END_IF
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD RapidStop : BOOL
 VAR_INPUT
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 END_VAR
 
 VAR
-	request: AbbLinkinRequest_Typ;
+	request : AbbLinkinRequest_Typ;
 END_VAR
 ]]></Declaration>
       <Implementation>
@@ -1492,19 +1492,19 @@ METHOD SetIO : BOOL
 VAR_INPUT
 	signal : STRING;
 	value : ANY;
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 END_VAR
 VAR
-	request: AbbLinkinRequest_Typ;
-	pBool: POINTER TO BOOL;
-	pSint: POINTER TO SINT;
-	pUsint: POINTER TO USINT;
-	pInt: POINTER TO INT;
-	pUint: POINTER TO UINT;
-	pDint: POINTER TO DINT;
-	pUdint: POINTER TO UDINT;
-	pReal: POINTER TO REAL;
-	pLreal: POINTER TO LREAL;
+	request : AbbLinkinRequest_Typ;
+	pBool : POINTER TO BOOL;
+	pSint : POINTER TO SINT;
+	pUsint : POINTER TO USINT;
+	pInt : POINTER TO INT;
+	pUint : POINTER TO UINT;
+	pDint : POINTER TO DINT;
+	pUdint : POINTER TO UDINT;
+	pReal : POINTER TO REAL;
+	pLreal : POINTER TO LREAL;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
@@ -1597,22 +1597,22 @@ METHOD SetSymbol : BOOL
 VAR_INPUT
 	name : STRING;
 	value : ANY;
-	pStatus	: POINTER TO AbbLinkinRequestStatus_Typ;
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 END_VAR
 
 VAR
-	request: AbbLinkinRequest_Typ;
-	pBool: POINTER TO BOOL;
-	pSint: POINTER TO SINT;
-	pUsint: POINTER TO USINT;
-	pInt: POINTER TO INT;
-	pUint: POINTER TO UINT;
-	pDint: POINTER TO DINT;
-	pUdint: POINTER TO UDINT;
-	pReal: POINTER TO REAL;
-	pLreal: POINTER TO LREAL;
-	pString: POINTER TO STRING;
-	pWString: POINTER TO WSTRING;
+	request : AbbLinkinRequest_Typ;
+	pBool : POINTER TO BOOL;
+	pSint : POINTER TO SINT;
+	pUsint : POINTER TO USINT;
+	pInt : POINTER TO INT;
+	pUint : POINTER TO UINT;
+	pDint : POINTER TO DINT;
+	pUdint : POINTER TO UDINT;
+	pReal : POINTER TO REAL;
+	pLreal : POINTER TO LREAL;
+	pString : POINTER TO STRING;
+	pWString : POINTER TO WSTRING;
 END_VAR
 ]]></Declaration>
       <Implementation>
