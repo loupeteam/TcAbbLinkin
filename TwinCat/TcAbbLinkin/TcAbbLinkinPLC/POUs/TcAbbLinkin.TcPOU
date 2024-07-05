@@ -137,12 +137,6 @@ CASE command OF
 	ABBLINKIN_COMMAND_TYPE.GET_SYMBOL:
 		_getSymbolRespCallbackSuccess(httpRequest, request);
 		
-	ABBLINKIN_COMMAND_TYPE.MOTORS_OFF:
-		; // Do Nothing
-		
-	ABBLINKIN_COMMAND_TYPE.MOTORS_ON:
-		;// Do Nothing
-		
 	ABBLINKIN_COMMAND_TYPE.POWER_OFF:
 		;// Do Nothing
 		
@@ -1758,12 +1752,6 @@ END_IF]]></ST>
       <LineId Id="24" Count="0" />
       <LineId Id="36" Count="0" />
       <LineId Id="57" Count="0" />
-      <LineId Id="25" Count="0" />
-      <LineId Id="68" Count="0" />
-      <LineId Id="56" Count="0" />
-      <LineId Id="26" Count="0" />
-      <LineId Id="67" Count="0" />
-      <LineId Id="55" Count="0" />
       <LineId Id="27" Count="0" />
       <LineId Id="39" Count="0" />
       <LineId Id="54" Count="0" />
