@@ -72,7 +72,7 @@ tempString := CONCAT(tempString, ':');
 tempString := CONCAT(tempString, realm);
 tempString := CONCAT(tempString, ':');
 tempString := CONCAT(tempString, password);
-F_GenerateHashValue(E_HashMode.HASH_MD5, ADR(tempString), LEN(tempString), ADR(h1_byArr), SIZEOF(h1_byArr));
+F_GenerateHashValue(E_HashMode.HASH_MD5, ADR(tempString), INT_TO_UDINT(LEN(tempString)), ADR(h1_byArr), SIZEOF(h1_byArr));
 h1_hexStr := '';
 FOR i := 0 TO 15 DO
 	h1_hexStr := CONCAT(h1_hexStr, BYTE_TO_HEXSTR(h1_byArr[i], 2, TRUE));
@@ -84,7 +84,7 @@ tempString := '';
 tempString := CONCAT(tempString, httpMethod);
 tempString := CONCAT(tempString, ':');
 tempString := CONCAT(tempString, uri);
-F_GenerateHashValue(E_HashMode.HASH_MD5, ADR(tempString), LEN(tempString), ADR(h2_byArr), SIZEOF(h2_byArr));
+F_GenerateHashValue(E_HashMode.HASH_MD5, ADR(tempString), INT_TO_UDINT(LEN(tempString)), ADR(h2_byArr), SIZEOF(h2_byArr));
 h2_hexStr := '';
 FOR i := 0 TO 15 DO
 	h2_hexStr := CONCAT(h2_hexStr, BYTE_TO_HEXSTR(h2_byArr[i], 2, TRUE));
@@ -104,7 +104,7 @@ tempString := CONCAT(tempString, ':');
 tempString := CONCAT(tempString, qop);
 tempString := CONCAT(tempString, ':');
 tempString := CONCAT(tempString, h2_hexStr);
-F_GenerateHashValue(E_HashMode.HASH_MD5, ADR(tempString), LEN(tempString), ADR(response_byArr), SIZEOF(response_byArr));
+F_GenerateHashValue(E_HashMode.HASH_MD5, ADR(tempString), INT_TO_UDINT(LEN(tempString)), ADR(response_byArr), SIZEOF(response_byArr));
 response_hexStr := '';
 FOR i := 0 TO 15 DO
 	response_hexStr := CONCAT(response_hexStr, BYTE_TO_HEXSTR(response_byArr[i], 2, TRUE));
@@ -868,7 +868,7 @@ CASE _state OF
 	ABBLINKIN_STATE.SEND_REQUEST:
 		
 		_setHeader(ABBLINKIN_AUTH_HEADER_VALUE.NONE);
-		retVal := _httpRequest.SendRequest(_currentRequest.uri, _httpClient, _currentRequest.httpMethod, ADR(_currentRequest.httpBody), LEN(_currentRequest.httpBody), _httpHeader);
+		retVal := _httpRequest.SendRequest(_currentRequest.uri, _httpClient, _currentRequest.httpMethod, ADR(_currentRequest.httpBody), INT_TO_UDINT(LEN(_currentRequest.httpBody)), _httpHeader);
 		
 		IF retVal = FALSE THEN
 			_currentRequest.pStatus^.busy := FALSE;
