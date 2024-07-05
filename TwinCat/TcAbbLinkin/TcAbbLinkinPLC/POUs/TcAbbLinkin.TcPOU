@@ -676,7 +676,6 @@ IF LEN(_auth.httpSessionCookie) > 0 THEN
 	tempString := CONCAT(tempString, '-http-session-='); 
 	tempString := CONCAT(tempString, _auth.httpSessionCookie); 
 	cookieValue := CONCAT(cookieValue, tempString);
-	//_httpHeader.AddField('Cookie', tempString, anyCookieSetYet);
 	anyCookieSetYet := TRUE;
 END_IF
 
@@ -688,8 +687,7 @@ IF LEN(_auth.ABBCXCookie) > 0 THEN
 	END_IF
 	tempString := CONCAT(tempString, 'ABBCX='); 
 	tempString := CONCAT(tempString, _auth.ABBCXCookie); 
-	cookieValue := CONCAT(cookieValue, tempString);	
-	//_httpHeader.AddField('Cookie', tempString, anyCookieSetYet);
+	cookieValue := CONCAT(cookieValue, tempString);
 	anyCookieSetYet := TRUE;
 END_IF
 
@@ -752,9 +750,6 @@ IF httpRequest.GetHeaderField('Set-Cookie', ADR(setCookieValue), SIZEOF(setCooki
 	
 	
 END_IF
-
-
-
 ]]></ST>
       </Implementation>
     </Method>
@@ -1066,9 +1061,6 @@ CASE _state OF
 END_CASE
 
 
-
-
-
 // Handle Methods
 
 IF _methodConnectionStartCalled THEN
@@ -1194,7 +1186,6 @@ ELSE
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' could not be added to request Queue');
 	GetState := FALSE;
 END_IF
-
 ]]></ST>
       </Implementation>
     </Method>
@@ -1596,7 +1587,8 @@ ELSE
 	pStatus^.errorMsg := TO_STRING(request.command);
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' could not be added to request Queue');
 	SetIO := FALSE;
-END_IF]]></ST>
+END_IF
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="SetSymbol" Id="{bc0a5da5-b662-4b6f-a5f4-f2caf9d05bbf}">
@@ -1715,7 +1707,8 @@ ELSE
 	pStatus^.errorMsg := TO_STRING(request.command);
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' could not be added to request Queue');
 	SetSymbol := FALSE;
-END_IF]]></ST>
+END_IF
+]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="TcAbbLinkin">
@@ -2034,7 +2027,6 @@ END_IF]]></ST>
       <LineId Id="100" Count="0" />
       <LineId Id="96" Count="0" />
       <LineId Id="80" Count="0" />
-      <LineId Id="113" Count="0" />
       <LineId Id="90" Count="0" />
       <LineId Id="81" Count="0" />
       <LineId Id="92" Count="0" />
@@ -2044,7 +2036,6 @@ END_IF]]></ST>
       <LineId Id="108" Count="0" />
       <LineId Id="102" Count="0" />
       <LineId Id="104" Count="1" />
-      <LineId Id="114" Count="0" />
       <LineId Id="95" Count="0" />
       <LineId Id="91" Count="0" />
       <LineId Id="115" Count="0" />
@@ -2079,7 +2070,6 @@ END_IF]]></ST>
       <LineId Id="17" Count="0" />
       <LineId Id="54" Count="1" />
       <LineId Id="16" Count="0" />
-      <LineId Id="8" Count="2" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.AckError">
@@ -2251,9 +2241,7 @@ END_IF]]></ST>
       <LineId Id="401" Count="0" />
       <LineId Id="276" Count="1" />
       <LineId Id="76" Count="0" />
-      <LineId Id="75" Count="0" />
-      <LineId Id="223" Count="0" />
-      <LineId Id="191" Count="1" />
+      <LineId Id="191" Count="0" />
       <LineId Id="29" Count="2" />
       <LineId Id="41" Count="0" />
       <LineId Id="32" Count="0" />
@@ -2324,7 +2312,6 @@ END_IF]]></ST>
       <LineId Id="69" Count="0" />
       <LineId Id="88" Count="0" />
       <LineId Id="60" Count="0" />
-      <LineId Id="86" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.GetSymbolBool">
@@ -2489,6 +2476,7 @@ END_IF]]></ST>
       <LineId Id="159" Count="0" />
       <LineId Id="148" Count="9" />
       <LineId Id="15" Count="0" />
+      <LineId Id="202" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.SetSymbol">
       <LineId Id="14" Count="7" />
@@ -2519,6 +2507,7 @@ END_IF]]></ST>
       <LineId Id="79" Count="6" />
       <LineId Id="88" Count="10" />
       <LineId Id="5" Count="0" />
+      <LineId Id="183" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>
