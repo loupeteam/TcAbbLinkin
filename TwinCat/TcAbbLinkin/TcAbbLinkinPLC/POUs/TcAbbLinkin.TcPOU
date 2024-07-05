@@ -245,6 +245,17 @@ _encodeBase64 := _jsonDomParser.GetString(_jsonValue2);
 ]]></ST>
       </Implementation>
     </Method>
+    <Method Name="_generateCnonce" Id="{519316ba-e894-4dfd-aa31-ef81cf83541b}" FolderPath="digestMethods\">
+      <Declaration><![CDATA[METHOD PRIVATE _generateCnonce : STRING
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+_generateCnonce := 'diddLOPR';	// TODO: reimplement with random generation
+]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="_getIO" Id="{bd29dab4-cb08-45fe-84ff-e3737f6110e8}">
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD PRIVATE _getIO : BOOL
@@ -1046,8 +1057,8 @@ CASE _state OF
  
 		IF NOT error THEN
 			// Calculate Digest response
-			_auth.digest.nc := '00000001';	// TODO refine
-			_auth.digest.cnonce := 'diddLOPR'; // TODO refine
+			_auth.digest.nc := '00000001';
+			_auth.digest.cnonce := _generateCnonce();
 			_auth.digest.response := _calculateDigestResponse(	username := configuration.rwsUsername,
 																realm := _auth.digest.realm,
 																password := configuration.rwsPassword,
@@ -1851,6 +1862,11 @@ END_IF
       <LineId Id="15" Count="4" />
       <LineId Id="5" Count="0" />
     </LineIds>
+    <LineIds Name="TcAbbLinkin._generateCnonce">
+      <LineId Id="7" Count="0" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="8" Count="0" />
+    </LineIds>
     <LineIds Name="TcAbbLinkin._getIO">
       <LineId Id="25" Count="2" />
       <LineId Id="22" Count="0" />
@@ -2287,7 +2303,8 @@ END_IF
       <LineId Id="800" Count="2" />
       <LineId Id="358" Count="0" />
       <LineId Id="374" Count="0" />
-      <LineId Id="753" Count="1" />
+      <LineId Id="753" Count="0" />
+      <LineId Id="811" Count="0" />
       <LineId Id="383" Count="0" />
       <LineId Id="376" Count="0" />
       <LineId Id="325" Count="0" />
