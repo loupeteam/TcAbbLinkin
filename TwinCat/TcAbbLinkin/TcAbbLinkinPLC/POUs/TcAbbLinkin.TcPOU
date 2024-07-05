@@ -209,16 +209,16 @@ CASE connectionConfig.rwsVersion OF
 		// 		see https://forums.robotstudio.com/discussion/12177/how-to-change-the-listening-port-of-the-virtual-controller-robotware-6-x-and-7-x
 		
 		//_httpClient.stTLS.aPskKey := 0;
-		_httpClient.stTLS.bNoServerCertCheck := FALSE;
+		_httpClient.stTLS.bNoServerCertCheck := TRUE;
 		//_httpClient.stTLS.nPskKeyLen := 0;
 		//_httpClient.stTLS.sCA := '';
 		//_httpClient.stTLS.sCert := '';
-	//	_httpClient.stTLS.sCiphers := 'TLS_AES_128_GCM_SHA256';
+		//_httpClient.stTLS.sCiphers := 'TLS_AES_128_GCM_SHA256';
 		//_httpClient.stTLS.sCrl := '';
 		//_httpClient.stTLS.sKeyFile := '';
 		//_httpClient.stTLS.sKeyPwd := '';
 		//_httpClient.stTLS.sPskIdentity := '';
-	//	_httpClient.stTLS.sVersion := 'tlsv1.3';
+		//_httpClient.stTLS.sVersion := 'tlsv1.3';
 		
 END_CASE
 ]]></ST>
