@@ -201,17 +201,19 @@ CASE connectionConfig.rwsVersion OF
 		_httpClient.stTLS.bNoServerCertCheck := FALSE;
 		
 	ABBLINKIN_RWS_API_VERSION.V2:
+		// TODO: Correctly configure for TLS/HTTPS connection
+	
 		//_httpClient.stTLS.aPskKey := 0;
 		_httpClient.stTLS.bNoServerCertCheck := FALSE;
 		//_httpClient.stTLS.nPskKeyLen := 0;
 		//_httpClient.stTLS.sCA := '';
 		//_httpClient.stTLS.sCert := '';
-	//	_httpClient.stTLS.sCiphers := 'TLS_AES_128_GCM_SHA256';
+		_httpClient.stTLS.sCiphers := 'TLS_AES_128_GCM_SHA256';
 		//_httpClient.stTLS.sCrl := '';
 		//_httpClient.stTLS.sKeyFile := '';
 		//_httpClient.stTLS.sKeyPwd := '';
 		//_httpClient.stTLS.sPskIdentity := '';
-	//	_httpClient.stTLS.sVersion := 'tlsv1.3';
+		_httpClient.stTLS.sVersion := 'tlsv1.3';
 		
 END_CASE
 ]]></ST>
@@ -1790,6 +1792,7 @@ END_IF]]></ST>
       <LineId Id="9" Count="4" />
       <LineId Id="24" Count="0" />
       <LineId Id="15" Count="5" />
+      <LineId Id="48" Count="1" />
       <LineId Id="32" Count="9" />
       <LineId Id="31" Count="0" />
       <LineId Id="42" Count="0" />
