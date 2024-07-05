@@ -39,9 +39,11 @@ END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
-    <Folder Name="digestMethods" Id="{29dc1ba2-5044-4aed-a071-8839204fb61b}" />
-    <Folder Name="responseCallbacks" Id="{81e09dac-321f-4653-938f-510c189b178d}" />
-    <Method Name="_calculateDigestResponse" Id="{b6ba6c5c-69f4-4fe0-9917-9e6697b8c0e1}" FolderPath="digestMethods\">
+    <Folder Name="Internal" Id="{5ac5924a-3df1-404e-a599-087d64bab566}">
+      <Folder Name="digestMethods" Id="{29dc1ba2-5044-4aed-a071-8839204fb61b}" />
+      <Folder Name="responseCallbacks" Id="{81e09dac-321f-4653-938f-510c189b178d}" />
+    </Folder>
+    <Method Name="_calculateDigestResponse" Id="{b6ba6c5c-69f4-4fe0-9917-9e6697b8c0e1}" FolderPath="Internal\digestMethods\">
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD PRIVATE _calculateDigestResponse : STRING
 VAR_INPUT
@@ -117,20 +119,17 @@ _calculateDigestResponse := response_hexStr;
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="_callCommandSuccessHandler" Id="{4e7a3f83-8e9c-4794-9ff8-99e39dc09c79}">
+    <Method Name="_callCommandSuccessHandler" Id="{4e7a3f83-8e9c-4794-9ff8-99e39dc09c79}" FolderPath="Internal\">
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD PRIVATE _callCommandSuccessHandler : BOOL
-VAR_INPUT
-	command : ABBLINKIN_COMMAND_TYPE;
-END_VAR
 VAR_IN_OUT
-	httpRequest : FB_IotHttpRequest;
 	request : AbbLinkinRequest_Typ;
+	httpRequest : FB_IotHttpRequest;
 END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[
-CASE command OF 
+CASE request.command OF 
 	ABBLINKIN_COMMAND_TYPE.GET_IO:
 		_getIORespCallbackSuccess(httpRequest, request);
 		
@@ -165,7 +164,7 @@ END_CASE
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="_clearRequestStatus" Id="{c36ff0b3-102e-47ec-ab8d-11137cae997a}">
+    <Method Name="_clearRequestStatus" Id="{c36ff0b3-102e-47ec-ab8d-11137cae997a}" FolderPath="Internal\">
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD PRIVATE _clearRequestStatus : BOOL
 VAR_INPUT
@@ -184,7 +183,7 @@ _clearRequestStatus := TRUE;
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="_configureClient" Id="{4a508a3b-482e-4d68-8353-2815209fac39}">
+    <Method Name="_configureClient" Id="{4a508a3b-482e-4d68-8353-2815209fac39}" FolderPath="Internal\">
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD PRIVATE _configureClient : BOOL
 VAR_IN_OUT
@@ -204,25 +203,28 @@ CASE connectionConfig.rwsVersion OF
 		_httpClient.stTLS.bNoServerCertCheck := FALSE;
 		
 	ABBLINKIN_RWS_API_VERSION.V2:
-		// TODO : Correctly configure for TLS/HTTPS connection
-	
+		// TODO : Correctly configure for TLS/HTTPS connection. 
+		// Currently, this will connect over unencrypted HTTP
+		// To enable HTTP (note: unsecure) on an Omnicore Controller, ammend appweb.conf (comment ListenSecure, uncomment Listen)
+		// 		see https://forums.robotstudio.com/discussion/12177/how-to-change-the-listening-port-of-the-virtual-controller-robotware-6-x-and-7-x
+		
 		//_httpClient.stTLS.aPskKey := 0;
 		_httpClient.stTLS.bNoServerCertCheck := FALSE;
 		//_httpClient.stTLS.nPskKeyLen := 0;
 		//_httpClient.stTLS.sCA := '';
 		//_httpClient.stTLS.sCert := '';
-		_httpClient.stTLS.sCiphers := 'TLS_AES_128_GCM_SHA256';
+	//	_httpClient.stTLS.sCiphers := 'TLS_AES_128_GCM_SHA256';
 		//_httpClient.stTLS.sCrl := '';
 		//_httpClient.stTLS.sKeyFile := '';
 		//_httpClient.stTLS.sKeyPwd := '';
 		//_httpClient.stTLS.sPskIdentity := '';
-		_httpClient.stTLS.sVersion := 'tlsv1.3';
+	//	_httpClient.stTLS.sVersion := 'tlsv1.3';
 		
 END_CASE
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="_encodeBase64" Id="{3fa22cec-5508-414f-9012-9c1691dace64}">
+    <Method Name="_encodeBase64" Id="{3fa22cec-5508-414f-9012-9c1691dace64}" FolderPath="Internal\">
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD PRIVATE _encodeBase64 : STRING
 VAR_INPUT
@@ -245,7 +247,18 @@ _encodeBase64 := _jsonDomParser.GetString(_jsonValue2);
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="_getIO" Id="{bd29dab4-cb08-45fe-84ff-e3737f6110e8}">
+    <Method Name="_generateCnonce" Id="{519316ba-e894-4dfd-aa31-ef81cf83541b}" FolderPath="Internal\digestMethods\">
+      <Declaration><![CDATA[METHOD PRIVATE _generateCnonce : STRING
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+_generateCnonce := 'diddLOPR';	// TODO: reimplement with random generation
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="_getIO" Id="{bd29dab4-cb08-45fe-84ff-e3737f6110e8}" FolderPath="Internal\">
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD PRIVATE _getIO : BOOL
 VAR_INPUT
@@ -328,7 +341,7 @@ END_IF
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="_getIORespCallbackSuccess" Id="{8de14980-869f-4f0b-8bbf-fcfda3d0e6d3}" FolderPath="responseCallbacks\">
+    <Method Name="_getIORespCallbackSuccess" Id="{8de14980-869f-4f0b-8bbf-fcfda3d0e6d3}" FolderPath="Internal\responseCallbacks\">
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD PRIVATE _getIORespCallbackSuccess : BOOL
 VAR_IN_OUT
@@ -375,7 +388,7 @@ _getIORespCallbackSuccess := TRUE;
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="_getStateRespCallbackSuccess" Id="{70e217fe-2d07-46fe-9a64-f1eb329f34c5}" FolderPath="responseCallbacks\">
+    <Method Name="_getStateRespCallbackSuccess" Id="{70e217fe-2d07-46fe-9a64-f1eb329f34c5}" FolderPath="Internal\responseCallbacks\">
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD PRIVATE _getStateRespCallbackSuccess : BOOL
 VAR_IN_OUT
@@ -420,7 +433,7 @@ _getStateRespCallbackSuccess := TRUE;
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="_getSymbol" Id="{d9ba7421-7242-4767-a53d-8b068c42b046}">
+    <Method Name="_getSymbol" Id="{d9ba7421-7242-4767-a53d-8b068c42b046}" FolderPath="Internal\">
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD PRIVATE _getSymbol : BOOL
 VAR_INPUT
@@ -505,7 +518,7 @@ END_IF
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="_getSymbolRespCallbackSuccess" Id="{ef9782bf-23a7-46c0-9904-995a74b6e086}" FolderPath="responseCallbacks\">
+    <Method Name="_getSymbolRespCallbackSuccess" Id="{ef9782bf-23a7-46c0-9904-995a74b6e086}" FolderPath="Internal\responseCallbacks\">
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD PRIVATE _getSymbolRespCallbackSuccess : BOOL
 VAR_IN_OUT
@@ -554,7 +567,7 @@ _getSymbolRespCallbackSuccess := TRUE;
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="_parseWwwAuthForParameter" Id="{3381c2f0-a73a-48c3-a8d7-1dfd534075ee}" FolderPath="digestMethods\">
+    <Method Name="_parseWwwAuthForParameter" Id="{3381c2f0-a73a-48c3-a8d7-1dfd534075ee}" FolderPath="Internal\digestMethods\">
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD PRIVATE _parseWwwAuthForParameter : STRING
 
@@ -589,7 +602,7 @@ _parseWwwAuthForParameter := MID(contentString, secondQuoteLocation - firstQuote
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="_requestQueueAdd" Id="{04fd7ebd-e8f9-46c7-bc9e-2330c22267da}">
+    <Method Name="_requestQueueAdd" Id="{04fd7ebd-e8f9-46c7-bc9e-2330c22267da}" FolderPath="Internal\">
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD PRIVATE _requestQueueAdd : BOOL
 VAR_INPUT
@@ -607,7 +620,7 @@ _requestQueueAdd := TRUE;
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="_requestQueuePop" Id="{daa4e678-3558-4037-bf7f-bd7a40f193a5}">
+    <Method Name="_requestQueuePop" Id="{daa4e678-3558-4037-bf7f-bd7a40f193a5}" FolderPath="Internal\">
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD PRIVATE _requestQueuePop : AbbLinkinRequest_Typ
 VAR_INPUT
@@ -622,7 +635,7 @@ _requestQueuePop := _requestQueue.request;
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="_setHeader" Id="{03deb409-7be0-4e61-9c99-83e8f97b30dc}">
+    <Method Name="_setHeader" Id="{03deb409-7be0-4e61-9c99-83e8f97b30dc}" FolderPath="Internal\">
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD PRIVATE _setHeader : BOOL
 VAR_INPUT
@@ -703,7 +716,7 @@ END_CASE
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="_storeCookies" Id="{495ad33e-c453-424c-aeee-f8fc1c4fb6d3}">
+    <Method Name="_storeCookies" Id="{495ad33e-c453-424c-aeee-f8fc1c4fb6d3}" FolderPath="Internal\">
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD PRIVATE _storeCookies : BOOL
 VAR_INPUT
@@ -905,7 +918,7 @@ CASE _state OF
 			200..204 : // HTTP Success
 			
 				// Command-specific success-response-processing
-				_callCommandSuccessHandler(_currentRequest.command, _httpRequest, _currentRequest);
+				_callCommandSuccessHandler(_currentRequest, _httpRequest);
 				
 				// Write and close out current request status
 				_currentRequest.pStatus^.busy := FALSE;
@@ -1008,11 +1021,11 @@ CASE _state OF
 				// Note : You can get a 503 if you try to send the same credentials repeatedly instead of 
 				// 		sending the http session cookies that the server provides after the first successful authentication			
 				errorID := _httpRequest.nStatusCode;
-				errorMsg := 'Authentication request recieved an error response (see errorID for HTTP status code).';
+				errorMsg := 'Authentication request recieved an error response (see errorID for HTTP code)';
 				_state := ABBLINKIN_STATE.ERROR;
 		ELSE			
 			errorID := _httpRequest.nStatusCode;
-			errorMsg := 'Authentication request recieved an error response (see errorID for HTTP status code).';
+			errorMsg := 'Authentication request recieved an error response (see errorID for HTTP code)';
 			_state := ABBLINKIN_STATE.ERROR;			
 		END_CASE
 	
@@ -1046,8 +1059,8 @@ CASE _state OF
  
 		IF NOT error THEN
 			// Calculate Digest response
-			_auth.digest.nc := '00000001';	// TODO refine
-			_auth.digest.cnonce := 'diddLOPR'; // TODO refine
+			_auth.digest.nc := '00000001';
+			_auth.digest.cnonce := _generateCnonce();
 			_auth.digest.response := _calculateDigestResponse(	username := configuration.rwsUsername,
 																realm := _auth.digest.realm,
 																password := configuration.rwsPassword,
@@ -1840,7 +1853,10 @@ END_IF
       <LineId Id="9" Count="4" />
       <LineId Id="24" Count="0" />
       <LineId Id="15" Count="5" />
-      <LineId Id="48" Count="1" />
+      <LineId Id="48" Count="0" />
+      <LineId Id="55" Count="1" />
+      <LineId Id="58" Count="0" />
+      <LineId Id="57" Count="0" />
       <LineId Id="32" Count="9" />
       <LineId Id="31" Count="0" />
       <LineId Id="42" Count="0" />
@@ -1850,6 +1866,11 @@ END_IF
     <LineIds Name="TcAbbLinkin._encodeBase64">
       <LineId Id="15" Count="4" />
       <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin._generateCnonce">
+      <LineId Id="7" Count="0" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="8" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin._getIO">
       <LineId Id="25" Count="2" />
@@ -2287,7 +2308,8 @@ END_IF
       <LineId Id="800" Count="2" />
       <LineId Id="358" Count="0" />
       <LineId Id="374" Count="0" />
-      <LineId Id="753" Count="1" />
+      <LineId Id="753" Count="0" />
+      <LineId Id="811" Count="0" />
       <LineId Id="383" Count="0" />
       <LineId Id="376" Count="0" />
       <LineId Id="325" Count="0" />

@@ -7,6 +7,33 @@
 	},
 	"item": [
 		{
+			"name": "IRC5_Auth",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{abbhost}}/",
+					"host": [
+						"{{abbhost}}"
+					],
+					"path": [
+						""
+					],
+					"query": [
+						{
+							"key": "json",
+							"value": "1",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "IRC5_GetState",
 			"request": {
 				"auth": {
@@ -236,6 +263,219 @@
 						{
 							"key": "json",
 							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "IRC5_SetIO_myInputANA",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "digest",
+					"digest": [
+						{
+							"key": "disableRetryRequest",
+							"value": false,
+							"type": "boolean"
+						},
+						{
+							"key": "password",
+							"value": "{{pw}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{user}}",
+							"type": "string"
+						},
+						{
+							"key": "algorithm",
+							"value": "MD5",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "lvalue=52",
+					"options": {
+						"raw": {
+							"language": "text"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{abbhost}}/rw/iosystem/signals/myInputANA?action=set",
+					"host": [
+						"{{abbhost}}"
+					],
+					"path": [
+						"rw",
+						"iosystem",
+						"signals",
+						"myInputANA"
+					],
+					"query": [
+						{
+							"key": "action",
+							"value": "set"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "IRC5_SetIO_myInputDIG",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "digest",
+					"digest": [
+						{
+							"key": "disableRetryRequest",
+							"value": false,
+							"type": "boolean"
+						},
+						{
+							"key": "password",
+							"value": "{{pw}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{user}}",
+							"type": "string"
+						},
+						{
+							"key": "algorithm",
+							"value": "MD5",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "lvalue=1",
+					"options": {
+						"raw": {
+							"language": "text"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{abbhost}}/rw/iosystem/signals/myInputDIG?action=set",
+					"host": [
+						"{{abbhost}}"
+					],
+					"path": [
+						"rw",
+						"iosystem",
+						"signals",
+						"myInputDIG"
+					],
+					"query": [
+						{
+							"key": "action",
+							"value": "set"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "IRC5_SetIO_myInputGRP",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "digest",
+					"digest": [
+						{
+							"key": "disableRetryRequest",
+							"value": false,
+							"type": "boolean"
+						},
+						{
+							"key": "password",
+							"value": "{{pw}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{user}}",
+							"type": "string"
+						},
+						{
+							"key": "algorithm",
+							"value": "MD5",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "lvalue=5000",
+					"options": {
+						"raw": {
+							"language": "text"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{abbhost}}/rw/iosystem/signals/myInputGRP?action=set",
+					"host": [
+						"{{abbhost}}"
+					],
+					"path": [
+						"rw",
+						"iosystem",
+						"signals",
+						"myInputGRP"
+					],
+					"query": [
+						{
+							"key": "action",
+							"value": "set"
 						}
 					]
 				}
@@ -609,7 +849,7 @@
 			"response": []
 		},
 		{
-			"name": "IRC5_SetIO_myInputANA",
+			"name": "IRC5_PowerOff",
 			"protocolProfileBehavior": {
 				"disabledSystemHeaders": {
 					"content-type": true
@@ -650,171 +890,33 @@
 					}
 				],
 				"body": {
-					"mode": "raw",
-					"raw": "lvalue=52",
-					"options": {
-						"raw": {
-							"language": "text"
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "ctrl-state",
+							"value": "motoroff",
+							"type": "text"
 						}
-					}
+					]
 				},
 				"url": {
-					"raw": "{{abbhost}}/rw/iosystem/signals/myInputANA?action=set",
+					"raw": "{{abbhost}}/rw/panel/ctrlstate?action=setctrlstate&json=1",
 					"host": [
 						"{{abbhost}}"
 					],
 					"path": [
 						"rw",
-						"iosystem",
-						"signals",
-						"myInputANA"
+						"panel",
+						"ctrlstate"
 					],
 					"query": [
 						{
 							"key": "action",
-							"value": "set"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "IRC5_SetIO_myInputGRP",
-			"protocolProfileBehavior": {
-				"disabledSystemHeaders": {
-					"content-type": true
-				}
-			},
-			"request": {
-				"auth": {
-					"type": "digest",
-					"digest": [
-						{
-							"key": "disableRetryRequest",
-							"value": false,
-							"type": "boolean"
+							"value": "setctrlstate"
 						},
 						{
-							"key": "password",
-							"value": "{{pw}}",
-							"type": "string"
-						},
-						{
-							"key": "username",
-							"value": "{{user}}",
-							"type": "string"
-						},
-						{
-							"key": "algorithm",
-							"value": "MD5",
-							"type": "string"
-						}
-					]
-				},
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/x-www-form-urlencoded",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "lvalue=5000",
-					"options": {
-						"raw": {
-							"language": "text"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{abbhost}}/rw/iosystem/signals/myInputGRP?action=set",
-					"host": [
-						"{{abbhost}}"
-					],
-					"path": [
-						"rw",
-						"iosystem",
-						"signals",
-						"myInputGRP"
-					],
-					"query": [
-						{
-							"key": "action",
-							"value": "set"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "IRC5_SetIO_myInputDIG",
-			"protocolProfileBehavior": {
-				"disabledSystemHeaders": {
-					"content-type": true
-				}
-			},
-			"request": {
-				"auth": {
-					"type": "digest",
-					"digest": [
-						{
-							"key": "disableRetryRequest",
-							"value": false,
-							"type": "boolean"
-						},
-						{
-							"key": "password",
-							"value": "{{pw}}",
-							"type": "string"
-						},
-						{
-							"key": "username",
-							"value": "{{user}}",
-							"type": "string"
-						},
-						{
-							"key": "algorithm",
-							"value": "MD5",
-							"type": "string"
-						}
-					]
-				},
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/x-www-form-urlencoded",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "lvalue=1",
-					"options": {
-						"raw": {
-							"language": "text"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{abbhost}}/rw/iosystem/signals/myInputDIG?action=set",
-					"host": [
-						"{{abbhost}}"
-					],
-					"path": [
-						"rw",
-						"iosystem",
-						"signals",
-						"myInputDIG"
-					],
-					"query": [
-						{
-							"key": "action",
-							"value": "set"
+							"key": "json",
+							"value": "1"
 						}
 					]
 				}
@@ -890,81 +992,6 @@
 							"key": "json",
 							"value": "1",
 							"disabled": true
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "IRC5_PowerOff",
-			"protocolProfileBehavior": {
-				"disabledSystemHeaders": {
-					"content-type": true
-				}
-			},
-			"request": {
-				"auth": {
-					"type": "digest",
-					"digest": [
-						{
-							"key": "disableRetryRequest",
-							"value": false,
-							"type": "boolean"
-						},
-						{
-							"key": "password",
-							"value": "{{pw}}",
-							"type": "string"
-						},
-						{
-							"key": "username",
-							"value": "{{user}}",
-							"type": "string"
-						},
-						{
-							"key": "algorithm",
-							"value": "MD5",
-							"type": "string"
-						}
-					]
-				},
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/x-www-form-urlencoded",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "urlencoded",
-					"urlencoded": [
-						{
-							"key": "ctrl-state",
-							"value": "motoroff",
-							"type": "text"
-						}
-					]
-				},
-				"url": {
-					"raw": "{{abbhost}}/rw/panel/ctrlstate?action=setctrlstate&json=1",
-					"host": [
-						"{{abbhost}}"
-					],
-					"path": [
-						"rw",
-						"panel",
-						"ctrlstate"
-					],
-					"query": [
-						{
-							"key": "action",
-							"value": "setctrlstate"
-						},
-						{
-							"key": "json",
-							"value": "1"
 						}
 					]
 				}
@@ -1215,33 +1242,6 @@
 			"response": []
 		},
 		{
-			"name": "IRC5_root_no_auth",
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{abbhost}}/",
-					"host": [
-						"{{abbhost}}"
-					],
-					"path": [
-						""
-					],
-					"query": [
-						{
-							"key": "json",
-							"value": "1",
-							"disabled": true
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "Omnicore_Auth",
 			"event": [
 				{
@@ -1298,11 +1298,12 @@
 					}
 				],
 				"url": {
-					"raw": "{{http_mode}}://{{abbhost}}/?json=1",
+					"raw": "{{http_mode}}://{{abbhost}}:80/?json=1",
 					"protocol": "{{http_mode}}",
 					"host": [
 						"{{abbhost}}"
 					],
+					"port": "80",
 					"path": [
 						""
 					],
@@ -1464,80 +1465,6 @@
 			"response": []
 		},
 		{
-			"name": "Omnicore_GetIO_myInputGRP",
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							"\r",
-							"/*\r",
-							"Note: I had to comment/uncomment the lines in C:\\Users\\dwiens\\AppData\\Local\\ABB\\RobotWare\\RobotControl_7.14.3\\system\\appweb.conf in order for the simulated robot controller to listen on port 80. Before that, it seemed it wasn't listening on port 443\r",
-							"\r",
-							"Listen -1\r",
-							"#ListenSecure -1\r",
-							"\r",
-							"\r",
-							"\r",
-							"\r",
-							"*/\r",
-							""
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"protocolProfileBehavior": {
-				"strictSSL": false,
-				"disabledSystemHeaders": {}
-			},
-			"request": {
-				"auth": {
-					"type": "basic",
-					"basic": [
-						{
-							"key": "password",
-							"value": "{{pw}}",
-							"type": "string"
-						},
-						{
-							"key": "username",
-							"value": "{{user}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/xhtml+xml;v=2.0",
-						"disabled": true
-					},
-					{
-						"key": "Accept",
-						"value": "application/hal+json;v=2.0"
-					}
-				],
-				"url": {
-					"raw": "{{http_mode}}://{{abbhost}}:80/rw/iosystem/signals/myInputGRP",
-					"protocol": "{{http_mode}}",
-					"host": [
-						"{{abbhost}}"
-					],
-					"port": "80",
-					"path": [
-						"rw",
-						"iosystem",
-						"signals",
-						"myInputGRP"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "Omnicore_GetIO_myInputDIG",
 			"event": [
 				{
@@ -1606,6 +1533,80 @@
 						"iosystem",
 						"signals",
 						"myInputDIG"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Omnicore_GetIO_myInputGRP",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"\r",
+							"/*\r",
+							"Note: I had to comment/uncomment the lines in C:\\Users\\dwiens\\AppData\\Local\\ABB\\RobotWare\\RobotControl_7.14.3\\system\\appweb.conf in order for the simulated robot controller to listen on port 80. Before that, it seemed it wasn't listening on port 443\r",
+							"\r",
+							"Listen -1\r",
+							"#ListenSecure -1\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							"*/\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"strictSSL": false,
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pw}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{user}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/xhtml+xml;v=2.0",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/hal+json;v=2.0"
+					}
+				],
+				"url": {
+					"raw": "{{http_mode}}://{{abbhost}}:80/rw/iosystem/signals/myInputGRP",
+					"protocol": "{{http_mode}}",
+					"host": [
+						"{{abbhost}}"
+					],
+					"port": "80",
+					"path": [
+						"rw",
+						"iosystem",
+						"signals",
+						"myInputGRP"
 					]
 				}
 			},
