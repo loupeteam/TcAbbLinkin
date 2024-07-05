@@ -13,21 +13,21 @@ VAR_OUTPUT
 END_VAR
 VAR
 	_connectionEnabled : BOOL;
+	_sendingEnabled: BOOL;
+	_authorized: BOOL;
+	
 	_httpClient: FB_IotHttpClient;
 	_httpRequest: FB_IotHttpRequest;
 	_httpHeader: FB_IotHttpHeaderFieldMap;
-	_httpHeader2: FB_IotHttpHeaderFieldMap;
+	
 	_methodConnectionStartCalled: BOOL;
 	_methodConnectionStopCalled: BOOL;
 	_methodAckErrorCalled: BOOL;
+	
 	_state: ABBLINKIN_STATE;
 	_auth: AbbLinkinAuth_Typ;
 	_requestQueue: AbbLinkinRequestQueue_Typ;
 	_currentRequest: AbbLinkinRequest_Typ;
-	_sendingEnabled: BOOL;
-	_authorized: BOOL;
-	_httpSessionCookie: STRING;
-	_ABBCXCookie: STRING;
 END_VAR
 
 VAR CONSTANT
@@ -127,8 +127,6 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[
-
-
 CASE command OF 
 	ABBLINKIN_COMMAND_TYPE.GET_IO:
 		_getIORespCallbackSuccess(httpRequest, request);
@@ -140,25 +138,25 @@ CASE command OF
 		_getSymbolRespCallbackSuccess(httpRequest, request);
 		
 	ABBLINKIN_COMMAND_TYPE.MOTORS_OFF:
-		;//TODO
+		; // Do Nothing
 		
 	ABBLINKIN_COMMAND_TYPE.MOTORS_ON:
-		;//TODO
+		;// Do Nothing
 		
 	ABBLINKIN_COMMAND_TYPE.POWER_OFF:
-		;//TODO
+		;// Do Nothing
 		
 	ABBLINKIN_COMMAND_TYPE.POWER_ON:
-		;//TODO
+		;// Do Nothing
 		
 	ABBLINKIN_COMMAND_TYPE.RAPID_RESET:
-		;//TODO
+		;// Do Nothing
 		
 	ABBLINKIN_COMMAND_TYPE.RAPID_START:
-		;//TODO
+		;// Do Nothing
 		
 	ABBLINKIN_COMMAND_TYPE.RAPID_STOP:
-		;//TODO
+		;// Do Nothing
 		
 	ABBLINKIN_COMMAND_TYPE.SET_IO:
 		;// Do Nothing
@@ -579,7 +577,6 @@ VAR
 	firstQuoteLocation : INT;
 	secondQuoteLocation : INT;
 	tempString : ABBLINKIN_STRING_EX_LEN;
-	
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
@@ -678,23 +675,23 @@ END_CASE
 // Cookie
 anyCookieSetYet := FALSE;
 cookieValue := '';
-IF LEN(_httpSessionCookie) > 0 THEN
+IF LEN(_auth.httpSessionCookie) > 0 THEN
 	tempString := '';
 	tempString := CONCAT(tempString, '-http-session-='); 
-	tempString := CONCAT(tempString, _httpSessionCookie); 
+	tempString := CONCAT(tempString, _auth.httpSessionCookie); 
 	cookieValue := CONCAT(cookieValue, tempString);
 	//_httpHeader.AddField('Cookie', tempString, anyCookieSetYet);
 	anyCookieSetYet := TRUE;
 END_IF
 
-IF LEN(_ABBCXCookie) > 0 THEN
+IF LEN(_auth.ABBCXCookie) > 0 THEN
 	IF anyCookieSetYet THEN
 		tempString := '; ';
 	ELSE
 		tempString := '';	
 	END_IF
 	tempString := CONCAT(tempString, 'ABBCX='); 
-	tempString := CONCAT(tempString, _ABBCXCookie); 
+	tempString := CONCAT(tempString, _auth.ABBCXCookie); 
 	cookieValue := CONCAT(cookieValue, tempString);	
 	//_httpHeader.AddField('Cookie', tempString, anyCookieSetYet);
 	anyCookieSetYet := TRUE;
@@ -746,7 +743,7 @@ IF httpRequest.GetHeaderField('Set-Cookie', ADR(setCookieValue), SIZEOF(setCooki
 	equalLoc := FIND(tempString, '=') + keyLoc;
 	tempString := RIGHT(setCookieValue, setCookieValueLen - equalLoc);
 	semicolonLoc := FIND(tempString, ';') + equalLoc;
-	_httpSessionCookie := MID(setCookieValue, semicolonLoc - equalLoc - 1, equalLoc + 1);
+	_auth.httpSessionCookie := MID(setCookieValue, semicolonLoc - equalLoc - 1, equalLoc + 1);
 	
 	
 	// ABBCX
@@ -755,7 +752,7 @@ IF httpRequest.GetHeaderField('Set-Cookie', ADR(setCookieValue), SIZEOF(setCooki
 	equalLoc := FIND(tempString, '=') + keyLoc;
 	tempString := RIGHT(setCookieValue, setCookieValueLen - equalLoc);
 	semicolonLoc := FIND(tempString, ';') + equalLoc;
-	_ABBCXCookie := MID(setCookieValue, semicolonLoc - equalLoc - 1, equalLoc + 1);
+	_auth.ABBCXCookie := MID(setCookieValue, semicolonLoc - equalLoc - 1, equalLoc + 1);
 	
 	
 END_IF
@@ -1750,7 +1747,6 @@ END_IF]]></ST>
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin._callCommandSuccessHandler">
-      <LineId Id="10" Count="1" />
       <LineId Id="13" Count="0" />
       <LineId Id="18" Count="0" />
       <LineId Id="33" Count="0" />
@@ -1763,10 +1759,10 @@ END_IF]]></ST>
       <LineId Id="36" Count="0" />
       <LineId Id="57" Count="0" />
       <LineId Id="25" Count="0" />
-      <LineId Id="37" Count="0" />
+      <LineId Id="68" Count="0" />
       <LineId Id="56" Count="0" />
       <LineId Id="26" Count="0" />
-      <LineId Id="38" Count="0" />
+      <LineId Id="67" Count="0" />
       <LineId Id="55" Count="0" />
       <LineId Id="27" Count="0" />
       <LineId Id="39" Count="0" />
