@@ -127,6 +127,122 @@
 			"response": []
 		},
 		{
+			"name": "IRC5_GetIO_myInputDIG",
+			"request": {
+				"auth": {
+					"type": "digest",
+					"digest": [
+						{
+							"key": "disableRetryRequest",
+							"value": false,
+							"type": "boolean"
+						},
+						{
+							"key": "password",
+							"value": "{{pw}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{user}}",
+							"type": "string"
+						},
+						{
+							"key": "algorithm",
+							"value": "MD5",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "   ",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{abbhost}}/rw/iosystem/signals/myInputDIG?json=1",
+					"host": [
+						"{{abbhost}}"
+					],
+					"path": [
+						"rw",
+						"iosystem",
+						"signals",
+						"myInputDIG"
+					],
+					"query": [
+						{
+							"key": "json",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "IRC5_GetIO_myInputGRP",
+			"request": {
+				"auth": {
+					"type": "digest",
+					"digest": [
+						{
+							"key": "disableRetryRequest",
+							"value": false,
+							"type": "boolean"
+						},
+						{
+							"key": "password",
+							"value": "{{pw}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{user}}",
+							"type": "string"
+						},
+						{
+							"key": "algorithm",
+							"value": "MD5",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "   ",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{abbhost}}/rw/iosystem/signals/myInputGRP?json=1",
+					"host": [
+						"{{abbhost}}"
+					],
+					"path": [
+						"rw",
+						"iosystem",
+						"signals",
+						"myInputGRP"
+					],
+					"query": [
+						{
+							"key": "json",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "IRC5_GetSymbol_myRapidNum",
 			"request": {
 				"auth": {
@@ -486,122 +602,6 @@
 						{
 							"key": "action",
 							"value": "set"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "IRC5_GetIO_myInputGRP",
-			"request": {
-				"auth": {
-					"type": "digest",
-					"digest": [
-						{
-							"key": "disableRetryRequest",
-							"value": false,
-							"type": "boolean"
-						},
-						{
-							"key": "password",
-							"value": "{{pw}}",
-							"type": "string"
-						},
-						{
-							"key": "username",
-							"value": "{{user}}",
-							"type": "string"
-						},
-						{
-							"key": "algorithm",
-							"value": "MD5",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "   ",
-						"type": "text",
-						"disabled": true
-					}
-				],
-				"url": {
-					"raw": "{{abbhost}}/rw/iosystem/signals/myInputGRP?json=1",
-					"host": [
-						"{{abbhost}}"
-					],
-					"path": [
-						"rw",
-						"iosystem",
-						"signals",
-						"myInputGRP"
-					],
-					"query": [
-						{
-							"key": "json",
-							"value": "1"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "IRC5_GetIO_myInputDIG",
-			"request": {
-				"auth": {
-					"type": "digest",
-					"digest": [
-						{
-							"key": "disableRetryRequest",
-							"value": false,
-							"type": "boolean"
-						},
-						{
-							"key": "password",
-							"value": "{{pw}}",
-							"type": "string"
-						},
-						{
-							"key": "username",
-							"value": "{{user}}",
-							"type": "string"
-						},
-						{
-							"key": "algorithm",
-							"value": "MD5",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "   ",
-						"type": "text",
-						"disabled": true
-					}
-				],
-				"url": {
-					"raw": "{{abbhost}}/rw/iosystem/signals/myInputDIG?json=1",
-					"host": [
-						"{{abbhost}}"
-					],
-					"path": [
-						"rw",
-						"iosystem",
-						"signals",
-						"myInputDIG"
-					],
-					"query": [
-						{
-							"key": "json",
-							"value": "1"
 						}
 					]
 				}
@@ -1159,11 +1159,6 @@
 					"mode": "urlencoded",
 					"urlencoded": [
 						{
-							"key": "cycle",
-							"value": "once",
-							"type": "text"
-						},
-						{
 							"key": "regain",
 							"value": "continue",
 							"type": "text"
@@ -1176,6 +1171,11 @@
 						{
 							"key": "condition",
 							"value": "none",
+							"type": "text"
+						},
+						{
+							"key": "cycle",
+							"value": "once",
 							"type": "text"
 						},
 						{
@@ -1242,7 +1242,82 @@
 			"response": []
 		},
 		{
-			"name": "OmnicoreHTTP_GetState",
+			"name": "Omnicore_Auth",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"\r",
+							"/*\r",
+							"Note: I had to comment/uncomment the lines in C:\\Users\\dwiens\\AppData\\Local\\ABB\\RobotWare\\RobotControl_7.14.3\\system\\appweb.conf in order for the simulated robot controller to listen on port 80. Before that, it seemed it wasn't listening on port 443\r",
+							"\r",
+							"Listen -1\r",
+							"#ListenSecure -1\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							"*/\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"strictSSL": false
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pw}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{user}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/xhtml+xml;v=2.0",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/hal+json;v=2.0"
+					}
+				],
+				"url": {
+					"raw": "{{http_mode}}://{{abbhost}}/?json=1",
+					"protocol": "{{http_mode}}",
+					"host": [
+						"{{abbhost}}"
+					],
+					"path": [
+						""
+					],
+					"query": [
+						{
+							"key": "json",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Omnicore_GetState",
 			"event": [
 				{
 					"listen": "prerequest",
@@ -1299,159 +1374,8 @@
 					}
 				],
 				"url": {
-					"raw": "http://{{abbhost}}/rw/rapid/execution",
-					"protocol": "http",
-					"host": [
-						"{{abbhost}}"
-					],
-					"path": [
-						"rw",
-						"rapid",
-						"execution"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "OmnicoreHTTP_Auth",
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							"\r",
-							"/*\r",
-							"Note: I had to comment/uncomment the lines in C:\\Users\\dwiens\\AppData\\Local\\ABB\\RobotWare\\RobotControl_7.14.3\\system\\appweb.conf in order for the simulated robot controller to listen on port 80. Before that, it seemed it wasn't listening on port 443\r",
-							"\r",
-							"Listen -1\r",
-							"#ListenSecure -1\r",
-							"\r",
-							"\r",
-							"\r",
-							"\r",
-							"*/\r",
-							""
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"protocolProfileBehavior": {
-				"strictSSL": false
-			},
-			"request": {
-				"auth": {
-					"type": "basic",
-					"basic": [
-						{
-							"key": "password",
-							"value": "{{pw}}",
-							"type": "string"
-						},
-						{
-							"key": "username",
-							"value": "{{user}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/xhtml+xml;v=2.0",
-						"disabled": true
-					},
-					{
-						"key": "Accept",
-						"value": "application/hal+json;v=2.0"
-					},
-					{
-						"key": "Cookie",
-						"value": " ",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "http://{{abbhost}}/?json=1",
-					"protocol": "http",
-					"host": [
-						"{{abbhost}}"
-					],
-					"path": [
-						""
-					],
-					"query": [
-						{
-							"key": "json",
-							"value": "1"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Omnicore_GetState",
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							"\r",
-							"/*\r",
-							"Note: I had to comment/uncomment the lines in C:\\Users\\dwiens\\AppData\\Local\\ABB\\RobotWare\\RobotControl_7.14.3\\system\\appweb.conf in order for the simulated robot controller to listen on port 80. Before that, it seemed it wasn't listening on port 443\r",
-							"\r",
-							"Listen -1\r",
-							"#ListenSecure -1\r",
-							"\r",
-							"\r",
-							"\r",
-							"\r",
-							"*/\r",
-							""
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"protocolProfileBehavior": {
-				"strictSSL": false
-			},
-			"request": {
-				"auth": {
-					"type": "basic",
-					"basic": [
-						{
-							"key": "password",
-							"value": "{{pw}}",
-							"type": "string"
-						},
-						{
-							"key": "username",
-							"value": "{{user}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/xhtml+xml;v=2.0",
-						"disabled": true
-					},
-					{
-						"key": "Accept",
-						"value": "application/hal+json;v=2.0"
-					}
-				],
-				"url": {
-					"raw": "https://{{abbhost}}:80/rw/rapid/execution",
-					"protocol": "https",
+					"raw": "{{http_mode}}://{{abbhost}}:80/rw/rapid/execution",
+					"protocol": "{{http_mode}}",
 					"host": [
 						"{{abbhost}}"
 					],
@@ -1466,7 +1390,7 @@
 			"response": []
 		},
 		{
-			"name": "Omnicore_GetSymbol_myVar",
+			"name": "Omnicore_GetIO_myInputANA",
 			"event": [
 				{
 					"listen": "prerequest",
@@ -1491,7 +1415,8 @@
 				}
 			],
 			"protocolProfileBehavior": {
-				"strictSSL": false
+				"strictSSL": false,
+				"disabledSystemHeaders": {}
 			},
 			"request": {
 				"auth": {
@@ -1522,8 +1447,413 @@
 					}
 				],
 				"url": {
-					"raw": "https://{{abbhost}}:80/rw/rapid/symbol/T_ROB1/BASE/myVar/data",
-					"protocol": "https",
+					"raw": "{{http_mode}}://{{abbhost}}:80/rw/iosystem/signals/myInputANA",
+					"protocol": "{{http_mode}}",
+					"host": [
+						"{{abbhost}}"
+					],
+					"port": "80",
+					"path": [
+						"rw",
+						"iosystem",
+						"signals",
+						"myInputANA"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Omnicore_GetIO_myInputGRP",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"\r",
+							"/*\r",
+							"Note: I had to comment/uncomment the lines in C:\\Users\\dwiens\\AppData\\Local\\ABB\\RobotWare\\RobotControl_7.14.3\\system\\appweb.conf in order for the simulated robot controller to listen on port 80. Before that, it seemed it wasn't listening on port 443\r",
+							"\r",
+							"Listen -1\r",
+							"#ListenSecure -1\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							"*/\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"strictSSL": false,
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pw}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{user}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/xhtml+xml;v=2.0",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/hal+json;v=2.0"
+					}
+				],
+				"url": {
+					"raw": "{{http_mode}}://{{abbhost}}:80/rw/iosystem/signals/myInputGRP",
+					"protocol": "{{http_mode}}",
+					"host": [
+						"{{abbhost}}"
+					],
+					"port": "80",
+					"path": [
+						"rw",
+						"iosystem",
+						"signals",
+						"myInputGRP"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Omnicore_GetIO_myInputDIG",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"\r",
+							"/*\r",
+							"Note: I had to comment/uncomment the lines in C:\\Users\\dwiens\\AppData\\Local\\ABB\\RobotWare\\RobotControl_7.14.3\\system\\appweb.conf in order for the simulated robot controller to listen on port 80. Before that, it seemed it wasn't listening on port 443\r",
+							"\r",
+							"Listen -1\r",
+							"#ListenSecure -1\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							"*/\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"strictSSL": false,
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pw}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{user}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/xhtml+xml;v=2.0",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/hal+json;v=2.0"
+					}
+				],
+				"url": {
+					"raw": "{{http_mode}}://{{abbhost}}:80/rw/iosystem/signals/myInputDIG",
+					"protocol": "{{http_mode}}",
+					"host": [
+						"{{abbhost}}"
+					],
+					"port": "80",
+					"path": [
+						"rw",
+						"iosystem",
+						"signals",
+						"myInputDIG"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Omnicore_SetIO_myInputANA",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pw}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{user}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded;v=2.0",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "lvalue",
+							"value": "52",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{http_mode}}://{{abbhost}}:80/rw/iosystem/signals/myInputANA/set-value",
+					"protocol": "{{http_mode}}",
+					"host": [
+						"{{abbhost}}"
+					],
+					"port": "80",
+					"path": [
+						"rw",
+						"iosystem",
+						"signals",
+						"myInputANA",
+						"set-value"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Omnicore_SetIO_myInputDIG",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pw}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{user}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded;v=2.0",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "lvalue",
+							"value": "0",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "lvalue",
+							"value": "1",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{http_mode}}://{{abbhost}}:80/rw/iosystem/signals/myInputDIG/set-value",
+					"protocol": "{{http_mode}}",
+					"host": [
+						"{{abbhost}}"
+					],
+					"port": "80",
+					"path": [
+						"rw",
+						"iosystem",
+						"signals",
+						"myInputDIG",
+						"set-value"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Omnicore_SetIO_myInputGRP",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pw}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{user}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded;v=2.0",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "lvalue",
+							"value": "41",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{http_mode}}://{{abbhost}}:80/rw/iosystem/signals/myInputGRP/set-value",
+					"protocol": "{{http_mode}}",
+					"host": [
+						"{{abbhost}}"
+					],
+					"port": "80",
+					"path": [
+						"rw",
+						"iosystem",
+						"signals",
+						"myInputGRP",
+						"set-value"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Omnicore_GetSymbol_myRapidNum",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"\r",
+							"/*\r",
+							"Note: I had to comment/uncomment the lines in C:\\Users\\dwiens\\AppData\\Local\\ABB\\RobotWare\\RobotControl_7.14.3\\system\\appweb.conf in order for the simulated robot controller to listen on port 80. Before that, it seemed it wasn't listening on port 443\r",
+							"\r",
+							"Listen -1\r",
+							"#ListenSecure -1\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							"*/\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"strictSSL": false,
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pw}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{user}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/xhtml+xml;v=2.0",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/hal+json;v=2.0"
+					}
+				],
+				"url": {
+					"raw": "{{http_mode}}://{{abbhost}}:80/rw/rapid/symbol/RAPID/T_ROB1/Module1/myRapidNum/data",
+					"protocol": "{{http_mode}}",
 					"host": [
 						"{{abbhost}}"
 					],
@@ -1532,9 +1862,10 @@
 						"rw",
 						"rapid",
 						"symbol",
+						"RAPID",
 						"T_ROB1",
-						"BASE",
-						"myVar",
+						"Module1",
+						"myRapidNum",
 						"data"
 					]
 				}
@@ -1542,7 +1873,7 @@
 			"response": []
 		},
 		{
-			"name": "Omnicore_GetSymbols",
+			"name": "Omnicore_GetSymbol_myRapidBool",
 			"event": [
 				{
 					"listen": "prerequest",
@@ -1567,7 +1898,8 @@
 				}
 			],
 			"protocolProfileBehavior": {
-				"strictSSL": false
+				"strictSSL": false,
+				"disabledSystemHeaders": {}
 			},
 			"request": {
 				"auth": {
@@ -1598,8 +1930,8 @@
 					}
 				],
 				"url": {
-					"raw": "https://{{abbhost}}:80/rw/rapid/tasks",
-					"protocol": "https",
+					"raw": "{{http_mode}}://{{abbhost}}:80/rw/rapid/symbol/RAPID/T_ROB1/Module1/myRapidBool/data",
+					"protocol": "{{http_mode}}",
 					"host": [
 						"{{abbhost}}"
 					],
@@ -1607,178 +1939,575 @@
 					"path": [
 						"rw",
 						"rapid",
-						"tasks"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "simpleHttpsTest",
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							"\r",
-							"/*\r",
-							"Note: I had to comment/uncomment the lines in C:\\Users\\dwiens\\AppData\\Local\\ABB\\RobotWare\\RobotControl_7.14.3\\system\\appweb.conf in order for the simulated robot controller to listen on port 80. Before that, it seemed it wasn't listening on port 443\r",
-							"\r",
-							"Listen -1\r",
-							"#ListenSecure -1\r",
-							"\r",
-							"\r",
-							"\r",
-							"\r",
-							"*/\r",
-							""
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"protocolProfileBehavior": {
-				"strictSSL": false
-			},
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "GET",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/xhtml+xml;v=2.0",
-						"disabled": true
-					},
-					{
-						"key": "Accept",
-						"value": "application/hal+json;v=2.0"
-					}
-				],
-				"url": {
-					"raw": "https://127.0.0.1/rw/rapid/execution",
-					"protocol": "https",
-					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
-					],
-					"path": [
-						"rw",
-						"rapid",
-						"execution"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "OmnicorePort80_CtrlSystemInfo",
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							"\r",
-							"/*\r",
-							"Note: I had to comment/uncomment the lines in C:\\Users\\dwiens\\AppData\\Local\\ABB\\RobotWare\\RobotControl_7.14.3\\system\\appweb.conf in order for the simulated robot controller to listen on port 80. Before that, it seemed it wasn't listening on port 443\r",
-							"\r",
-							"Listen -1\r",
-							"#ListenSecure -1\r",
-							"\r",
-							"\r",
-							"\r",
-							"\r",
-							"*/\r",
-							""
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"protocolProfileBehavior": {
-				"strictSSL": false
-			},
-			"request": {
-				"auth": {
-					"type": "basic",
-					"basic": [
-						{
-							"key": "password",
-							"value": "{{pw}}",
-							"type": "string"
-						},
-						{
-							"key": "username",
-							"value": "{{user}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/xhtml+xml;v=2.0",
-						"disabled": true
-					},
-					{
-						"key": "Accept",
-						"value": "application/hal+json;v=2.0"
-					}
-				],
-				"url": {
-					"raw": "http://{{abbhost}}/ctrl/system/info",
-					"protocol": "http",
-					"host": [
-						"{{abbhost}}"
-					],
-					"path": [
-						"ctrl",
-						"system",
-						"info"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "https://{{abbhost}}:80/rw/rapid/tasks/T_ROB1/modules",
-			"request": {
-				"auth": {
-					"type": "basic",
-					"basic": [
-						{
-							"key": "password",
-							"value": "{{pw}}",
-							"type": "string"
-						},
-						{
-							"key": "username",
-							"value": "{{user}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "https://{{abbhost}}:80/rw/rapid/tasks/T_ROB1/modules",
-					"protocol": "https",
-					"host": [
-						"{{abbhost}}"
-					],
-					"port": "80",
-					"path": [
-						"rw",
-						"rapid",
-						"tasks",
+						"symbol",
+						"RAPID",
 						"T_ROB1",
-						"modules"
+						"Module1",
+						"myRapidBool",
+						"data"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Omnicore_GetSymbol_myRapidString",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"\r",
+							"/*\r",
+							"Note: I had to comment/uncomment the lines in C:\\Users\\dwiens\\AppData\\Local\\ABB\\RobotWare\\RobotControl_7.14.3\\system\\appweb.conf in order for the simulated robot controller to listen on port 80. Before that, it seemed it wasn't listening on port 443\r",
+							"\r",
+							"Listen -1\r",
+							"#ListenSecure -1\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							"*/\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"strictSSL": false,
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pw}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{user}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/xhtml+xml;v=2.0",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/hal+json;v=2.0"
+					}
+				],
+				"url": {
+					"raw": "{{http_mode}}://{{abbhost}}:80/rw/rapid/symbol/RAPID/T_ROB1/Module1/myRapidString/data",
+					"protocol": "{{http_mode}}",
+					"host": [
+						"{{abbhost}}"
+					],
+					"port": "80",
+					"path": [
+						"rw",
+						"rapid",
+						"symbol",
+						"RAPID",
+						"T_ROB1",
+						"Module1",
+						"myRapidString",
+						"data"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Omnicore_SetSymbol_myRapidNum",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pw}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{user}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded;v=2.0",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "value",
+							"value": "17",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{http_mode}}://{{abbhost}}:80/rw/rapid/symbol/RAPID/T_ROB1/Module1/myRapidNum/data",
+					"protocol": "{{http_mode}}",
+					"host": [
+						"{{abbhost}}"
+					],
+					"port": "80",
+					"path": [
+						"rw",
+						"rapid",
+						"symbol",
+						"RAPID",
+						"T_ROB1",
+						"Module1",
+						"myRapidNum",
+						"data"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Omnicore_SetSymbol_myRapidBool",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pw}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{user}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded;v=2.0",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "value",
+							"value": "TRUE",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "value",
+							"value": "FALSE",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{http_mode}}://{{abbhost}}:80/rw/rapid/symbol/RAPID/T_ROB1/Module1/myRapidBool/data",
+					"protocol": "{{http_mode}}",
+					"host": [
+						"{{abbhost}}"
+					],
+					"port": "80",
+					"path": [
+						"rw",
+						"rapid",
+						"symbol",
+						"RAPID",
+						"T_ROB1",
+						"Module1",
+						"myRapidBool",
+						"data"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Omnicore_SetSymbol_myRapidString",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pw}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{user}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded;v=2.0",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "value",
+							"value": "\"this is a string\"",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{http_mode}}://{{abbhost}}:80/rw/rapid/symbol/RAPID/T_ROB1/Module1/myRapidString/data",
+					"protocol": "{{http_mode}}",
+					"host": [
+						"{{abbhost}}"
+					],
+					"port": "80",
+					"path": [
+						"rw",
+						"rapid",
+						"symbol",
+						"RAPID",
+						"T_ROB1",
+						"Module1",
+						"myRapidString",
+						"data"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Omnicore_PowerOff",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pw}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{user}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded;v=2.0",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "ctrl-state",
+							"value": "motoroff",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{http_mode}}://{{abbhost}}:80/rw/panel/ctrl-state",
+					"protocol": "{{http_mode}}",
+					"host": [
+						"{{abbhost}}"
+					],
+					"port": "80",
+					"path": [
+						"rw",
+						"panel",
+						"ctrl-state"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Omnicore_PowerOn",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pw}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{user}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded;v=2.0",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "ctrl-state",
+							"value": "motoron",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{http_mode}}://{{abbhost}}:80/rw/panel/ctrl-state",
+					"protocol": "{{http_mode}}",
+					"host": [
+						"{{abbhost}}"
+					],
+					"port": "80",
+					"path": [
+						"rw",
+						"panel",
+						"ctrl-state"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Omnicore_RapidReset",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pw}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{user}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded;v=2.0",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{http_mode}}://{{abbhost}}:80/rw/rapid/execution/resetpp",
+					"protocol": "{{http_mode}}",
+					"host": [
+						"{{abbhost}}"
+					],
+					"port": "80",
+					"path": [
+						"rw",
+						"rapid",
+						"execution",
+						"resetpp"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Omnicore_RapidStop",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pw}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{user}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded;v=2.0",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{http_mode}}://{{abbhost}}:80/rw/rapid/execution/stop",
+					"protocol": "{{http_mode}}",
+					"host": [
+						"{{abbhost}}"
+					],
+					"port": "80",
+					"path": [
+						"rw",
+						"rapid",
+						"execution",
+						"stop"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Omnicore_RapidStart",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pw}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{user}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded;v=2.0",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "regain",
+							"value": "continue",
+							"type": "text"
+						},
+						{
+							"key": "execmode",
+							"value": "continue",
+							"type": "text"
+						},
+						{
+							"key": "condition",
+							"value": "none",
+							"type": "text"
+						},
+						{
+							"key": "cycle",
+							"value": "once",
+							"type": "text"
+						},
+						{
+							"key": "stopatbp",
+							"value": "disabled",
+							"type": "text"
+						},
+						{
+							"key": "alltaskbytsp",
+							"value": "false",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{http_mode}}://{{abbhost}}:80/rw/rapid/execution/start",
+					"protocol": "{{http_mode}}",
+					"host": [
+						"{{abbhost}}"
+					],
+					"port": "80",
+					"path": [
+						"rw",
+						"rapid",
+						"execution",
+						"start"
 					]
 				}
 			},
