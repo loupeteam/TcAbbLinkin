@@ -120,17 +120,14 @@ _calculateDigestResponse := response_hexStr;
     <Method Name="_callCommandSuccessHandler" Id="{4e7a3f83-8e9c-4794-9ff8-99e39dc09c79}">
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD PRIVATE _callCommandSuccessHandler : BOOL
-VAR_INPUT
-	command : ABBLINKIN_COMMAND_TYPE;
-END_VAR
 VAR_IN_OUT
-	httpRequest : FB_IotHttpRequest;
 	request : AbbLinkinRequest_Typ;
+	httpRequest : FB_IotHttpRequest;
 END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[
-CASE command OF 
+CASE request.command OF 
 	ABBLINKIN_COMMAND_TYPE.GET_IO:
 		_getIORespCallbackSuccess(httpRequest, request);
 		
@@ -916,7 +913,7 @@ CASE _state OF
 			200..204 : // HTTP Success
 			
 				// Command-specific success-response-processing
-				_callCommandSuccessHandler(_currentRequest.command, _httpRequest, _currentRequest);
+				_callCommandSuccessHandler(_currentRequest, _httpRequest);
 				
 				// Write and close out current request status
 				_currentRequest.pStatus^.busy := FALSE;
