@@ -1428,7 +1428,7 @@ CASE configuration.rwsVersion OF
 		request.httpBody := '';
 
 	ABBLINKIN_RWS_API_VERSION.V2:	
-		request.uri := '/rw/rapid/execution/resetpp';
+		request.uri := '/rw/rapid/execution/resetpp?mastership=implicit';
 		request.httpBody := '';
 		
 END_CASE
@@ -1482,7 +1482,7 @@ CASE configuration.rwsVersion OF
 		request.httpBody := CONCAT(request.httpBody, '&alltaskbytsp=false');
 
 	ABBLINKIN_RWS_API_VERSION.V2:	
-		request.uri := '/rw/rapid/execution/start';
+		request.uri := '/rw/rapid/execution/start?mastership=implicit';
 		request.httpBody := '';
 		request.httpBody := CONCAT(request.httpBody, 'regain=continue');
 		request.httpBody := CONCAT(request.httpBody, '&execmode=continue');
@@ -1707,7 +1707,7 @@ CASE configuration.rwsVersion OF
 	ABBLINKIN_RWS_API_VERSION.V2:
 		request.uri := '/rw/rapid/symbol/';
 		request.uri := concat(request.uri, name);
-		request.uri := concat(request.uri, '/data');
+		request.uri := concat(request.uri, '/data?mastership=implicit');
 		
 END_CASE
 
