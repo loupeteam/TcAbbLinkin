@@ -203,23 +203,12 @@ CASE connectionConfig.rwsVersion OF
 		_httpClient.stTLS.bNoServerCertCheck := FALSE;
 		
 	ABBLINKIN_RWS_API_VERSION.V2:
-		// TODO : Correctly configure for TLS/HTTPS connection. 
-		// Currently, this will connect over unencrypted HTTP
-		// To enable HTTP (note: unsecure) on an Omnicore Controller, ammend appweb.conf (comment ListenSecure, uncomment Listen)
-		// 		see https://forums.robotstudio.com/discussion/12177/how-to-change-the-listening-port-of-the-virtual-controller-robotware-6-x-and-7-x
-		
-		//_httpClient.stTLS.aPskKey := 0;
-		_httpClient.stTLS.bNoServerCertCheck := TRUE;
-		//_httpClient.stTLS.nPskKeyLen := 0;
-		//_httpClient.stTLS.sCA := '';
-		//_httpClient.stTLS.sCert := '';
-		//_httpClient.stTLS.sCiphers := 'TLS_AES_128_GCM_SHA256';
-		//_httpClient.stTLS.sCrl := '';
-		//_httpClient.stTLS.sKeyFile := '';
-		//_httpClient.stTLS.sKeyPwd := '';
-		//_httpClient.stTLS.sPskIdentity := '';
-		//_httpClient.stTLS.sVersion := 'tlsv1.3';
-		
+		IF connectionConfig.tlsAllowRwsCertSelfSigned THEN 
+			_httpClient.stTLS.bNoServerCertCheck := TRUE;
+		ELSE
+			_httpClient.stTLS.bNoServerCertCheck := FALSE;
+			_httpClient.stTLS.sCA := connectionConfig.tlsCAFile;
+		END_IF
 END_CASE
 ]]></ST>
       </Implementation>
@@ -903,7 +892,7 @@ CASE _state OF
 			_currentRequest.pStatus^.busy := FALSE;
 			_currentRequest.pStatus^.error := TRUE;
 			_currentRequest.pStatus^.errorID := _httpRequest.eErrorId;
-			_currentRequest.pStatus^.errorMsg := 'The client request object returned an error (see errorID)';
+			_currentRequest.pStatus^.errorMsg := CONCAT('Client request object error (see errorID) - ' , TO_STRING(_httpRequest.eErrorId));
 			MEMSET(ADR(_currentRequest), 0, SIZEOF(_currentRequest));	// Zero (i.e. terminate) current Request
 			
 			_state := ABBLINKIN_STATE.IDLE;
@@ -980,7 +969,7 @@ CASE _state OF
 		
 		IF _httpRequest.bError THEN
 			errorID := _httpRequest.eErrorId;
-			errorMsg := 'The client request object returned an error (see errorID)';
+			errorMsg := CONCAT('Client request object error (see errorID) - ' , TO_STRING(_httpRequest.eErrorId));
 			_state := ABBLINKIN_STATE.ERROR;
 		ELSIF _httpRequest.bBusy = FALSE THEN
 			_state := ABBLINKIN_STATE.AUTH_PROCESS_RESPONSE;
@@ -1853,13 +1842,11 @@ END_IF
       <LineId Id="9" Count="4" />
       <LineId Id="24" Count="0" />
       <LineId Id="15" Count="5" />
-      <LineId Id="48" Count="0" />
-      <LineId Id="55" Count="1" />
-      <LineId Id="58" Count="0" />
-      <LineId Id="57" Count="0" />
-      <LineId Id="32" Count="9" />
-      <LineId Id="31" Count="0" />
-      <LineId Id="42" Count="0" />
+      <LineId Id="64" Count="0" />
+      <LineId Id="66" Count="0" />
+      <LineId Id="68" Count="0" />
+      <LineId Id="70" Count="1" />
+      <LineId Id="67" Count="0" />
       <LineId Id="23" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>

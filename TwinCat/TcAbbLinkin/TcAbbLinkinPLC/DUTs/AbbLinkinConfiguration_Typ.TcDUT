@@ -9,6 +9,8 @@ STRUCT
 	rwsVersion : ABBLINKIN_RWS_API_VERSION;
 	rwsUsername : STRING := 'Default User';
 	rwsPassword : STRING := 'robotics';
+	tlsAllowRwsCertSelfSigned : BOOL := FALSE;
+	tlsCAFile : STRING := '';
 END_STRUCT
 END_TYPE
 ]]></Declaration>
