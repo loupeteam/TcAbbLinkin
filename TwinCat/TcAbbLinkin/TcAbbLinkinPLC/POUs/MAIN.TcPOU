@@ -88,6 +88,10 @@ if userSetConfigurationNow then
 	myRobotLink.configuration.rwsVersion := ABBLINKIN_RWS_API_VERSION.V2;
 	myRobotLink.configuration.rwsUsername := 'Default User';
 	myRobotLink.configuration.rwsPassword := 'robotics';
+	//myRobotLink.configuration.tlsAllowRwsCertSelfSigned := TRUE;
+	myRobotLink.configuration.tlsAllowRwsCertSelfSigned := FALSE;
+	myRobotLink.configuration.tlsCAFile := 'C:\TwinCAT\3.1\Config\Certificates\TcAbbLinkinCA.pem';
+	
 	userSetConfigurationNow := FALSE;
 END_IF
 
@@ -210,7 +214,11 @@ END_IF
     </Implementation>
     <LineIds Name="MAIN">
       <LineId Id="96" Count="0" />
-      <LineId Id="111" Count="8" />
+      <LineId Id="111" Count="6" />
+      <LineId Id="514" Count="0" />
+      <LineId Id="517" Count="1" />
+      <LineId Id="515" Count="0" />
+      <LineId Id="118" Count="1" />
       <LineId Id="109" Count="1" />
       <LineId Id="35" Count="1" />
       <LineId Id="120" Count="0" />
