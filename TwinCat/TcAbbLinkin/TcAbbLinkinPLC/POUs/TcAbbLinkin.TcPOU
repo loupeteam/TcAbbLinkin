@@ -1154,7 +1154,7 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[
-GetIOAnalog:= _getIO(signal, pStatus, pResultBOOL := 0, pResultDINT := 0, pResultLREAL := pResult);
+GetIOAnalog := _getIO(signal, pStatus, pResultBOOL := 0, pResultDINT := 0, pResultLREAL := pResult);
 ]]></ST>
       </Implementation>
     </Method>
@@ -1257,7 +1257,7 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[
-GetSymbolBool:= _getSymbol(symbolUrl, pStatus, pResultBool := pResult, pResultLreal := 0, pResultString := 0);
+GetSymbolBool := _getSymbol(symbolUrl, pStatus, pResultBool := pResult, pResultLreal := 0, pResultString := 0);
 ]]></ST>
       </Implementation>
     </Method>
