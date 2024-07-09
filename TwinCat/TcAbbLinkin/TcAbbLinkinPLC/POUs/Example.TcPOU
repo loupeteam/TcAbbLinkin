@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="Example" Id="{6ae7d968-fc96-4ba1-b6bb-dff0068c2fd8}" SpecialFunc="None">
+    <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+PROGRAM Example
+VAR
+	myRobotLink : TcAbbLinkin;
+	initConfiguration : BOOL := TRUE;
+	initConnection : BOOL := TRUE;
+	userCommand_GetState : BOOL := TRUE;
+	getStateStatus : AbbLinkinRequestStatus_Typ;
+	currentState : STRING;
+	output : STRING;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Initialize configuration
+IF initConfiguration THEN
+	myRobotLink.configuration.rwsIpAddress := '127.0.0.1';
+	myRobotLink.configuration.rwsTcpPort := 80;
+	myRobotLink.configuration.rwsVersion := ABBLINKIN_RWS_API_VERSION.V2;
+	myRobotLink.configuration.rwsUsername := 'Default User';
+	myRobotLink.configuration.rwsPassword := 'robotics';
+	myRobotLink.configuration.tlsAllowRwsCertSelfSigned := TRUE;
+	
+	initConfiguration := FALSE;
+END_IF
+
+myRobotLink.Cyclic();
+
+/////////////////////////
+// Connect
+IF initConnection THEN
+	myRobotLink.ConnectionStart();
+	initConnection := FALSE;
+END_IF
+
+/////////////////////////
+// Get State
+
+// Send command
+IF myRobotLink.readyForCmd AND userCommand_GetState THEN
+	myRobotLink.GetState(pStatus := ADR(getStateStatus), pResultState := ADR(currentState));
+	userCommand_GetState := FALSE;
+END_IF
+
+// Process Results
+IF getStateStatus.done THEN
+	output := CONCAT('Current state is ', currentState);
+ELSIF getStateStatus.error THEN
+	output := 'An Error occured.';
+END_IF
+]]></ST>
+    </Implementation>
+    <LineIds Name="Example">
+      <LineId Id="6" Count="6" />
+      <LineId Id="15" Count="2" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="78" Count="0" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="74" Count="2" />
+      <LineId Id="34" Count="0" />
+      <LineId Id="46" Count="0" />
+      <LineId Id="37" Count="0" />
+      <LineId Id="36" Count="0" />
+      <LineId Id="72" Count="0" />
+      <LineId Id="53" Count="0" />
+      <LineId Id="49" Count="0" />
+      <LineId Id="71" Count="0" />
+      <LineId Id="70" Count="0" />
+      <LineId Id="48" Count="0" />
+      <LineId Id="52" Count="0" />
+      <LineId Id="50" Count="1" />
+      <LineId Id="69" Count="0" />
+      <LineId Id="61" Count="0" />
+      <LineId Id="60" Count="0" />
+      <LineId Id="62" Count="0" />
+      <LineId Id="64" Count="0" />
+      <LineId Id="66" Count="0" />
+      <LineId Id="63" Count="0" />
+      <LineId Id="22" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

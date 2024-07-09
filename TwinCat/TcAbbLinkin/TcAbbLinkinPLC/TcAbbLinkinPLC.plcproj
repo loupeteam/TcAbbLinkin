@@ -63,6 +63,9 @@
     <Compile Include="POUs\MAIN.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\SimpleExample.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\TcAbbLinkin.TcPOU">
       <SubType>Code</SubType>
     </Compile>

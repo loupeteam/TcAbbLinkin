@@ -426,7 +426,7 @@ _getStateRespCallbackSuccess := TRUE;
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD PRIVATE _getSymbol : BOOL
 VAR_INPUT
-	signal : STRING;
+	symbolUrl : STRING;
 	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 	pResultBool : POINTER TO BOOL := 0;
 	pResultLreal : POINTER TO LREAL := 0;
@@ -484,12 +484,12 @@ request.httpMethod :=  ETcIotHttpRequestType.HTTP_Get;
 CASE configuration.rwsVersion OF
 	ABBLINKIN_RWS_API_VERSION.V1:
 		request.uri := '/rw/rapid/symbol/data/';
-		request.uri := CONCAT(request.uri, signal);		// e.g. signal='RAPID/T_ROB1/Module1/myRapidString'
+		request.uri := CONCAT(request.uri, symbolUrl);		// e.g. signal='RAPID/T_ROB1/Module1/myRapidString'
 		request.uri := CONCAT(request.uri, '?json=1');
 
 	ABBLINKIN_RWS_API_VERSION.V2:	
 		request.uri := '/rw/rapid/symbol/';
-		request.uri := CONCAT(request.uri, signal);		// e.g. signal='RAPID/T_ROB1/Module1/myRapidString'
+		request.uri := CONCAT(request.uri, symbolUrl);		// e.g. signal='RAPID/T_ROB1/Module1/myRapidString'
 		request.uri := CONCAT(request.uri, '/data');
 		
 END_CASE
@@ -756,7 +756,7 @@ END_IF
     </Method>
     <Method Name="AckError" Id="{e7f175da-d890-48da-a6d6-1a4277b5b980}">
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
-METHOD AckError : BOOL
+METHOD AckError
 VAR_INPUT
 END_VAR
 ]]></Declaration>
@@ -768,7 +768,7 @@ _methodAckErrorCalled := TRUE;
     </Method>
     <Method Name="ConnectionStart" Id="{ae04014b-99d1-4864-b820-dd29eedcb99e}">
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
-METHOD ConnectionStart : BOOL
+METHOD ConnectionStart
 VAR_INPUT
 END_VAR
 ]]></Declaration>
@@ -791,7 +791,7 @@ _methodConnectionStartCalled := TRUE;
     </Method>
     <Method Name="ConnectionStop" Id="{fb28cdfe-8e1b-44f1-869a-b019fa3c0b7f}">
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
-METHOD ConnectionStop : BOOL
+METHOD ConnectionStop
 VAR_INPUT
 END_VAR
 ]]></Declaration>
@@ -805,7 +805,7 @@ _methodConnectionStopCalled := TRUE;
     </Method>
     <Method Name="Cyclic" Id="{b14f94df-ed21-4275-9dc6-f78c593c481d}">
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
-METHOD Cyclic : BOOL
+METHOD Cyclic
 VAR_INPUT
 END_VAR
 
@@ -1154,7 +1154,7 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[
-GetIOAnalog:= _getIO(signal, pStatus, pResultBOOL := 0, pResultDINT := 0, pResultLREAL := pResult);
+GetIOAnalog := _getIO(signal, pStatus, pResultBOOL := 0, pResultDINT := 0, pResultLREAL := pResult);
 ]]></ST>
       </Implementation>
     </Method>
@@ -1250,14 +1250,14 @@ END_IF
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD GetSymbolBool : BOOL
 VAR_INPUT
-	signal : STRING;
+	symbolUrl : STRING;
 	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 	pResult : POINTER TO BOOL;
 END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[
-GetSymbolBool:= _getSymbol(signal, pStatus, pResultBool := pResult, pResultLreal := 0, pResultString := 0);
+GetSymbolBool := _getSymbol(symbolUrl, pStatus, pResultBool := pResult, pResultLreal := 0, pResultString := 0);
 ]]></ST>
       </Implementation>
     </Method>
@@ -1265,14 +1265,14 @@ GetSymbolBool:= _getSymbol(signal, pStatus, pResultBool := pResult, pResultLreal
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD GetSymbolNum : BOOL
 VAR_INPUT
-	signal : STRING;
+	symbolUrl : STRING;
 	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 	pResult : POINTER TO LREAL;
 END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[
-GetSymbolNum := _getSymbol(signal, pStatus, pResultBool := 0, pResultLreal := pResult, pResultString := 0);
+GetSymbolNum := _getSymbol(symbolUrl, pStatus, pResultBool := 0, pResultLreal := pResult, pResultString := 0);
 ]]></ST>
       </Implementation>
     </Method>
@@ -1280,14 +1280,14 @@ GetSymbolNum := _getSymbol(signal, pStatus, pResultBool := 0, pResultLreal := pR
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD GetSymbolString : BOOL
 VAR_INPUT
-	signal : STRING;
+	symbolUrl : STRING;
 	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 	pResult : POINTER TO STRING;
 END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[
-GetSymbolString := _getSymbol(signal, pStatus, pResultBool := 0, pResultLreal := 0, pResultString := pResult);
+GetSymbolString := _getSymbol(symbolUrl, pStatus, pResultBool := 0, pResultLreal := 0, pResultString := pResult);
 ]]></ST>
       </Implementation>
     </Method>
@@ -1652,7 +1652,7 @@ END_IF
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD SetSymbol : BOOL
 VAR_INPUT
-	name : STRING;
+	symbolUrl : STRING;
 	value : ANY;
 	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 END_VAR
@@ -1690,12 +1690,12 @@ request.httpMethod :=  ETcIotHttpRequestType.HTTP_POST;
 CASE configuration.rwsVersion OF
 	ABBLINKIN_RWS_API_VERSION.V1:
 		request.uri := '/rw/rapid/symbol/data/';
-		request.uri := concat(request.uri, name);
+		request.uri := concat(request.uri, symbolUrl);
 		request.uri := concat(request.uri, '?action=set');
 		
 	ABBLINKIN_RWS_API_VERSION.V2:
 		request.uri := '/rw/rapid/symbol/';
-		request.uri := concat(request.uri, name);
+		request.uri := concat(request.uri, symbolUrl);
 		request.uri := concat(request.uri, '/data?mastership=implicit');
 		
 END_CASE

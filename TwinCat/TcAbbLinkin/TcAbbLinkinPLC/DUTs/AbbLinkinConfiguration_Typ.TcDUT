@@ -10,7 +10,7 @@ STRUCT
 	rwsUsername : STRING := 'Default User';
 	rwsPassword : STRING := 'robotics';
 	tlsAllowRwsCertSelfSigned : BOOL := FALSE;
-	tlsCAFile : STRING := '';
+	tlsCAFile : STRING(255) := '';
 END_STRUCT
 END_TYPE
 ]]></Declaration>
