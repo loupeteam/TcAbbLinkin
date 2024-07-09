@@ -426,7 +426,7 @@ _getStateRespCallbackSuccess := TRUE;
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD PRIVATE _getSymbol : BOOL
 VAR_INPUT
-	signal : STRING;
+	symbolUrl : STRING;
 	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 	pResultBool : POINTER TO BOOL := 0;
 	pResultLreal : POINTER TO LREAL := 0;
@@ -484,12 +484,12 @@ request.httpMethod :=  ETcIotHttpRequestType.HTTP_Get;
 CASE configuration.rwsVersion OF
 	ABBLINKIN_RWS_API_VERSION.V1:
 		request.uri := '/rw/rapid/symbol/data/';
-		request.uri := CONCAT(request.uri, signal);		// e.g. signal='RAPID/T_ROB1/Module1/myRapidString'
+		request.uri := CONCAT(request.uri, symbolUrl);		// e.g. signal='RAPID/T_ROB1/Module1/myRapidString'
 		request.uri := CONCAT(request.uri, '?json=1');
 
 	ABBLINKIN_RWS_API_VERSION.V2:	
 		request.uri := '/rw/rapid/symbol/';
-		request.uri := CONCAT(request.uri, signal);		// e.g. signal='RAPID/T_ROB1/Module1/myRapidString'
+		request.uri := CONCAT(request.uri, symbolUrl);		// e.g. signal='RAPID/T_ROB1/Module1/myRapidString'
 		request.uri := CONCAT(request.uri, '/data');
 		
 END_CASE
@@ -1250,14 +1250,14 @@ END_IF
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD GetSymbolBool : BOOL
 VAR_INPUT
-	signal : STRING;
+	symbolUrl : STRING;
 	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 	pResult : POINTER TO BOOL;
 END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[
-GetSymbolBool:= _getSymbol(signal, pStatus, pResultBool := pResult, pResultLreal := 0, pResultString := 0);
+GetSymbolBool:= _getSymbol(symbolUrl, pStatus, pResultBool := pResult, pResultLreal := 0, pResultString := 0);
 ]]></ST>
       </Implementation>
     </Method>
@@ -1265,14 +1265,14 @@ GetSymbolBool:= _getSymbol(signal, pStatus, pResultBool := pResult, pResultLreal
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD GetSymbolNum : BOOL
 VAR_INPUT
-	signal : STRING;
+	symbolUrl : STRING;
 	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 	pResult : POINTER TO LREAL;
 END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[
-GetSymbolNum := _getSymbol(signal, pStatus, pResultBool := 0, pResultLreal := pResult, pResultString := 0);
+GetSymbolNum := _getSymbol(symbolUrl, pStatus, pResultBool := 0, pResultLreal := pResult, pResultString := 0);
 ]]></ST>
       </Implementation>
     </Method>
@@ -1280,14 +1280,14 @@ GetSymbolNum := _getSymbol(signal, pStatus, pResultBool := 0, pResultLreal := pR
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD GetSymbolString : BOOL
 VAR_INPUT
-	signal : STRING;
+	symbolUrl : STRING;
 	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 	pResult : POINTER TO STRING;
 END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[
-GetSymbolString := _getSymbol(signal, pStatus, pResultBool := 0, pResultLreal := 0, pResultString := pResult);
+GetSymbolString := _getSymbol(symbolUrl, pStatus, pResultBool := 0, pResultLreal := 0, pResultString := pResult);
 ]]></ST>
       </Implementation>
     </Method>
@@ -1652,7 +1652,7 @@ END_IF
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD SetSymbol : BOOL
 VAR_INPUT
-	name : STRING;
+	symbolUrl : STRING;
 	value : ANY;
 	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 END_VAR
@@ -1690,12 +1690,12 @@ request.httpMethod :=  ETcIotHttpRequestType.HTTP_POST;
 CASE configuration.rwsVersion OF
 	ABBLINKIN_RWS_API_VERSION.V1:
 		request.uri := '/rw/rapid/symbol/data/';
-		request.uri := concat(request.uri, name);
+		request.uri := concat(request.uri, symbolUrl);
 		request.uri := concat(request.uri, '?action=set');
 		
 	ABBLINKIN_RWS_API_VERSION.V2:
 		request.uri := '/rw/rapid/symbol/';
-		request.uri := concat(request.uri, name);
+		request.uri := concat(request.uri, symbolUrl);
 		request.uri := concat(request.uri, '/data?mastership=implicit');
 		
 END_CASE

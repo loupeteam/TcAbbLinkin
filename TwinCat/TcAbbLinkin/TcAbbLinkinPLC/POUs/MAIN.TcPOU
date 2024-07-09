@@ -148,15 +148,15 @@ END_IF
 
 
 IF userGetSymbolBoolNow THEN
-	myRobotLink.GetSymbolBool(signal := 'RAPID/T_ROB1/Module1/myRapidBool', pStatus := ADR(userGetSymbolBoolStatus), pResult := ADR(userGetSymbolBoolResult));
+	myRobotLink.GetSymbolBool(symbolUrl := 'RAPID/T_ROB1/Module1/myRapidBool', pStatus := ADR(userGetSymbolBoolStatus), pResult := ADR(userGetSymbolBoolResult));
 	userGetSymbolBoolNow := FALSE;
 END_IF
 IF userGetSymbolNumNow THEN
-	myRobotLink.GetSymbolNum(signal := 'RAPID/T_ROB1/Module1/myRapidNum', pStatus := ADR(userGetSymbolNumStatus), pResult := ADR(userGetSymbolNumResult));
+	myRobotLink.GetSymbolNum(symbolUrl := 'RAPID/T_ROB1/Module1/myRapidNum', pStatus := ADR(userGetSymbolNumStatus), pResult := ADR(userGetSymbolNumResult));
 	userGetSymbolNumNow := FALSE;
 END_IF
 IF userGetSymbolStringNow THEN
-	myRobotLink.GetSymbolString(signal := 'RAPID/T_ROB1/Module1/myRapidString', pStatus := ADR(userGetSymbolStringStatus), pResult := ADR(userGetSymbolStringResult));
+	myRobotLink.GetSymbolString(symbolUrl := 'RAPID/T_ROB1/Module1/myRapidString', pStatus := ADR(userGetSymbolStringStatus), pResult := ADR(userGetSymbolStringResult));
 	userGetSymbolStringNow := FALSE;
 END_IF
 
