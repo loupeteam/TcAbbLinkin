@@ -756,7 +756,7 @@ END_IF
     </Method>
     <Method Name="AckError" Id="{e7f175da-d890-48da-a6d6-1a4277b5b980}">
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
-METHOD AckError : BOOL
+METHOD AckError
 VAR_INPUT
 END_VAR
 ]]></Declaration>
@@ -768,7 +768,7 @@ _methodAckErrorCalled := TRUE;
     </Method>
     <Method Name="ConnectionStart" Id="{ae04014b-99d1-4864-b820-dd29eedcb99e}">
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
-METHOD ConnectionStart : BOOL
+METHOD ConnectionStart
 VAR_INPUT
 END_VAR
 ]]></Declaration>
@@ -791,7 +791,7 @@ _methodConnectionStartCalled := TRUE;
     </Method>
     <Method Name="ConnectionStop" Id="{fb28cdfe-8e1b-44f1-869a-b019fa3c0b7f}">
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
-METHOD ConnectionStop : BOOL
+METHOD ConnectionStop
 VAR_INPUT
 END_VAR
 ]]></Declaration>
@@ -805,7 +805,7 @@ _methodConnectionStopCalled := TRUE;
     </Method>
     <Method Name="Cyclic" Id="{b14f94df-ed21-4275-9dc6-f78c593c481d}">
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
-METHOD Cyclic : BOOL
+METHOD Cyclic
 VAR_INPUT
 END_VAR
 
