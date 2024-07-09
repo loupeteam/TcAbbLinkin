@@ -21,5 +21,9 @@ The name of this library is intended to be a pun, sounding like the name of Abra
 
 <img src="./img/AbeLincolnWithTwinCats.jpg" alt="Abe Lincoln with twin cats, generated with Microsoft Copilot Image Creator" width="400" height="400">
 
+## Documentation
+
+The library documentation can be found [here](https://loupeteam.github.io/LoupeDocs/libraries_beckhoff/tcabblinkin.html)
+
 ## Licensing
 This project is licensed under the [MIT License](LICENSE).
