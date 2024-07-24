@@ -632,8 +632,8 @@ VAR_INPUT
 END_VAR
 VAR
 	authValue : STRING;
-	combinedUnPwRaw : STRING;
-	combinedUnPwBase64 : STRING;
+	combinedCredentialsRaw : STRING;
+	combinedCredentialsBase64 : STRING;
 	anyCookieSetYet : BOOL;
 	tempString : STRING;
 	cookieValue : ABBLINKIN_STRING_EX_LEN;
@@ -654,13 +654,13 @@ CASE authorizationValue OF
 		_httpHeader.AddField('Authorization', ' ', FALSE);
 	
 	ABBLINKIN_AUTH_HEADER_VALUE.BASIC:
-		combinedUnPwRaw := configuration.rwsUsername;
-		combinedUnPwRaw := CONCAT(combinedUnPwRaw, ':');
-		combinedUnPwRaw := CONCAT(combinedUnPwRaw, configuration.rwsPassword);
-		combinedUnPwBase64 := _encodeBase64(combinedUnPwRaw);
+		combinedCredentialsRaw := configuration.rwsUsername;
+		combinedCredentialsRaw := CONCAT(combinedCredentialsRaw, ':');
+		combinedCredentialsRaw := CONCAT(combinedCredentialsRaw, configuration.rwsPassword);
+		combinedCredentialsBase64 := _encodeBase64(combinedCredentialsRaw);
 		
 		authValue := 'Basic ';
-		authValue := CONCAT(authValue, combinedUnPwBase64);
+		authValue := CONCAT(authValue, combinedCredentialsBase64);
 		_httpHeader.AddField('Authorization', authValue, FALSE);
 	
 	ABBLINKIN_AUTH_HEADER_VALUE.DIGEST:
