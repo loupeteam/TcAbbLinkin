@@ -624,9 +624,9 @@ _requestQueuePop := _requestQueue.request;
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="_setHeader" Id="{03deb409-7be0-4e61-9c99-83e8f97b30dc}" FolderPath="Internal\">
+    <Method Name="_setHeaders" Id="{03deb409-7be0-4e61-9c99-83e8f97b30dc}" FolderPath="Internal\">
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
-METHOD PRIVATE _setHeader : BOOL
+METHOD PRIVATE _setHeaders : BOOL
 VAR_INPUT
 	authorizationValue : ABBLINKIN_AUTH_HEADER_VALUE;
 END_VAR
@@ -871,7 +871,7 @@ CASE _state OF
 		
 	ABBLINKIN_STATE.SEND_REQUEST:
 		
-		_setHeader(ABBLINKIN_AUTH_HEADER_VALUE.NONE);
+		_setHeaders(ABBLINKIN_AUTH_HEADER_VALUE.NONE);
 		retVal := _httpRequest.SendRequest(_currentRequest.uri, _httpClient, _currentRequest.httpMethod, ADR(_currentRequest.httpBody), INT_TO_UDINT(LEN(_currentRequest.httpBody)), _httpHeader);
 		_numRequestAttempts := _numRequestAttempts + 1;
 		
@@ -950,9 +950,9 @@ CASE _state OF
 		
 		CASE configuration.rwsVersion OF
 			ABBLINKIN_RWS_API_VERSION.V1:
-				_setHeader(ABBLINKIN_AUTH_HEADER_VALUE.NONE);
+				_setHeaders(ABBLINKIN_AUTH_HEADER_VALUE.NONE);
 			ABBLINKIN_RWS_API_VERSION.V2:
-				_setHeader(ABBLINKIN_AUTH_HEADER_VALUE.BASIC);
+				_setHeaders(ABBLINKIN_AUTH_HEADER_VALUE.BASIC);
 		END_CASE
 		
 		retVal := _httpRequest.SendRequest(AUTH_URI, _httpClient, ETcIotHttpRequestType.HTTP_Get, 0, 0, _httpHeader);
@@ -1085,7 +1085,7 @@ CASE _state OF
 	
 	ABBLINKIN_STATE.AUTH_DIGEST_RESPONSE_SEND:
 	
-		_setHeader(ABBLINKIN_AUTH_HEADER_VALUE.DIGEST);
+		_setHeaders(ABBLINKIN_AUTH_HEADER_VALUE.DIGEST);
 		retVal := _httpRequest.SendRequest(AUTH_URI, _httpClient, ETcIotHttpRequestType.HTTP_Get, 0, 0, _httpHeader);
 		
 		IF retVal = FALSE THEN
@@ -2059,7 +2059,7 @@ END_IF
       <LineId Id="16" Count="0" />
       <LineId Id="8" Count="0" />
     </LineIds>
-    <LineIds Name="TcAbbLinkin._setHeader">
+    <LineIds Name="TcAbbLinkin._setHeaders">
       <LineId Id="36" Count="0" />
       <LineId Id="38" Count="1" />
       <LineId Id="42" Count="0" />
