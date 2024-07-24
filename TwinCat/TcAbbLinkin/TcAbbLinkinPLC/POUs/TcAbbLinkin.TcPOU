@@ -13,7 +13,7 @@ VAR_OUTPUT
 	errorMsg : STRING;
 END_VAR
 VAR
-	_connectionEnabled : BOOL;
+	_connectionEnable : BOOL;
 	_sendingEnabled : BOOL;
 	_authorized : BOOL;
 	
@@ -776,13 +776,13 @@ END_VAR
         <ST><![CDATA[
 // If Connection is already enabled, disable and disconnect
 // Reference : https://infosys.beckhoff.com/content/1033/tf6760_tc3_iot_https_rest/9298409995.html?id=3568786990275794598
-IF _connectionEnabled THEN
-	_connectionEnabled := FALSE;
+IF _connectionEnable THEN
+	_connectionEnable := FALSE;
 	_httpClient.Disconnect();
 END_IF
 
 _configureClient(configuration);
-_connectionEnabled := TRUE;
+_connectionEnable := TRUE;
 
 _methodConnectionStartCalled := TRUE;
 
@@ -798,7 +798,7 @@ END_VAR
       <Implementation>
         <ST><![CDATA[
 _httpClient.Disconnect();
-_connectionEnabled := FALSE;
+_connectionEnable := FALSE;
 _methodConnectionStopCalled := TRUE;
 ]]></ST>
       </Implementation>
@@ -815,7 +815,7 @@ VAR
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
-IF _connectionEnabled THEN
+IF _connectionEnable THEN
 	_httpClient.Execute();
 	
 	IF _httpClient.bError THEN
@@ -826,7 +826,7 @@ IF _connectionEnabled THEN
 END_IF
 
 // Status
-_sendingEnabled := _connectionEnabled AND _httpClient.bConfigured AND NOT error;
+_sendingEnabled := _connectionEnable AND _httpClient.bConfigured AND NOT error;
 readyForCmd := _sendingEnabled AND _authorized;
 
 
