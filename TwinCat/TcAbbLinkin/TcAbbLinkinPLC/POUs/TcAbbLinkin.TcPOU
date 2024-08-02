@@ -766,9 +766,9 @@ _methodAckErrorCalled := TRUE;
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="ConnectionStart" Id="{ae04014b-99d1-4864-b820-dd29eedcb99e}">
+    <Method Name="Connect" Id="{ae04014b-99d1-4864-b820-dd29eedcb99e}">
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
-METHOD ConnectionStart
+METHOD Connect
 VAR_INPUT
 END_VAR
 ]]></Declaration>
@@ -786,20 +786,6 @@ _connectionEnable := TRUE;
 
 _methodConnectionStartCalled := TRUE;
 
-]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="ConnectionStop" Id="{fb28cdfe-8e1b-44f1-869a-b019fa3c0b7f}">
-      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
-METHOD ConnectionStop
-VAR_INPUT
-END_VAR
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[
-_httpClient.Disconnect();
-_connectionEnable := FALSE;
-_methodConnectionStopCalled := TRUE;
 ]]></ST>
       </Implementation>
     </Method>
@@ -1140,6 +1126,20 @@ END_IF
 // Set Error status
 error := (_state = ABBLINKIN_STATE.ERROR);
 
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Disconnect" Id="{fb28cdfe-8e1b-44f1-869a-b019fa3c0b7f}">
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD Disconnect
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+_httpClient.Disconnect();
+_connectionEnable := FALSE;
+_methodConnectionStopCalled := TRUE;
 ]]></ST>
       </Implementation>
     </Method>
@@ -2137,7 +2137,7 @@ END_IF
       <LineId Id="6" Count="1" />
       <LineId Id="5" Count="0" />
     </LineIds>
-    <LineIds Name="TcAbbLinkin.ConnectionStart">
+    <LineIds Name="TcAbbLinkin.Connect">
       <LineId Id="57" Count="1" />
       <LineId Id="64" Count="0" />
       <LineId Id="12" Count="0" />
@@ -2149,13 +2149,6 @@ END_IF
       <LineId Id="65" Count="0" />
       <LineId Id="69" Count="1" />
       <LineId Id="67" Count="0" />
-    </LineIds>
-    <LineIds Name="TcAbbLinkin.ConnectionStop">
-      <LineId Id="17" Count="0" />
-      <LineId Id="12" Count="0" />
-      <LineId Id="5" Count="0" />
-      <LineId Id="13" Count="0" />
-      <LineId Id="18" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.Cyclic">
       <LineId Id="7" Count="1" />
@@ -2380,6 +2373,13 @@ END_IF
       <LineId Id="15" Count="0" />
       <LineId Id="781" Count="0" />
       <LineId Id="727" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin.Disconnect">
+      <LineId Id="17" Count="0" />
+      <LineId Id="12" Count="0" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="13" Count="0" />
+      <LineId Id="18" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.GetIOAnalog">
       <LineId Id="123" Count="0" />
