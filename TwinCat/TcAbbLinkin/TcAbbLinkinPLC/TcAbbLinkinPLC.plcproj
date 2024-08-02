@@ -63,7 +63,7 @@
     <Compile Include="POUs\MAIN.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\SimpleExample.TcPOU">
+    <Compile Include="POUs\Example.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\TcAbbLinkin.TcPOU">
