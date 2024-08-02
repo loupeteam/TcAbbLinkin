@@ -600,12 +600,16 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[
-// Note : the requestQueue and this method are temporary implementations. It is not a real queue as shown.
+// Note : the requestQueue and this method are temporary implementations. It is not a real queue as shown (it can only hold one request).
 
-_requestQueue.request := request;
-_requestQueue.empty := FALSE;
-
-_requestQueueAdd := TRUE;
+IF _requestQueue.empty THEN
+	_requestQueue.request := request;
+	_requestQueue.empty := FALSE;
+	_requestQueueAdd := TRUE;
+ELSE
+	// Do not overwrite request
+	_requestQueueAdd := FALSE;
+END_IF
 ]]></ST>
       </Implementation>
     </Method>
@@ -2045,10 +2049,15 @@ END_IF
     <LineIds Name="TcAbbLinkin._requestQueueAdd">
       <LineId Id="10" Count="0" />
       <LineId Id="7" Count="0" />
+      <LineId Id="24" Count="0" />
       <LineId Id="11" Count="0" />
       <LineId Id="5" Count="0" />
       <LineId Id="9" Count="0" />
-      <LineId Id="16" Count="1" />
+      <LineId Id="17" Count="0" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="44" Count="0" />
+      <LineId Id="28" Count="0" />
+      <LineId Id="27" Count="0" />
       <LineId Id="8" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin._requestQueuePop">
