@@ -261,6 +261,10 @@ END_VAR
 VAR
 	request : AbbLinkinRequest_Typ;
 	pointersSet : INT;
+END_VAR
+
+VAR CONSTANT
+	THIS_COMMAND_TYPE: ABBLINKIN_COMMAND_TYPE := ABBLINKIN_COMMAND_TYPE.GET_IO;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[IF pStatus = 0 THEN
@@ -292,18 +296,18 @@ END_IF
 
 IF pointersSet = 0 THEN
 	pStatus^.error := TRUE;
-	pStatus^.errorMsg := TO_STRING(ABBLINKIN_COMMAND_TYPE.GET_STATE);
+	pStatus^.errorMsg := TO_STRING(THIS_COMMAND_TYPE);
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' : No result pointer set');
 	_getIO := FALSE;
 ELSIF pointersSet >= 2 THEN
 	pStatus^.error := TRUE;
-	pStatus^.errorMsg := TO_STRING(ABBLINKIN_COMMAND_TYPE.GET_STATE);
+	pStatus^.errorMsg := TO_STRING(THIS_COMMAND_TYPE);
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' : Two or more result pointer set');
 	_getIO := FALSE;
 END_IF
 
 request.pStatus := pStatus;
-request.command := ABBLINKIN_COMMAND_TYPE.GET_IO;
+request.command := THIS_COMMAND_TYPE;
 request.httpMethod :=  ETcIotHttpRequestType.HTTP_Get;
 
 CASE configuration.rwsVersion OF
@@ -323,7 +327,7 @@ IF _requestQueueAdd(request) THEN
 	_getIO := TRUE;
 ELSE
 	pStatus^.error := TRUE;
-	pStatus^.errorMsg := TO_STRING(request.command);
+	pStatus^.errorMsg := TO_STRING(THIS_COMMAND_TYPE);
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' could not be added to request Queue');
 	_getIO := FALSE;
 END_IF
@@ -435,6 +439,10 @@ END_VAR
 VAR
 	request : AbbLinkinRequest_Typ;
 	pointersSet : INT;
+END_VAR
+
+VAR CONSTANT
+	THIS_COMMAND_TYPE: ABBLINKIN_COMMAND_TYPE := ABBLINKIN_COMMAND_TYPE.GET_SYMBOL;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[IF pStatus = 0 THEN
@@ -466,18 +474,18 @@ END_IF
 
 IF pointersSet = 0 THEN
 	pStatus^.error := TRUE;
-	pStatus^.errorMsg := TO_STRING(ABBLINKIN_COMMAND_TYPE.GET_SYMBOL);
+	pStatus^.errorMsg := TO_STRING(THIS_COMMAND_TYPE);
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' : No result pointer set');
 	_getSymbol := FALSE;
 ELSIF pointersSet >= 2 THEN
 	pStatus^.error := TRUE;
-	pStatus^.errorMsg := TO_STRING(ABBLINKIN_COMMAND_TYPE.GET_SYMBOL);
+	pStatus^.errorMsg := TO_STRING(THIS_COMMAND_TYPE);
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' : Two or more result pointer set');
 	_getSymbol := FALSE;
 END_IF
 
 request.pStatus := pStatus;
-request.command := ABBLINKIN_COMMAND_TYPE.GET_SYMBOL;
+request.command := THIS_COMMAND_TYPE;
 request.httpMethod :=  ETcIotHttpRequestType.HTTP_Get;
 
 CASE configuration.rwsVersion OF
@@ -499,7 +507,7 @@ IF _requestQueueAdd(request) THEN
 	_getSymbol := TRUE;
 ELSE
 	pStatus^.error := TRUE;
-	pStatus^.errorMsg := TO_STRING(request.command);
+	pStatus^.errorMsg := TO_STRING(THIS_COMMAND_TYPE);
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' could not be added to request Queue');
 	_getSymbol := FALSE;
 END_IF
@@ -1201,7 +1209,12 @@ END_VAR
 
 VAR
 	request : AbbLinkinRequest_Typ;
-END_VAR]]></Declaration>
+END_VAR
+
+VAR CONSTANT
+	THIS_COMMAND_TYPE: ABBLINKIN_COMMAND_TYPE := ABBLINKIN_COMMAND_TYPE.GET_RAPID_STATE;
+END_VAR
+]]></Declaration>
       <Implementation>
         <ST><![CDATA[
 // Check for invalid status pointer
@@ -1216,14 +1229,14 @@ _clearRequestStatus(pStatus);
 // Check for invalid results pointer
 IF pResultState = 0 THEN
 	pStatus^.error := TRUE;
-	pStatus^.errorMsg := TO_STRING(ABBLINKIN_COMMAND_TYPE.GET_RAPID_STATE);
+	pStatus^.errorMsg := TO_STRING(THIS_COMMAND_TYPE);
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' results pointer invalid.');
 	GetRapidState := FALSE;
 	RETURN;
 END_IF
 
 request.pStatus := pStatus;
-request.command := ABBLINKIN_COMMAND_TYPE.GET_RAPID_STATE;
+request.command := THIS_COMMAND_TYPE;
 request.httpMethod :=  ETcIotHttpRequestType.HTTP_Get;
 
 CASE configuration.rwsVersion OF
@@ -1242,7 +1255,7 @@ IF _requestQueueAdd(request) THEN
 	GetRapidState := TRUE;
 ELSE
 	pStatus^.error := TRUE;
-	pStatus^.errorMsg := TO_STRING(request.command);
+	pStatus^.errorMsg := TO_STRING(THIS_COMMAND_TYPE);
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' could not be added to request Queue');
 	GetRapidState := FALSE;
 END_IF
@@ -1304,6 +1317,10 @@ END_VAR
 VAR
 	request : AbbLinkinRequest_Typ;
 END_VAR
+
+VAR CONSTANT
+	THIS_COMMAND_TYPE: ABBLINKIN_COMMAND_TYPE := ABBLINKIN_COMMAND_TYPE.POWER_OFF;
+END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[IF pStatus = 0 THEN
@@ -1315,7 +1332,7 @@ END_IF
 _clearRequestStatus(pStatus);
 
 request.pStatus := pStatus;
-request.command := ABBLINKIN_COMMAND_TYPE.POWER_OFF;
+request.command := THIS_COMMAND_TYPE;
 request.httpMethod :=  ETcIotHttpRequestType.HTTP_POST;
 
 CASE configuration.rwsVersion OF
@@ -1335,7 +1352,7 @@ IF _requestQueueAdd(request) THEN
 	PowerOff := TRUE;
 ELSE
 	pStatus^.error := TRUE;
-	pStatus^.errorMsg := TO_STRING(request.command);
+	pStatus^.errorMsg := TO_STRING(THIS_COMMAND_TYPE);
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' could not be added to request Queue');
 	PowerOff := FALSE;
 END_IF
@@ -1352,6 +1369,10 @@ END_VAR
 VAR
 	request : AbbLinkinRequest_Typ;
 END_VAR
+
+VAR CONSTANT
+	THIS_COMMAND_TYPE: ABBLINKIN_COMMAND_TYPE := ABBLINKIN_COMMAND_TYPE.POWER_ON;
+END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[IF pStatus = 0 THEN
@@ -1363,7 +1384,7 @@ END_IF
 _clearRequestStatus(pStatus);
 
 request.pStatus := pStatus;
-request.command := ABBLINKIN_COMMAND_TYPE.POWER_ON;
+request.command := THIS_COMMAND_TYPE;
 request.httpMethod :=  ETcIotHttpRequestType.HTTP_POST;
 
 CASE configuration.rwsVersion OF
@@ -1383,7 +1404,7 @@ IF _requestQueueAdd(request) THEN
 	PowerOn := TRUE;
 ELSE
 	pStatus^.error := TRUE;
-	pStatus^.errorMsg := TO_STRING(request.command);
+	pStatus^.errorMsg := TO_STRING(THIS_COMMAND_TYPE);
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' could not be added to request Queue');
 	PowerOn := FALSE;
 END_IF
@@ -1400,6 +1421,10 @@ END_VAR
 VAR
 	request : AbbLinkinRequest_Typ;
 END_VAR
+
+VAR CONSTANT
+	THIS_COMMAND_TYPE: ABBLINKIN_COMMAND_TYPE := ABBLINKIN_COMMAND_TYPE.RAPID_RESET;
+END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[IF pStatus = 0 THEN
@@ -1411,7 +1436,7 @@ END_IF
 _clearRequestStatus(pStatus);
 
 request.pStatus := pStatus;
-request.command := ABBLINKIN_COMMAND_TYPE.RAPID_RESET;
+request.command := THIS_COMMAND_TYPE;
 request.httpMethod :=  ETcIotHttpRequestType.HTTP_POST;
 
 CASE configuration.rwsVersion OF
@@ -1431,7 +1456,7 @@ IF _requestQueueAdd(request) THEN
 	RapidReset := TRUE;
 ELSE
 	pStatus^.error := TRUE;
-	pStatus^.errorMsg := TO_STRING(request.command);
+	pStatus^.errorMsg := TO_STRING(THIS_COMMAND_TYPE);
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' could not be added to request Queue');
 	RapidReset := FALSE;
 END_IF
@@ -1448,6 +1473,10 @@ END_VAR
 VAR
 	request : AbbLinkinRequest_Typ;
 END_VAR
+
+VAR CONSTANT
+	THIS_COMMAND_TYPE: ABBLINKIN_COMMAND_TYPE := ABBLINKIN_COMMAND_TYPE.RAPID_START;
+END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[IF pStatus = 0 THEN
@@ -1459,7 +1488,7 @@ END_IF
 _clearRequestStatus(pStatus);
 
 request.pStatus := pStatus;
-request.command := ABBLINKIN_COMMAND_TYPE.RAPID_START;
+request.command := THIS_COMMAND_TYPE;
 request.httpMethod :=  ETcIotHttpRequestType.HTTP_POST;
 
 CASE configuration.rwsVersion OF
@@ -1491,7 +1520,7 @@ IF _requestQueueAdd(request) THEN
 	RapidStart := TRUE;
 ELSE
 	pStatus^.error := TRUE;
-	pStatus^.errorMsg := TO_STRING(request.command);
+	pStatus^.errorMsg := TO_STRING(THIS_COMMAND_TYPE);
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' could not be added to request Queue');
 	RapidStart := FALSE;
 END_IF
@@ -1508,6 +1537,10 @@ END_VAR
 VAR
 	request : AbbLinkinRequest_Typ;
 END_VAR
+
+VAR CONSTANT
+	THIS_COMMAND_TYPE: ABBLINKIN_COMMAND_TYPE := ABBLINKIN_COMMAND_TYPE.RAPID_STOP;
+END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[IF pStatus = 0 THEN
@@ -1519,7 +1552,7 @@ END_IF
 _clearRequestStatus(pStatus);
 
 request.pStatus := pStatus;
-request.command := ABBLINKIN_COMMAND_TYPE.RAPID_STOP;
+request.command := THIS_COMMAND_TYPE;
 request.httpMethod :=  ETcIotHttpRequestType.HTTP_POST;
 
 CASE configuration.rwsVersion OF
@@ -1539,7 +1572,7 @@ IF _requestQueueAdd(request) THEN
 	RapidStop := TRUE;
 ELSE
 	pStatus^.error := TRUE;
-	pStatus^.errorMsg := TO_STRING(request.command);
+	pStatus^.errorMsg := TO_STRING(THIS_COMMAND_TYPE);
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' could not be added to request Queue');
 	RapidStop := FALSE;
 END_IF
@@ -1565,6 +1598,10 @@ VAR
 	pUdint : POINTER TO UDINT;
 	pReal : POINTER TO REAL;
 	pLreal : POINTER TO LREAL;
+END_VAR
+
+VAR CONSTANT
+	THIS_COMMAND_TYPE: ABBLINKIN_COMMAND_TYPE := ABBLINKIN_COMMAND_TYPE.SET_IO;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
@@ -1578,7 +1615,7 @@ END_IF
 _clearRequestStatus(pStatus);
 
 request.pStatus := pStatus;
-request.command := ABBLINKIN_COMMAND_TYPE.SET_IO;
+request.command := THIS_COMMAND_TYPE;
 request.httpMethod :=  ETcIotHttpRequestType.HTTP_POST;
 
 CASE configuration.rwsVersion OF
@@ -1632,7 +1669,7 @@ CASE value.TypeClass OF
 		
 ELSE
 	pStatus^.error := TRUE;
-	pStatus^.errorMsg := TO_STRING(ABBLINKIN_COMMAND_TYPE.SET_IO);
+	pStatus^.errorMsg := TO_STRING(THIS_COMMAND_TYPE);
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' was passed an unsupported "value" datatype');
 	SetIO := FALSE;
 	RETURN;
@@ -1644,7 +1681,7 @@ IF _requestQueueAdd(request) THEN
 	SetIO := TRUE;
 ELSE
 	pStatus^.error := TRUE;
-	pStatus^.errorMsg := TO_STRING(request.command);
+	pStatus^.errorMsg := TO_STRING(THIS_COMMAND_TYPE);
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' could not be added to request Queue');
 	SetIO := FALSE;
 END_IF
@@ -1674,6 +1711,10 @@ VAR
 	pString : POINTER TO STRING;
 	pWString : POINTER TO WSTRING;
 END_VAR
+
+VAR CONSTANT
+	THIS_COMMAND_TYPE: ABBLINKIN_COMMAND_TYPE := ABBLINKIN_COMMAND_TYPE.SET_SYMBOL;
+END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[
@@ -1687,7 +1728,7 @@ END_IF
 _clearRequestStatus(pStatus);
 
 request.pStatus := pStatus;
-request.command := ABBLINKIN_COMMAND_TYPE.SET_SYMBOL;
+request.command := THIS_COMMAND_TYPE;
 request.httpMethod :=  ETcIotHttpRequestType.HTTP_POST;
 
 CASE configuration.rwsVersion OF
@@ -1752,7 +1793,7 @@ CASE value.TypeClass OF
 		
 ELSE
 	pStatus^.error := TRUE;
-	pStatus^.errorMsg := TO_STRING(ABBLINKIN_COMMAND_TYPE.SET_SYMBOL);
+	pStatus^.errorMsg := TO_STRING(THIS_COMMAND_TYPE);
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' was passed an unsupported "value" datatype');
 	SetSymbol := FALSE;
 	RETURN;
@@ -1764,7 +1805,7 @@ IF _requestQueueAdd(request) THEN
 	SetSymbol := TRUE;
 ELSE
 	pStatus^.error := TRUE;
-	pStatus^.errorMsg := TO_STRING(request.command);
+	pStatus^.errorMsg := TO_STRING(THIS_COMMAND_TYPE);
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' could not be added to request Queue');
 	SetSymbol := FALSE;
 END_IF
