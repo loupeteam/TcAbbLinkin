@@ -133,8 +133,8 @@ CASE request.command OF
 	ABBLINKIN_COMMAND_TYPE.GET_IO:
 		_getIORespCallbackSuccess(httpRequest, request);
 		
-	ABBLINKIN_COMMAND_TYPE.GET_STATE:
-		_getStateRespCallbackSuccess(httpRequest, request);
+	ABBLINKIN_COMMAND_TYPE.GET_RAPID_STATE:
+		_getRapidStateRespCallbackSuccess(httpRequest, request);
 		
 	ABBLINKIN_COMMAND_TYPE.GET_SYMBOL:
 		_getSymbolRespCallbackSuccess(httpRequest, request);
@@ -377,9 +377,9 @@ _getIORespCallbackSuccess := TRUE;
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="_getStateRespCallbackSuccess" Id="{70e217fe-2d07-46fe-9a64-f1eb329f34c5}" FolderPath="Internal\responseCallbacks\">
+    <Method Name="_getRapidStateRespCallbackSuccess" Id="{70e217fe-2d07-46fe-9a64-f1eb329f34c5}" FolderPath="Internal\responseCallbacks\">
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
-METHOD PRIVATE _getStateRespCallbackSuccess : BOOL
+METHOD PRIVATE _getRapidStateRespCallbackSuccess : BOOL
 VAR_IN_OUT
 	httpRequest : FB_IotHttpRequest;
 	request : AbbLinkinRequest_Typ;
@@ -392,8 +392,7 @@ VAR
 	tempString : STRING;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[
-CASE configuration.rwsVersion OF 
+        <ST><![CDATA[CASE configuration.rwsVersion OF 
 	ABBLINKIN_RWS_API_VERSION.V1:
 		valuePath := '_embedded/_state#0/ctrlexecstate';
 	ABBLINKIN_RWS_API_VERSION.V2:
@@ -418,7 +417,7 @@ ELSE
 END_IF
 
 
-_getStateRespCallbackSuccess := TRUE;
+_getRapidStateRespCallbackSuccess := TRUE;
 ]]></ST>
       </Implementation>
     </Method>
@@ -1192,9 +1191,9 @@ GetIOGroup := _getIO(signal, pStatus, pResultBOOL := 0, pResultDINT := pResult, 
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="GetState" Id="{39878dda-bc14-4b8b-833d-1d9c4ab2cc84}">
+    <Method Name="GetRapidState" Id="{39878dda-bc14-4b8b-833d-1d9c4ab2cc84}">
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
-METHOD GetState : BOOL
+METHOD GetRapidState : BOOL
 VAR_INPUT
 	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
 	pResultState : POINTER TO STRING;
@@ -1207,7 +1206,7 @@ END_VAR]]></Declaration>
         <ST><![CDATA[
 // Check for invalid status pointer
 IF pStatus = 0 THEN
-	GetState := FALSE;
+	GetRapidState := FALSE;
 	RETURN;
 END_IF
 
@@ -1217,14 +1216,14 @@ _clearRequestStatus(pStatus);
 // Check for invalid results pointer
 IF pResultState = 0 THEN
 	pStatus^.error := TRUE;
-	pStatus^.errorMsg := TO_STRING(ABBLINKIN_COMMAND_TYPE.GET_STATE);
+	pStatus^.errorMsg := TO_STRING(ABBLINKIN_COMMAND_TYPE.GET_RAPID_STATE);
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' results pointer invalid.');
-	GetState := FALSE;
+	GetRapidState := FALSE;
 	RETURN;
 END_IF
 
 request.pStatus := pStatus;
-request.command := ABBLINKIN_COMMAND_TYPE.GET_STATE;
+request.command := ABBLINKIN_COMMAND_TYPE.GET_RAPID_STATE;
 request.httpMethod :=  ETcIotHttpRequestType.HTTP_Get;
 
 CASE configuration.rwsVersion OF
@@ -1240,12 +1239,12 @@ request.results.pDataString := pResultState;
 // Add Request to Queue, and Set Busy (or Error) Status
 IF _requestQueueAdd(request) THEN
 	pStatus^.busy := TRUE;
-	GetState := TRUE;
+	GetRapidState := TRUE;
 ELSE
 	pStatus^.error := TRUE;
 	pStatus^.errorMsg := TO_STRING(request.command);
 	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' could not be added to request Queue');
-	GetState := FALSE;
+	GetRapidState := FALSE;
 END_IF
 ]]></ST>
       </Implementation>
@@ -1936,30 +1935,8 @@ END_IF
       <LineId Id="5" Count="0" />
       <LineId Id="82" Count="0" />
     </LineIds>
-    <LineIds Name="TcAbbLinkin._getStateRespCallbackSuccess">
-      <LineId Id="32" Count="0" />
-      <LineId Id="52" Count="0" />
-      <LineId Id="56" Count="0" />
-      <LineId Id="58" Count="0" />
-      <LineId Id="57" Count="0" />
-      <LineId Id="59" Count="0" />
-      <LineId Id="55" Count="0" />
-      <LineId Id="15" Count="1" />
-      <LineId Id="25" Count="1" />
-      <LineId Id="47" Count="0" />
-      <LineId Id="79" Count="0" />
-      <LineId Id="45" Count="1" />
-      <LineId Id="27" Count="0" />
-      <LineId Id="44" Count="0" />
-      <LineId Id="30" Count="0" />
-      <LineId Id="62" Count="0" />
-      <LineId Id="65" Count="0" />
-      <LineId Id="67" Count="0" />
-      <LineId Id="50" Count="0" />
-      <LineId Id="31" Count="0" />
-      <LineId Id="23" Count="0" />
-      <LineId Id="80" Count="1" />
-      <LineId Id="5" Count="0" />
+    <LineIds Name="TcAbbLinkin._getRapidStateRespCallbackSuccess">
+      <LineId Id="107" Count="25" />
       <LineId Id="82" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin._getSymbol">
@@ -2405,7 +2382,7 @@ END_IF
       <LineId Id="109" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
-    <LineIds Name="TcAbbLinkin.GetState">
+    <LineIds Name="TcAbbLinkin.GetRapidState">
       <LineId Id="102" Count="0" />
       <LineId Id="81" Count="0" />
       <LineId Id="80" Count="0" />

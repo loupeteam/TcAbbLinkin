@@ -112,7 +112,7 @@ END_IF
 
 
 IF userGetStateNow THEN
-	myRobotLink.GetState(ADR(userGetStateStatus), ADR(userGetStateResult));
+	myRobotLink.GetRapidState(ADR(userGetStateStatus), ADR(userGetStateResult));
 	userGetStateNow := FALSE;
 END_IF
 
@@ -215,6 +215,7 @@ END_IF
     <LineIds Name="MAIN">
       <LineId Id="725" Count="128" />
       <LineId Id="10" Count="0" />
+      <LineId Id="2" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>
