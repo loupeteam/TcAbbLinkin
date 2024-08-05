@@ -9,13 +9,13 @@ VAR
 	userConnectStartNow : BOOL := TRUE;
 	userConnectStopNow : BOOL;
 	
-	userGetPanelCtrlStateNow : BOOL;
-	userGetPanelCtrlStateStatus : AbbLinkinRequestStatus_Typ;
-	userGetPanelCtrlStateResult : STRING;
+	userGetCtrlStateNow : BOOL;
+	userGetCtrlStateStatus : AbbLinkinRequestStatus_Typ;
+	userGetCtrlStateResult : STRING;
 	
-	userGetPanelOpModeNow : BOOL;
-	userGetPanelOpModeStatus : AbbLinkinRequestStatus_Typ;
-	userGetPanelOpModeResult : STRING;
+	userGetOpModeNow : BOOL;
+	userGetOpModeStatus : AbbLinkinRequestStatus_Typ;
+	userGetOpModeResult : STRING;
 	
 	userGetRapidStateNow : BOOL;
 	userGetRapidStateStatus : AbbLinkinRequestStatus_Typ;
@@ -88,8 +88,7 @@ VAR
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[
-// Set configuration
+      <ST><![CDATA[// Set configuration
 if userSetConfigurationNow then
 	myRobotLink.configuration.rwsIpAddress := '127.0.0.1';
 	myRobotLink.configuration.rwsTcpPort := 80;
@@ -119,15 +118,15 @@ IF userConnectStopNow THEN
 END_IF
 
 
-IF userGetPanelCtrlStateNow THEN
-	myRobotLink.GetPanelCtrlState(ADR(userGetPanelCtrlStateStatus), ADR(userGetPanelCtrlStateResult));
-	userGetPanelCtrlStateNow := FALSE;
+IF userGetCtrlStateNow THEN
+	myRobotLink.GetCtrlState(ADR(userGetCtrlStateStatus), ADR(userGetCtrlStateResult));
+	userGetCtrlStateNow := FALSE;
 END_IF
 
 
-IF userGetPanelOpModeNow THEN
-	myRobotLink.GetPanelOpMode(ADR(userGetPanelOpModeStatus), ADR(userGetPanelOpModeResult));
-	userGetPanelOpModeNow := FALSE;
+IF userGetOpModeNow THEN
+	myRobotLink.GetOpMode(ADR(userGetOpModeStatus), ADR(userGetOpModeResult));
+	userGetOpModeNow := FALSE;
 END_IF
 
 
@@ -233,10 +232,7 @@ END_IF
 ]]></ST>
     </Implementation>
     <LineIds Name="MAIN">
-      <LineId Id="725" Count="30" />
-      <LineId Id="963" Count="17" />
-      <LineId Id="762" Count="91" />
-      <LineId Id="10" Count="0" />
+      <LineId Id="1207" Count="140" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>
