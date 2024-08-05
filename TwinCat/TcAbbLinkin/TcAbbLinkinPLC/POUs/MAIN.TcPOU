@@ -9,9 +9,17 @@ VAR
 	userConnectStartNow : BOOL := TRUE;
 	userConnectStopNow : BOOL;
 	
-	userGetStateNow : BOOL;
-	userGetStateStatus : AbbLinkinRequestStatus_Typ;
-	userGetStateResult : STRING;
+	userGetPanelCtrlStateNow : BOOL;
+	userGetPanelCtrlStateStatus : AbbLinkinRequestStatus_Typ;
+	userGetPanelCtrlStateResult : STRING;
+	
+	userGetPanelOpModeNow : BOOL;
+	userGetPanelOpModeStatus : AbbLinkinRequestStatus_Typ;
+	userGetPanelOpModeResult : STRING;
+	
+	userGetRapidStateNow : BOOL;
+	userGetRapidStateStatus : AbbLinkinRequestStatus_Typ;
+	userGetRapidStateResult : STRING;
 	
 	userGetIoBoolNow : BOOL;
 	userGetIoBoolStatus : AbbLinkinRequestStatus_Typ;
@@ -111,9 +119,21 @@ IF userConnectStopNow THEN
 END_IF
 
 
-IF userGetStateNow THEN
-	myRobotLink.GetState(ADR(userGetStateStatus), ADR(userGetStateResult));
-	userGetStateNow := FALSE;
+IF userGetPanelCtrlStateNow THEN
+	myRobotLink.GetPanelCtrlState(ADR(userGetPanelCtrlStateStatus), ADR(userGetPanelCtrlStateResult));
+	userGetPanelCtrlStateNow := FALSE;
+END_IF
+
+
+IF userGetPanelOpModeNow THEN
+	myRobotLink.GetPanelOpMode(ADR(userGetPanelOpModeStatus), ADR(userGetPanelOpModeResult));
+	userGetPanelOpModeNow := FALSE;
+END_IF
+
+
+IF userGetRapidStateNow THEN
+	myRobotLink.GetRapidState(ADR(userGetRapidStateStatus), ADR(userGetRapidStateResult));
+	userGetRapidStateNow := FALSE;
 END_IF
 
 
@@ -213,8 +233,11 @@ END_IF
 ]]></ST>
     </Implementation>
     <LineIds Name="MAIN">
-      <LineId Id="725" Count="128" />
+      <LineId Id="725" Count="30" />
+      <LineId Id="963" Count="17" />
+      <LineId Id="762" Count="91" />
       <LineId Id="10" Count="0" />
+      <LineId Id="2" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

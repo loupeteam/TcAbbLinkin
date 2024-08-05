@@ -10,12 +10,39 @@
 			"name": "IRC5_Auth",
 			"request": {
 				"auth": {
-					"type": "noauth"
+					"type": "digest",
+					"digest": [
+						{
+							"key": "nonceCount",
+							"value": "",
+							"type": "string"
+						},
+						{
+							"key": "disableRetryRequest",
+							"value": false,
+							"type": "boolean"
+						},
+						{
+							"key": "password",
+							"value": "{{pw}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{user}}",
+							"type": "string"
+						},
+						{
+							"key": "algorithm",
+							"value": "MD5",
+							"type": "string"
+						}
+					]
 				},
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{abbhost}}/",
+					"raw": "{{abbhost}}/?json=1",
 					"host": [
 						"{{abbhost}}"
 					],
@@ -25,8 +52,7 @@
 					"query": [
 						{
 							"key": "json",
-							"value": "1",
-							"disabled": true
+							"value": "1"
 						}
 					]
 				}
@@ -34,7 +60,7 @@
 			"response": []
 		},
 		{
-			"name": "IRC5_GetState",
+			"name": "IRC5_GetState (OLD)",
 			"request": {
 				"auth": {
 					"type": "digest",
@@ -94,6 +120,453 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "IRC5_GetRapidState",
+			"request": {
+				"auth": {
+					"type": "digest",
+					"digest": [
+						{
+							"key": "nonceCount",
+							"value": "00000002",
+							"type": "string"
+						},
+						{
+							"key": "disableRetryRequest",
+							"value": false,
+							"type": "boolean"
+						},
+						{
+							"key": "password",
+							"value": "{{pw}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{user}}",
+							"type": "string"
+						},
+						{
+							"key": "algorithm",
+							"value": "MD5",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "   ",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{abbhost}}/rw/rapid/execution?json=1",
+					"host": [
+						"{{abbhost}}"
+					],
+					"path": [
+						"rw",
+						"rapid",
+						"execution"
+					],
+					"query": [
+						{
+							"key": "json",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "IRC5_GetRapidState",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "   ",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{abbhost}}/rw/rapid/execution?json=1",
+							"host": [
+								"{{abbhost}}"
+							],
+							"path": [
+								"rw",
+								"rapid",
+								"execution"
+							],
+							"query": [
+								{
+									"key": "json",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Vary",
+							"value": "Accept-Encoding"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "SAMEORIGIN"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 05 Aug 2024 20:18:41 GMT"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "max-age=0, no-cache, no-store"
+						},
+						{
+							"key": "Content-Length",
+							"value": "189"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "1; mode=block"
+						},
+						{
+							"key": "Connection",
+							"value": "Keep-Alive"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "-1"
+						},
+						{
+							"key": "Accept-Ranges",
+							"value": "bytes"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"_links\": {\n        \"base\": {\n            \"href\": \"http://127.0.0.1:80/rw/rapid/\"\n        }\n    },\n    \"_embedded\": {\n        \"_state\": [\n            {\n                \"_type\": \"rap-execution\",\n                \"_title\": \"execution\",\n                \"ctrlexecstate\": \"stopped\",\n                \"cycle\": \"once\"\n            }\n        ]\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "IRC5_GetPanelCtrlState",
+			"request": {
+				"auth": {
+					"type": "digest",
+					"digest": [
+						{
+							"key": "nonceCount",
+							"value": "00000002",
+							"type": "string"
+						},
+						{
+							"key": "disableRetryRequest",
+							"value": false,
+							"type": "boolean"
+						},
+						{
+							"key": "password",
+							"value": "{{pw}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{user}}",
+							"type": "string"
+						},
+						{
+							"key": "algorithm",
+							"value": "MD5",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "   ",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{abbhost}}/rw/panel/ctrlstate?json=1",
+					"host": [
+						"{{abbhost}}"
+					],
+					"path": [
+						"rw",
+						"panel",
+						"ctrlstate"
+					],
+					"query": [
+						{
+							"key": "json",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "IRC5_GetPanelCtrlState",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "   ",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{abbhost}}/rw/panel/ctrlstate?json=1",
+							"host": [
+								"{{abbhost}}"
+							],
+							"path": [
+								"rw",
+								"panel",
+								"ctrlstate"
+							],
+							"query": [
+								{
+									"key": "json",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Vary",
+							"value": "Accept-Encoding"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "SAMEORIGIN"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 05 Aug 2024 20:19:17 GMT"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "max-age=0, no-cache, no-store"
+						},
+						{
+							"key": "Content-Length",
+							"value": "178"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "1; mode=block"
+						},
+						{
+							"key": "Connection",
+							"value": "Keep-Alive"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "-1"
+						},
+						{
+							"key": "Accept-Ranges",
+							"value": "bytes"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"_links\": {\n        \"base\": {\n            \"href\": \"http://127.0.0.1:80/rw/panel/ctrlstate/\"\n        }\n    },\n    \"_embedded\": {\n        \"_state\": [\n            {\n                \"_type\": \"pnl-ctrlstate\",\n                \"_title\": \"ctrlstate\",\n                \"ctrlstate\": \"motoron\"\n            }\n        ]\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "IRC5_GetPanelOpMode",
+			"request": {
+				"auth": {
+					"type": "digest",
+					"digest": [
+						{
+							"key": "nonceCount",
+							"value": "00000002",
+							"type": "string"
+						},
+						{
+							"key": "disableRetryRequest",
+							"value": false,
+							"type": "boolean"
+						},
+						{
+							"key": "password",
+							"value": "{{pw}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{user}}",
+							"type": "string"
+						},
+						{
+							"key": "algorithm",
+							"value": "MD5",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "   ",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{abbhost}}/rw/panel/ctrlstate?json=1",
+					"host": [
+						"{{abbhost}}"
+					],
+					"path": [
+						"rw",
+						"panel",
+						"ctrlstate"
+					],
+					"query": [
+						{
+							"key": "json",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "IRC5_GetPanelCtrlState Copy",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "   ",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{abbhost}}/rw/panel/opmode?json=1",
+							"host": [
+								"{{abbhost}}"
+							],
+							"path": [
+								"rw",
+								"panel",
+								"opmode"
+							],
+							"query": [
+								{
+									"key": "json",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Vary",
+							"value": "Accept-Encoding"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "SAMEORIGIN"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 05 Aug 2024 20:19:24 GMT"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "max-age=0, no-cache, no-store"
+						},
+						{
+							"key": "Content-Length",
+							"value": "163"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "1; mode=block"
+						},
+						{
+							"key": "Connection",
+							"value": "Keep-Alive"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "-1"
+						},
+						{
+							"key": "Accept-Ranges",
+							"value": "bytes"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"_links\": {\n        \"base\": {\n            \"href\": \"http://127.0.0.1:80/rw/panel/opmode/\"\n        }\n    },\n    \"_embedded\": {\n        \"_state\": [\n            {\n                \"_type\": \"pnl-opmode\",\n                \"_title\": \"opmode\",\n                \"opmode\": \"AUTO\"\n            }\n        ]\n    }\n}"
+				}
+			]
 		},
 		{
 			"name": "IRC5_GetIO_myInputANA",
@@ -1267,7 +1740,15 @@
 				}
 			],
 			"protocolProfileBehavior": {
-				"strictSSL": false
+				"strictSSL": false,
+				"tlsDisabledProtocols": [
+					"TLSv1_3",
+					"TLSv1_1",
+					"TLSv1"
+				],
+				"disabledSystemHeaders": {
+					"connection": true
+				}
 			},
 			"request": {
 				"auth": {
@@ -1318,7 +1799,7 @@
 			"response": []
 		},
 		{
-			"name": "Omnicore_GetState",
+			"name": "Omnicore_GetState (OLD)",
 			"event": [
 				{
 					"listen": "prerequest",
@@ -1389,6 +1870,483 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "Omnicore_GetRapidState",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"\r",
+							"/*\r",
+							"Note: I had to comment/uncomment the lines in C:\\Users\\dwiens\\AppData\\Local\\ABB\\RobotWare\\RobotControl_7.14.3\\system\\appweb.conf in order for the simulated robot controller to listen on port 80. Before that, it seemed it wasn't listening on port 443\r",
+							"\r",
+							"Listen -1\r",
+							"#ListenSecure -1\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							"*/\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"strictSSL": false,
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pw}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{user}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/xhtml+xml;v=2.0",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/hal+json;v=2.0"
+					}
+				],
+				"url": {
+					"raw": "{{http_mode}}://{{abbhost}}:80/rw/rapid/execution",
+					"protocol": "{{http_mode}}",
+					"host": [
+						"{{abbhost}}"
+					],
+					"port": "80",
+					"path": [
+						"rw",
+						"rapid",
+						"execution"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Omnicore_GetRapidState",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/xhtml+xml;v=2.0",
+								"disabled": true
+							},
+							{
+								"key": "Accept",
+								"value": "application/hal+json;v=2.0"
+							}
+						],
+						"url": {
+							"raw": "{{http_mode}}://{{abbhost}}:80/rw/rapid/execution",
+							"protocol": "{{http_mode}}",
+							"host": [
+								"{{abbhost}}"
+							],
+							"port": "80",
+							"path": [
+								"rw",
+								"rapid",
+								"execution"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Vary",
+							"value": "Accept-Encoding"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=300, max=2147483645"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/hal+json;v=2.0"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 05 Aug 2024 20:20:36 GMT"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "max-age=0, no-cache, no-store"
+						},
+						{
+							"key": "Content-Length",
+							"value": "252"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "1; mode=block"
+						},
+						{
+							"key": "Connection",
+							"value": "Keep-Alive"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "-1"
+						},
+						{
+							"key": "Accept-Ranges",
+							"value": "bytes"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"_links\": {\n        \"base\": {\n            \"href\": \"https://127.0.0.1:80/rw/rapid/\"\n        },\n        \"self\": {\n            \"href\": \"execution\"\n        }\n    },\n    \"status\": {\n        \"code\": 294912\n    },\n    \"state\": [\n        {\n            \"_type\": \"rap-execution\",\n            \"_title\": \"execution\",\n            \"ctrlexecstate\": \"stopped\",\n            \"cycle\": \"once\"\n        }\n    ]\n}"
+				}
+			]
+		},
+		{
+			"name": "Omnicore_GetPanelCtrlState",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"\r",
+							"/*\r",
+							"Note: I had to comment/uncomment the lines in C:\\Users\\dwiens\\AppData\\Local\\ABB\\RobotWare\\RobotControl_7.14.3\\system\\appweb.conf in order for the simulated robot controller to listen on port 80. Before that, it seemed it wasn't listening on port 443\r",
+							"\r",
+							"Listen -1\r",
+							"#ListenSecure -1\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							"*/\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"strictSSL": false,
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pw}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{user}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/xhtml+xml;v=2.0",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/hal+json;v=2.0"
+					}
+				],
+				"url": {
+					"raw": "{{http_mode}}://{{abbhost}}:80/rw/panel/ctrl-state",
+					"protocol": "{{http_mode}}",
+					"host": [
+						"{{abbhost}}"
+					],
+					"port": "80",
+					"path": [
+						"rw",
+						"panel",
+						"ctrl-state"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Omnicore_GetPanelCtrlState",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/xhtml+xml;v=2.0",
+								"disabled": true
+							},
+							{
+								"key": "Accept",
+								"value": "application/hal+json;v=2.0"
+							}
+						],
+						"url": {
+							"raw": "{{http_mode}}://{{abbhost}}:80/rw/panel/ctrl-state",
+							"protocol": "{{http_mode}}",
+							"host": [
+								"{{abbhost}}"
+							],
+							"port": "80",
+							"path": [
+								"rw",
+								"panel",
+								"ctrl-state"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Vary",
+							"value": "Accept-Encoding"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=300, max=2147483644"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/hal+json;v=2.0"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 05 Aug 2024 20:21:19 GMT"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "max-age=0, no-cache, no-store"
+						},
+						{
+							"key": "Content-Length",
+							"value": "234"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "1; mode=block"
+						},
+						{
+							"key": "Connection",
+							"value": "Keep-Alive"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "-1"
+						},
+						{
+							"key": "Accept-Ranges",
+							"value": "bytes"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"_links\": {\n        \"base\": {\n            \"href\": \"https://127.0.0.1:80/rw/panel/ctrl-state/\"\n        },\n        \"self\": {\n            \"href\": \"\"\n        }\n    },\n    \"status\": {\n        \"code\": 294912\n    },\n    \"state\": [\n        {\n            \"_type\": \"pnl-ctrlstate\",\n            \"_title\": \"ctrl-state\",\n            \"ctrlstate\": \"motoroff\"\n        }\n    ]\n}"
+				}
+			]
+		},
+		{
+			"name": "Omnicore_GetPanelOpMode",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"\r",
+							"/*\r",
+							"Note: I had to comment/uncomment the lines in C:\\Users\\dwiens\\AppData\\Local\\ABB\\RobotWare\\RobotControl_7.14.3\\system\\appweb.conf in order for the simulated robot controller to listen on port 80. Before that, it seemed it wasn't listening on port 443\r",
+							"\r",
+							"Listen -1\r",
+							"#ListenSecure -1\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							"*/\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"strictSSL": false,
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pw}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{user}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/xhtml+xml;v=2.0",
+						"disabled": true
+					},
+					{
+						"key": "Accept",
+						"value": "application/hal+json;v=2.0"
+					}
+				],
+				"url": {
+					"raw": "{{http_mode}}://{{abbhost}}:80/rw/panel/opmode",
+					"protocol": "{{http_mode}}",
+					"host": [
+						"{{abbhost}}"
+					],
+					"port": "80",
+					"path": [
+						"rw",
+						"panel",
+						"opmode"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Omnicore_GetPanelCtrlState Copy",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/xhtml+xml;v=2.0",
+								"disabled": true
+							},
+							{
+								"key": "Accept",
+								"value": "application/hal+json;v=2.0"
+							}
+						],
+						"url": {
+							"raw": "{{http_mode}}://{{abbhost}}:80/rw/panel/opmode",
+							"protocol": "{{http_mode}}",
+							"host": [
+								"{{abbhost}}"
+							],
+							"port": "80",
+							"path": [
+								"rw",
+								"panel",
+								"opmode"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Vary",
+							"value": "Accept-Encoding"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=300, max=2147483643"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/hal+json;v=2.0"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "Date",
+							"value": "Mon, 05 Aug 2024 20:22:19 GMT"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "max-age=0, no-cache, no-store"
+						},
+						{
+							"key": "Content-Length",
+							"value": "361"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "1; mode=block"
+						},
+						{
+							"key": "Connection",
+							"value": "Keep-Alive"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "-1"
+						},
+						{
+							"key": "Accept-Ranges",
+							"value": "bytes"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"_links\": {\n        \"base\": {\n            \"href\": \"https://127.0.0.1:80/rw/panel/opmode/\"\n        },\n        \"self\": {\n            \"href\": \"\"\n        }\n    },\n    \"status\": {\n        \"code\": 294912\n    },\n    \"state\": [\n        {\n            \"_type\": \"pnl-opmode\",\n            \"_title\": \"opmode\",\n            \"opmode\": \"AUTO\"\n        }\n    ],\n    \"_embedded\": {\n        \"resources\": [\n            {\n                \"_links\": {\n                    \"self\": {\n                        \"href\": \"lock-state\"\n                    }\n                },\n                \"_type\": \"pnl-lockstate-li\",\n                \"_title\": \"lock-sate\"\n            }\n        ]\n    }\n}"
+				}
+			]
 		},
 		{
 			"name": "Omnicore_GetIO_myInputANA",
@@ -2071,7 +3029,7 @@
 					]
 				},
 				"url": {
-					"raw": "{{http_mode}}://{{abbhost}}:80/rw/rapid/symbol/RAPID/T_ROB1/Module1/myRapidNum/data",
+					"raw": "{{http_mode}}://{{abbhost}}:80/rw/rapid/symbol/RAPID/T_ROB1/Module1/myRapidNum/data?mastership=implicit",
 					"protocol": "{{http_mode}}",
 					"host": [
 						"{{abbhost}}"
@@ -2086,6 +3044,12 @@
 						"Module1",
 						"myRapidNum",
 						"data"
+					],
+					"query": [
+						{
+							"key": "mastership",
+							"value": "implicit"
+						}
 					]
 				}
 			},
@@ -2128,18 +3092,18 @@
 						{
 							"key": "value",
 							"value": "TRUE",
-							"type": "text",
-							"disabled": true
+							"type": "text"
 						},
 						{
 							"key": "value",
 							"value": "FALSE",
-							"type": "text"
+							"type": "text",
+							"disabled": true
 						}
 					]
 				},
 				"url": {
-					"raw": "{{http_mode}}://{{abbhost}}:80/rw/rapid/symbol/RAPID/T_ROB1/Module1/myRapidBool/data",
+					"raw": "{{http_mode}}://{{abbhost}}:80/rw/rapid/symbol/RAPID/T_ROB1/Module1/myRapidBool/data?mastership=implicit",
 					"protocol": "{{http_mode}}",
 					"host": [
 						"{{abbhost}}"
@@ -2154,6 +3118,12 @@
 						"Module1",
 						"myRapidBool",
 						"data"
+					],
+					"query": [
+						{
+							"key": "mastership",
+							"value": "implicit"
+						}
 					]
 				}
 			},
@@ -2201,7 +3171,7 @@
 					]
 				},
 				"url": {
-					"raw": "{{http_mode}}://{{abbhost}}:80/rw/rapid/symbol/RAPID/T_ROB1/Module1/myRapidString/data",
+					"raw": "{{http_mode}}://{{abbhost}}:80/rw/rapid/symbol/RAPID/T_ROB1/Module1/myRapidString/data?mastership=implicit",
 					"protocol": "{{http_mode}}",
 					"host": [
 						"{{abbhost}}"
@@ -2216,6 +3186,12 @@
 						"Module1",
 						"myRapidString",
 						"data"
+					],
+					"query": [
+						{
+							"key": "mastership",
+							"value": "implicit"
+						}
 					]
 				}
 			},
@@ -2367,7 +3343,7 @@
 					}
 				],
 				"url": {
-					"raw": "{{http_mode}}://{{abbhost}}:80/rw/rapid/execution/resetpp",
+					"raw": "{{http_mode}}://{{abbhost}}:80/rw/rapid/execution/resetpp?mastership=implicit",
 					"protocol": "{{http_mode}}",
 					"host": [
 						"{{abbhost}}"
@@ -2378,6 +3354,12 @@
 						"rapid",
 						"execution",
 						"resetpp"
+					],
+					"query": [
+						{
+							"key": "mastership",
+							"value": "implicit"
+						}
 					]
 				}
 			},
@@ -2498,7 +3480,7 @@
 					]
 				},
 				"url": {
-					"raw": "{{http_mode}}://{{abbhost}}:80/rw/rapid/execution/start",
+					"raw": "{{http_mode}}://{{abbhost}}:80/rw/rapid/execution/start?mastership=implicit",
 					"protocol": "{{http_mode}}",
 					"host": [
 						"{{abbhost}}"
@@ -2509,6 +3491,12 @@
 						"rapid",
 						"execution",
 						"start"
+					],
+					"query": [
+						{
+							"key": "mastership",
+							"value": "implicit"
+						}
 					]
 				}
 			},
