@@ -7,8 +7,8 @@ VAR
 	myRobotLink : TcAbbLinkin;
 	initConfiguration : BOOL := TRUE;
 	initConnection : BOOL := TRUE;
-	userCommand_GetState : BOOL := TRUE;
-	getStateStatus : AbbLinkinRequestStatus_Typ;
+	userCommand_GetCtrlState : BOOL := TRUE;
+	getCtrlStateStatus : AbbLinkinRequestStatus_Typ;
 	currentState : STRING;
 	output : STRING;
 END_VAR
@@ -31,7 +31,7 @@ myRobotLink.Cyclic();
 /////////////////////////
 // Connect
 IF initConnection THEN
-	myRobotLink.ConnectionStart();
+	myRobotLink.Connect();
 	initConnection := FALSE;
 END_IF
 
@@ -39,21 +39,21 @@ END_IF
 // Get State
 
 // Send command
-IF myRobotLink.readyForCmd AND userCommand_GetState THEN
-	myRobotLink.GetRapidState(pStatus := ADR(getStateStatus), pResultState := ADR(currentState));
-	userCommand_GetState := FALSE;
+IF myRobotLink.readyForCmd AND userCommand_GetCtrlState THEN
+	myRobotLink.GetCtrlState(pStatus := ADR(getCtrlStateStatus), pResultState := ADR(currentState));
+	userCommand_GetCtrlState := FALSE;
 END_IF
 
 // Process Results
-IF getStateStatus.done THEN
+IF getCtrlStateStatus.done THEN
 	output := CONCAT('Current state is ', currentState);
-ELSIF getStateStatus.error THEN
+ELSIF getCtrlStateStatus.error THEN
 	output := 'An Error occured.';
 END_IF
 ]]></ST>
     </Implementation>
     <LineIds Name="Example">
-      <LineId Id="90" Count="35" />
+      <LineId Id="137" Count="35" />
       <LineId Id="22" Count="0" />
     </LineIds>
   </POU>
