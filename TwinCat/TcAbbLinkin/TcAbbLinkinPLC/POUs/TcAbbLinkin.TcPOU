@@ -133,6 +133,12 @@ CASE request.command OF
 	ABBLINKIN_COMMAND_TYPE.GET_IO:
 		_getIORespCallbackSuccess(httpRequest, request);
 		
+	ABBLINKIN_COMMAND_TYPE.GET_PANEL_CTRL_STATE:
+		_getPanelCtrlStateRespCallbackSuccess(httpRequest, request);
+		
+	ABBLINKIN_COMMAND_TYPE.GET_PANEL_OP_MODE:
+		_getPanelOpModeRespCallbackSuccess(httpRequest, request);
+		
 	ABBLINKIN_COMMAND_TYPE.GET_RAPID_STATE:
 		_getRapidStateRespCallbackSuccess(httpRequest, request);
 		
@@ -378,6 +384,94 @@ END_IF
 
 
 _getIORespCallbackSuccess := TRUE;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="_getPanelCtrlStateRespCallbackSuccess" Id="{a654bea9-1410-4082-b25e-5f4d12f7b480}" FolderPath="Internal\responseCallbacks\">
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD PRIVATE _getPanelCtrlStateRespCallbackSuccess : BOOL
+VAR_IN_OUT
+	httpRequest : FB_IotHttpRequest;
+	request : AbbLinkinRequest_Typ;
+END_VAR
+VAR
+	jsonDomParser : FB_JsonDomParser;
+	jsonRoot : SJsonValue;
+	jsonValue : SJsonValue;
+	valuePath : STRING;
+	tempString : STRING;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE configuration.rwsVersion OF 
+	ABBLINKIN_RWS_API_VERSION.V1:
+		valuePath := '_embedded/_state#0/ctrlstate';
+	ABBLINKIN_RWS_API_VERSION.V2:
+		valuePath := 'state#0/ctrlstate';
+END_CASE
+
+jsonRoot := httpRequest.GetJsonDomContent(jsonDomParser);
+jsonValue := jsonDomParser.FindMemberPath(jsonRoot, valuePath);
+IF (jsonValue <> 0) THEN
+	request.results.pDataString^ := jsonDomParser.GetString(jsonValue);
+	//tempString := jsonDomParser.GetString(jsonValue);
+	//memset(request.pResults, 0, SIZEOF(AbbLinkinGetterResults_Typ.data));
+	//memcpy(request.pResults, ADR(tempString), LEN(tempString) + 1);
+	//request.pResults^.dataType := ABBLINKIN_RESULT_TYPE_Typ._STRING;
+	//request.pResults^.dataLen := LEN(tempString) + 1;
+ELSE
+	request.pStatus^.error := TRUE;
+	request.pStatus^.errorID := 0;
+	request.pStatus^.errorMsg := 'Unable to parse RWS json response';
+	//request.pResults^.dataType := ABBLINKIN_RESULT_TYPE_Typ._NONE;
+	//request.pResults^.dataLen := 0;
+END_IF
+
+
+_getPanelCtrlStateRespCallbackSuccess := TRUE;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="_getPanelOpModeRespCallbackSuccess" Id="{8f5c030a-aaa0-4d55-b9a1-2fe878201e3e}" FolderPath="Internal\responseCallbacks\">
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD PRIVATE _getPanelOpModeRespCallbackSuccess : BOOL
+VAR_IN_OUT
+	httpRequest : FB_IotHttpRequest;
+	request : AbbLinkinRequest_Typ;
+END_VAR
+VAR
+	jsonDomParser : FB_JsonDomParser;
+	jsonRoot : SJsonValue;
+	jsonValue : SJsonValue;
+	valuePath : STRING;
+	tempString : STRING;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE configuration.rwsVersion OF 
+	ABBLINKIN_RWS_API_VERSION.V1:
+		valuePath := '_embedded/_state#0/opmode';
+	ABBLINKIN_RWS_API_VERSION.V2:
+		valuePath := 'state#0/opmode';
+END_CASE
+
+jsonRoot := httpRequest.GetJsonDomContent(jsonDomParser);
+jsonValue := jsonDomParser.FindMemberPath(jsonRoot, valuePath);
+IF (jsonValue <> 0) THEN
+	request.results.pDataString^ := jsonDomParser.GetString(jsonValue);
+	//tempString := jsonDomParser.GetString(jsonValue);
+	//memset(request.pResults, 0, SIZEOF(AbbLinkinGetterResults_Typ.data));
+	//memcpy(request.pResults, ADR(tempString), LEN(tempString) + 1);
+	//request.pResults^.dataType := ABBLINKIN_RESULT_TYPE_Typ._STRING;
+	//request.pResults^.dataLen := LEN(tempString) + 1;
+ELSE
+	request.pStatus^.error := TRUE;
+	request.pStatus^.errorID := 0;
+	request.pStatus^.errorMsg := 'Unable to parse RWS json response';
+	//request.pResults^.dataType := ABBLINKIN_RESULT_TYPE_Typ._NONE;
+	//request.pResults^.dataLen := 0;
+END_IF
+
+
+_getPanelOpModeRespCallbackSuccess := TRUE;
 ]]></ST>
       </Implementation>
     </Method>
@@ -1199,6 +1293,132 @@ GetIOGroup := _getIO(signal, pStatus, pResultBOOL := 0, pResultDINT := pResult, 
 ]]></ST>
       </Implementation>
     </Method>
+    <Method Name="GetPanelCtrlState" Id="{40fa5955-cc35-49c4-a5b6-ce5c2f95f4e6}">
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD GetPanelCtrlState : BOOL
+VAR_INPUT
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
+	pResultState : POINTER TO STRING;
+END_VAR
+
+VAR
+	request : AbbLinkinRequest_Typ;
+END_VAR
+
+VAR CONSTANT
+	THIS_COMMAND_TYPE: ABBLINKIN_COMMAND_TYPE := ABBLINKIN_COMMAND_TYPE.GET_PANEL_CTRL_STATE;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+// Check for invalid status pointer
+IF pStatus = 0 THEN
+	GetPanelCtrlState := FALSE;
+	RETURN;
+END_IF
+
+// Clear Status
+_clearRequestStatus(pStatus);
+
+// Check for invalid results pointer
+IF pResultState = 0 THEN
+	pStatus^.error := TRUE;
+	pStatus^.errorMsg := TO_STRING(THIS_COMMAND_TYPE);
+	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' results pointer invalid.');
+	GetPanelCtrlState := FALSE;
+	RETURN;
+END_IF
+
+request.pStatus := pStatus;
+request.command := THIS_COMMAND_TYPE;
+request.httpMethod :=  ETcIotHttpRequestType.HTTP_Get;
+
+CASE configuration.rwsVersion OF
+	ABBLINKIN_RWS_API_VERSION.V1:
+		request.uri := '/rw/panel/ctrlstate?json=1';
+
+	ABBLINKIN_RWS_API_VERSION.V2:	
+		request.uri := '/rw/panel/ctrl-state';
+END_CASE
+
+request.results.pDataString := pResultState;
+
+// Add Request to Queue, and Set Busy (or Error) Status
+IF _requestQueueAdd(request) THEN
+	pStatus^.busy := TRUE;
+	GetPanelCtrlState := TRUE;
+ELSE
+	pStatus^.error := TRUE;
+	pStatus^.errorMsg := TO_STRING(THIS_COMMAND_TYPE);
+	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' could not be added to request Queue');
+	GetPanelCtrlState := FALSE;
+END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="GetPanelOpMode" Id="{6dd57f97-99fd-41c7-9977-bd277651614c}">
+      <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+METHOD GetPanelOpMode : BOOL
+VAR_INPUT
+	pStatus : POINTER TO AbbLinkinRequestStatus_Typ;
+	pResultState : POINTER TO STRING;
+END_VAR
+
+VAR
+	request : AbbLinkinRequest_Typ;
+END_VAR
+
+VAR CONSTANT
+	THIS_COMMAND_TYPE: ABBLINKIN_COMMAND_TYPE := ABBLINKIN_COMMAND_TYPE.GET_PANEL_OP_MODE;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+// Check for invalid status pointer
+IF pStatus = 0 THEN
+	GetPanelOpMode := FALSE;
+	RETURN;
+END_IF
+
+// Clear Status
+_clearRequestStatus(pStatus);
+
+// Check for invalid results pointer
+IF pResultState = 0 THEN
+	pStatus^.error := TRUE;
+	pStatus^.errorMsg := TO_STRING(THIS_COMMAND_TYPE);
+	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' results pointer invalid.');
+	GetPanelOpMode := FALSE;
+	RETURN;
+END_IF
+
+request.pStatus := pStatus;
+request.command := THIS_COMMAND_TYPE;
+request.httpMethod :=  ETcIotHttpRequestType.HTTP_Get;
+
+CASE configuration.rwsVersion OF
+	ABBLINKIN_RWS_API_VERSION.V1:
+		request.uri := '/rw/panel/opmode?json=1';
+
+	ABBLINKIN_RWS_API_VERSION.V2:	
+		request.uri := '/rw/panel/opmode';
+END_CASE
+
+request.results.pDataString := pResultState;
+
+// Add Request to Queue, and Set Busy (or Error) Status
+IF _requestQueueAdd(request) THEN
+	pStatus^.busy := TRUE;
+	GetPanelOpMode := TRUE;
+ELSE
+	pStatus^.error := TRUE;
+	pStatus^.errorMsg := TO_STRING(THIS_COMMAND_TYPE);
+	pStatus^.errorMsg := CONCAT(pStatus^.errorMsg, ' could not be added to request Queue');
+	GetPanelOpMode := FALSE;
+END_IF
+]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="GetRapidState" Id="{39878dda-bc14-4b8b-833d-1d9c4ab2cc84}">
       <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
 METHOD GetRapidState : BOOL
@@ -1840,9 +2060,8 @@ END_IF
       <LineId Id="13" Count="0" />
       <LineId Id="18" Count="0" />
       <LineId Id="33" Count="0" />
-      <LineId Id="35" Count="0" />
-      <LineId Id="47" Count="0" />
-      <LineId Id="34" Count="0" />
+      <LineId Id="70" Count="5" />
+      <LineId Id="67" Count="2" />
       <LineId Id="23" Count="0" />
       <LineId Id="46" Count="0" />
       <LineId Id="24" Count="0" />
@@ -1974,6 +2193,22 @@ END_IF
       <LineId Id="23" Count="0" />
       <LineId Id="80" Count="1" />
       <LineId Id="5" Count="0" />
+      <LineId Id="82" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin._getPanelCtrlStateRespCallbackSuccess">
+      <LineId Id="107" Count="9" />
+      <LineId Id="147" Count="4" />
+      <LineId Id="122" Count="3" />
+      <LineId Id="145" Count="1" />
+      <LineId Id="128" Count="4" />
+      <LineId Id="82" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin._getPanelOpModeRespCallbackSuccess">
+      <LineId Id="107" Count="9" />
+      <LineId Id="147" Count="4" />
+      <LineId Id="122" Count="3" />
+      <LineId Id="145" Count="1" />
+      <LineId Id="128" Count="4" />
       <LineId Id="82" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin._getRapidStateRespCallbackSuccess">
@@ -2421,6 +2656,88 @@ END_IF
     <LineIds Name="TcAbbLinkin.GetIOGroup">
       <LineId Id="123" Count="0" />
       <LineId Id="109" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin.GetPanelCtrlState">
+      <LineId Id="102" Count="0" />
+      <LineId Id="81" Count="0" />
+      <LineId Id="80" Count="0" />
+      <LineId Id="84" Count="1" />
+      <LineId Id="96" Count="0" />
+      <LineId Id="99" Count="1" />
+      <LineId Id="98" Count="0" />
+      <LineId Id="101" Count="0" />
+      <LineId Id="97" Count="0" />
+      <LineId Id="89" Count="0" />
+      <LineId Id="92" Count="2" />
+      <LineId Id="90" Count="0" />
+      <LineId Id="95" Count="0" />
+      <LineId Id="83" Count="0" />
+      <LineId Id="115" Count="0" />
+      <LineId Id="65" Count="0" />
+      <LineId Id="20" Count="0" />
+      <LineId Id="10" Count="0" />
+      <LineId Id="30" Count="0" />
+      <LineId Id="29" Count="0" />
+      <LineId Id="31" Count="0" />
+      <LineId Id="37" Count="0" />
+      <LineId Id="35" Count="0" />
+      <LineId Id="34" Count="0" />
+      <LineId Id="36" Count="0" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="113" Count="0" />
+      <LineId Id="46" Count="0" />
+      <LineId Id="58" Count="0" />
+      <LineId Id="70" Count="0" />
+      <LineId Id="57" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="87" Count="0" />
+      <LineId Id="61" Count="1" />
+      <LineId Id="112" Count="0" />
+      <LineId Id="69" Count="0" />
+      <LineId Id="88" Count="0" />
+      <LineId Id="60" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TcAbbLinkin.GetPanelOpMode">
+      <LineId Id="102" Count="0" />
+      <LineId Id="81" Count="0" />
+      <LineId Id="80" Count="0" />
+      <LineId Id="84" Count="1" />
+      <LineId Id="96" Count="0" />
+      <LineId Id="99" Count="1" />
+      <LineId Id="98" Count="0" />
+      <LineId Id="101" Count="0" />
+      <LineId Id="97" Count="0" />
+      <LineId Id="89" Count="0" />
+      <LineId Id="92" Count="2" />
+      <LineId Id="90" Count="0" />
+      <LineId Id="95" Count="0" />
+      <LineId Id="83" Count="0" />
+      <LineId Id="115" Count="0" />
+      <LineId Id="65" Count="0" />
+      <LineId Id="20" Count="0" />
+      <LineId Id="10" Count="0" />
+      <LineId Id="30" Count="0" />
+      <LineId Id="29" Count="0" />
+      <LineId Id="31" Count="0" />
+      <LineId Id="37" Count="0" />
+      <LineId Id="35" Count="0" />
+      <LineId Id="34" Count="0" />
+      <LineId Id="36" Count="0" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="113" Count="0" />
+      <LineId Id="46" Count="0" />
+      <LineId Id="58" Count="0" />
+      <LineId Id="70" Count="0" />
+      <LineId Id="57" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="87" Count="0" />
+      <LineId Id="61" Count="1" />
+      <LineId Id="112" Count="0" />
+      <LineId Id="69" Count="0" />
+      <LineId Id="88" Count="0" />
+      <LineId Id="60" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="TcAbbLinkin.GetRapidState">
