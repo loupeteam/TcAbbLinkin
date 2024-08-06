@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <DUT Name="AbbLinkinConfiguration_Typ" Id="{eb4cc820-41d0-4679-875f-49cfa6130169}">
+    <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+TYPE AbbLinkinConfiguration_Typ :
+STRUCT
+	rwsIpAddress : STRING := '127.0.0.1';
+	rwsTcpPort : USINT := 80;
+	rwsVersion : ABBLINKIN_RWS_API_VERSION;
+	rwsUsername : STRING := 'Default User';
+	rwsPassword : STRING := 'robotics';
+	tlsAllowRwsCertSelfSigned : BOOL := FALSE;
+	tlsCAFile : STRING(255) := '';
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <DUT Name="AbbLinkinAuthDigest_Typ" Id="{9ed59e39-fc70-44a3-b78f-e9eab3846bf1}">
+    <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+TYPE AbbLinkinAuthDigest_Typ :
+STRUCT
+	realm : STRING;
+	qop : STRING;
+	nonce : STRING;
+	opaque : STRING;
+	nc : STRING;
+	cnonce : STRING;
+	response : STRING;
+	authContent : ABBLINKIN_STRING_EX_LEN;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

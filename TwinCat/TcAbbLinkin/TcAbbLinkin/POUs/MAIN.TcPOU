@@ -1,0 +1,239 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="MAIN" Id="{af726fc5-8ad0-4774-86c1-258758d62ada}" SpecialFunc="None">
+    <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+PROGRAM MAIN
+VAR
+	myRobotLink : TcAbbLinkin;
+	userSetConfigurationNow : BOOL := TRUE;
+	userConnectStartNow : BOOL := TRUE;
+	userConnectStopNow : BOOL;
+	
+	userGetCtrlStateNow : BOOL;
+	userGetCtrlStateStatus : AbbLinkinRequestStatus_Typ;
+	userGetCtrlStateResult : STRING;
+	
+	userGetOpModeNow : BOOL;
+	userGetOpModeStatus : AbbLinkinRequestStatus_Typ;
+	userGetOpModeResult : STRING;
+	
+	userGetRapidStateNow : BOOL;
+	userGetRapidStateStatus : AbbLinkinRequestStatus_Typ;
+	userGetRapidStateResult : STRING;
+	
+	userGetIoBoolNow : BOOL;
+	userGetIoBoolStatus : AbbLinkinRequestStatus_Typ;
+	userGetIoBoolResult : BOOL;
+	
+	userGetIoLrealNow : BOOL;
+	userGetIoLrealStatus : AbbLinkinRequestStatus_Typ;
+	userGetIoLrealResult : LREAL;
+	
+	userGetIoDintNow : BOOL;
+	userGetIoDintStatus : AbbLinkinRequestStatus_Typ;
+	userGetIoDintResult : DINT;
+	
+	
+	userSetIoBoolNow : BOOL;
+	userSetIoBoolValue : BOOL := 1;
+	userSetIoBoolStatus : AbbLinkinRequestStatus_Typ;
+	userSetIoDintNow : BOOL;
+	userSetIoDintValue : DINT := 57;
+	userSetIoDintStatus : AbbLinkinRequestStatus_Typ;
+	userSetIoLrealNow : BOOL;
+	userSetIoLrealValue : LREAL := 41.123456;
+	userSetIoLrealStatus : AbbLinkinRequestStatus_Typ;
+	
+	
+	userGetSymbolBoolNow : BOOL;
+	userGetSymbolBoolResult : BOOL;
+	userGetSymbolBoolStatus : AbbLinkinRequestStatus_Typ;
+	userGetSymbolNumNow : BOOL;
+	userGetSymbolNumResult : LREAL;
+	userGetSymbolNumStatus : AbbLinkinRequestStatus_Typ;
+	userGetSymbolStringNow : BOOL;
+	userGetSymbolStringResult : STRING;
+	userGetSymbolStringStatus : AbbLinkinRequestStatus_Typ;
+	
+	userSetSymbolBoolNow : BOOL;
+	userSetSymbolBoolValue : BOOL := 1;
+	userSetSymbolBoolStatus : AbbLinkinRequestStatus_Typ;
+	userSetSymbolDintNow : BOOL;
+	userSetSymbolDintValue : DINT := -57;
+	userSetSymbolDintStatus : AbbLinkinRequestStatus_Typ;
+	userSetSymbolLrealNow : BOOL;
+	userSetSymbolLrealValue : LREAL := -41.123456;
+	userSetSymbolLrealStatus : AbbLinkinRequestStatus_Typ;
+	userSetSymbolStringNow : BOOL;
+	userSetSymbolStringValue : STRING := 'test String';
+	userSetSymbolStringStatus : AbbLinkinRequestStatus_Typ;
+	userSetSymbolWStringNow : BOOL;
+	userSetSymbolWStringValue : WSTRING := "test WString";
+	userSetSymbolWStringStatus : AbbLinkinRequestStatus_Typ;
+	
+	
+	userPowerOffNow : BOOL;
+	userPowerOffStatus : AbbLinkinRequestStatus_Typ;
+	userPowerOnNow : BOOL;
+	userPowerOnStatus : AbbLinkinRequestStatus_Typ;
+	userRapidResetNow : BOOL;
+	userRapidResetStatus : AbbLinkinRequestStatus_Typ;
+	userRapidStopNow : BOOL;
+	userRapidStopStatus : AbbLinkinRequestStatus_Typ;
+	userRapidStartNow : BOOL;
+	userRapidStartStatus : AbbLinkinRequestStatus_Typ;
+	
+	
+	userAckErrorNow : BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Set configuration
+if userSetConfigurationNow then
+	myRobotLink.configuration.rwsIpAddress := '127.0.0.1';
+	myRobotLink.configuration.rwsTcpPort := 80;
+	myRobotLink.configuration.rwsVersion := ABBLINKIN_RWS_API_VERSION.V2;
+	myRobotLink.configuration.rwsUsername := 'Default User';
+	myRobotLink.configuration.rwsPassword := 'robotics';
+	//myRobotLink.configuration.tlsAllowRwsCertSelfSigned := TRUE;
+	myRobotLink.configuration.tlsAllowRwsCertSelfSigned := FALSE;
+	myRobotLink.configuration.tlsCAFile := 'C:\TwinCAT\3.1\Config\Certificates\TcAbbLinkinCA.pem';
+	
+	userSetConfigurationNow := FALSE;
+END_IF
+
+
+// Cyclic
+myRobotLink.Cyclic();
+
+
+IF userConnectStartNow THEN
+	myRobotLink.Connect();
+	userConnectStartNow := FALSE;
+END_IF
+
+IF userConnectStopNow THEN
+	myRobotLink.Disconnect();
+	userConnectStopNow := FALSE;
+END_IF
+
+
+IF userGetCtrlStateNow THEN
+	myRobotLink.GetCtrlState(ADR(userGetCtrlStateStatus), ADR(userGetCtrlStateResult));
+	userGetCtrlStateNow := FALSE;
+END_IF
+
+
+IF userGetOpModeNow THEN
+	myRobotLink.GetOpMode(ADR(userGetOpModeStatus), ADR(userGetOpModeResult));
+	userGetOpModeNow := FALSE;
+END_IF
+
+
+IF userGetRapidStateNow THEN
+	myRobotLink.GetRapidState(ADR(userGetRapidStateStatus), ADR(userGetRapidStateResult));
+	userGetRapidStateNow := FALSE;
+END_IF
+
+
+IF userGetIoBoolNow THEN
+	myRobotLink.GetIODigital(signal := 'myInputDIG', pStatus := ADR(userGetIoBoolStatus), pResult := ADR(userGetIoBoolResult));
+	userGetIoBoolNow := FALSE;
+END_IF
+
+IF userGetIoLrealNow THEN
+	myRobotLink.GetIOAnalog(signal := 'myInputANA', pStatus := ADR(userGetIoLrealStatus), pResult := ADR(userGetIoLrealResult));
+	userGetIoLrealNow := FALSE;
+END_IF
+
+IF userGetIoDintNow THEN
+	myRobotLink.GetIOGroup(signal := 'myInputGRP', pStatus := ADR(userGetIoDintStatus), pResult := ADR(userGetIoDintResult));
+	userGetIoDintNow := FALSE;
+END_IF
+
+
+IF userSetIoBoolNow THEN
+	myRobotLink.SetIO('myInputDIG', userSetIoBoolValue, ADR(userSetIoBoolStatus));
+	userSetIoBoolNow := FALSE;
+END_IF
+IF userSetIoDintNow THEN
+	myRobotLink.SetIO('myInputGRP', userSetIoDintValue, ADR(userSetIoDintStatus));
+	userSetIoDintNow := FALSE;
+END_IF
+IF userSetIoLrealNow THEN
+	myRobotLink.SetIO('myInputANA', userSetIoLrealValue, ADR(userSetIoLrealStatus));
+	userSetIoLrealNow := FALSE;
+END_IF
+
+
+IF userGetSymbolBoolNow THEN
+	myRobotLink.GetSymbolBool(symbolUrl := 'RAPID/T_ROB1/Module1/myRapidBool', pStatus := ADR(userGetSymbolBoolStatus), pResult := ADR(userGetSymbolBoolResult));
+	userGetSymbolBoolNow := FALSE;
+END_IF
+IF userGetSymbolNumNow THEN
+	myRobotLink.GetSymbolNum(symbolUrl := 'RAPID/T_ROB1/Module1/myRapidNum', pStatus := ADR(userGetSymbolNumStatus), pResult := ADR(userGetSymbolNumResult));
+	userGetSymbolNumNow := FALSE;
+END_IF
+IF userGetSymbolStringNow THEN
+	myRobotLink.GetSymbolString(symbolUrl := 'RAPID/T_ROB1/Module1/myRapidString', pStatus := ADR(userGetSymbolStringStatus), pResult := ADR(userGetSymbolStringResult));
+	userGetSymbolStringNow := FALSE;
+END_IF
+
+
+IF userSetSymbolBoolNow THEN
+	myRobotLink.SetSymbol('RAPID/T_ROB1/Module1/myRapidBool', userSetSymbolBoolValue, ADR(userSetSymbolBoolStatus));
+	userSetSymbolBoolNow := FALSE;
+END_IF
+IF userSetSymbolDintNow THEN
+	myRobotLink.SetSymbol('RAPID/T_ROB1/Module1/myRapidNum', userSetSymbolDintValue, ADR(userSetSymbolDintStatus));
+	userSetSymbolDintNow := FALSE;
+END_IF
+IF userSetSymbolLrealNow THEN
+	myRobotLink.SetSymbol('RAPID/T_ROB1/Module1/myRapidNum', userSetSymbolLrealValue, ADR(userSetSymbolLrealStatus));
+	userSetSymbolLrealNow := FALSE;
+END_IF
+IF userSetSymbolStringNow THEN
+	myRobotLink.SetSymbol('RAPID/T_ROB1/Module1/myRapidString', userSetSymbolStringValue, ADR(userSetSymbolStringStatus));
+	userSetSymbolStringNow := FALSE;
+END_IF
+IF userSetSymbolWStringNow THEN
+	myRobotLink.SetSymbol('RAPID/T_ROB1/Module1/myRapidString', userSetSymbolWStringValue, ADR(userSetSymbolWStringStatus));
+	userSetSymbolWStringNow := FALSE;
+END_IF
+
+
+IF userPowerOffNow THEN
+	myRobotLink.PowerOff(ADR(userPowerOffStatus));
+	userPowerOffNow := FALSE;
+END_IF
+IF userPowerOnNow THEN
+	myRobotLink.PowerOn(ADR(userPowerOnStatus));
+	userPowerOnNow := FALSE;
+END_IF
+IF userRapidResetNow THEN
+	myRobotLink.RapidReset(ADR(userRapidResetStatus));
+	userRapidResetNow := FALSE;
+END_IF
+IF userRapidStopNow THEN
+	myRobotLink.RapidStop(ADR(userRapidStopStatus));
+	userRapidStopNow := FALSE;
+END_IF
+IF userRapidStartNow THEN
+	myRobotLink.RapidStart(ADR(userRapidStartStatus));
+	userRapidStartNow := FALSE;
+END_IF
+
+
+IF userAckErrorNow THEN
+	myRobotLink.AckError();
+	userAckErrorNow := FALSE;
+END_IF
+
+]]></ST>
+    </Implementation>
+    <LineIds Name="MAIN">
+      <LineId Id="1207" Count="140" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="Example" Id="{6ae7d968-fc96-4ba1-b6bb-dff0068c2fd8}" SpecialFunc="None">
+    <Declaration><![CDATA[// Copyright (c) 2024 Loupe (https://loupe.team), provided under the MIT License.
+PROGRAM Example
+VAR
+	myRobotLink : TcAbbLinkin;
+	initConfiguration : BOOL := TRUE;
+	initConnection : BOOL := TRUE;
+	userCommand_GetCtrlState : BOOL := TRUE;
+	getCtrlStateStatus : AbbLinkinRequestStatus_Typ;
+	currentState : STRING;
+	output : STRING;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Initialize configuration
+IF initConfiguration THEN
+	myRobotLink.configuration.rwsIpAddress := '127.0.0.1';
+	myRobotLink.configuration.rwsTcpPort := 80;
+	myRobotLink.configuration.rwsVersion := ABBLINKIN_RWS_API_VERSION.V2;
+	myRobotLink.configuration.rwsUsername := 'Default User';
+	myRobotLink.configuration.rwsPassword := 'robotics';
+	myRobotLink.configuration.tlsAllowRwsCertSelfSigned := TRUE;
+	
+	initConfiguration := FALSE;
+END_IF
+
+myRobotLink.Cyclic();
+
+/////////////////////////
+// Connect
+IF initConnection THEN
+	myRobotLink.Connect();
+	initConnection := FALSE;
+END_IF
+
+/////////////////////////
+// Get State
+
+// Send command
+IF myRobotLink.readyForCmd AND userCommand_GetCtrlState THEN
+	myRobotLink.GetCtrlState(pStatus := ADR(getCtrlStateStatus), pResultState := ADR(currentState));
+	userCommand_GetCtrlState := FALSE;
+END_IF
+
+// Process Results
+IF getCtrlStateStatus.done THEN
+	output := CONCAT('Current state is ', currentState);
+ELSIF getCtrlStateStatus.error THEN
+	output := 'An Error occured.';
+END_IF
+]]></ST>
+    </Implementation>
+    <LineIds Name="Example">
+      <LineId Id="137" Count="35" />
+      <LineId Id="22" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
