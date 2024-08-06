@@ -8,7 +8,7 @@
     <DownloadApplicationInfo>true</DownloadApplicationInfo>
     <WriteProductVersion>true</WriteProductVersion>
     <GenerateTpy>false</GenerateTpy>
-    <Name>TcAbbLinkinPLC</Name>
+    <Name>TcAbbLinkin</Name>
     <ProgramVersion>3.1.4024.0</ProgramVersion>
     <Application>{3c914a8d-4a17-4f1e-9445-1becbb2b5183}</Application>
     <TypeSystem>{1c6e5c95-0d27-455e-908e-faaa1e8978af}</TypeSystem>
@@ -16,6 +16,12 @@
     <Implicit_KindOfTask>{9ac765d3-3ac0-47da-b792-f5c56075217f}</Implicit_KindOfTask>
     <Implicit_Jitter_Distribution>{4dab9041-af5c-40f9-aeb5-736c8459509b}</Implicit_Jitter_Distribution>
     <LibraryReferences>{995e1ac0-267a-47a1-8ab1-6aac09d641b7}</LibraryReferences>
+    <Company>Loupe</Company>
+    <Released>false</Released>
+    <Title>TcAbbLinkin</Title>
+    <ProjectVersion>0.1.0</ProjectVersion>
+    <CombineIds>true</CombineIds>
+    <Author>Loupe</Author>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="DUTs\AbbLinkinAuthDigest_Typ.TcDUT">
@@ -102,7 +108,7 @@
     </PlaceholderReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="TcAbbLinkinPLC.tmc">
+    <None Include="TcAbbLinkin.tmc">
       <SubType>Content</SubType>
     </None>
   </ItemGroup>

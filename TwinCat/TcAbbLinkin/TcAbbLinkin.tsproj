@@ -12,9 +12,9 @@
 			</Tasks>
 		</System>
 		<Plc>
-			<Project GUID="{D1D47807-DDC9-4C87-BA84-A94C789102DA}" Name="TcAbbLinkinPLC" PrjFilePath="TcAbbLinkinPLC\TcAbbLinkinPLC.plcproj" TmcFilePath="TcAbbLinkinPLC\TcAbbLinkinPLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="TcAbbLinkinPLC\TcAbbLinkinPLC.tmc" TmcHash="{CDC1A06F-62AA-5D79-840C-C5D9EAEDCA11}">
-					<Name>TcAbbLinkinPLC Instance</Name>
+			<Project GUID="{D1D47807-DDC9-4C87-BA84-A94C789102DA}" Name="TcAbbLinkin" PrjFilePath="TcAbbLinkin\TcAbbLinkin.plcproj" TmcFilePath="TcAbbLinkin\TcAbbLinkin.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="TcAbbLinkinPLC\TcAbbLinkinPLC.tmc" TmcHash="{0A9DD89F-25AA-8229-C1D6-0EBCEA5A013C}">
+					<Name>TcAbbLinkin Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Contexts>
 						<Context>
