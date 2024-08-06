@@ -16,6 +16,12 @@
     <Implicit_KindOfTask>{9ac765d3-3ac0-47da-b792-f5c56075217f}</Implicit_KindOfTask>
     <Implicit_Jitter_Distribution>{4dab9041-af5c-40f9-aeb5-736c8459509b}</Implicit_Jitter_Distribution>
     <LibraryReferences>{995e1ac0-267a-47a1-8ab1-6aac09d641b7}</LibraryReferences>
+    <Company>Loupe</Company>
+    <Released>false</Released>
+    <Title>TcAbbLinkin</Title>
+    <ProjectVersion>0.1.0</ProjectVersion>
+    <CombineIds>true</CombineIds>
+    <Author>Loupe</Author>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="DUTs\AbbLinkinAuthDigest_Typ.TcDUT">
